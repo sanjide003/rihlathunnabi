@@ -178,8 +178,9 @@
                 </button>
 
                 <div class="text-center mb-8">
-                    <div class="w-20 h-20 bg-white rounded-full flex items-center justify-center mx-auto mb-4 shadow-[0_10px_20px_rgba(236,72,153,0.2)]">
-                        <i class="fa-solid fa-masks-theater text-4xl text-pink-500"></i>
+                    <div class="w-20 h-20 bg-white rounded-full flex items-center justify-center mx-auto mb-4 shadow-[0_10px_20px_rgba(236,72,153,0.2)] overflow-hidden">
+                        <i class="fa-solid fa-masks-theater text-4xl text-pink-500" id="default-logo-login"></i>
+                        <img id="custom-logo-login" src="" class="hidden-safe w-full h-full object-cover">
                     </div>
                     <h2 class="text-3xl font-black text-slate-800 font-['Quicksand'] tracking-tight">Join Fest Quiz</h2>
                     <p class="text-sm text-slate-500 font-bold mt-1">Enter details to start the challenge</p>
@@ -239,8 +240,9 @@
                     
                     <!-- Question Header with Icon -->
                     <div class="flex items-start mb-6">
-                        <div class="w-12 h-12 rounded-full bg-pink-100 flex items-center justify-center shrink-0 mr-4 shadow-inner">
-                            <i class="fa-solid fa-palette text-2xl text-pink-500"></i>
+                        <div class="w-12 h-12 rounded-full bg-pink-100 flex items-center justify-center shrink-0 mr-4 shadow-inner overflow-hidden">
+                            <i class="fa-solid fa-palette text-2xl text-pink-500" id="default-logo-quiz"></i>
+                            <img id="custom-logo-quiz" src="" class="hidden-safe w-full h-full object-cover">
                         </div>
                         <h3 id="quiz-question-text" class="text-lg sm:text-xl font-black text-slate-800 leading-snug pt-1">
                             Loading question...
@@ -390,6 +392,21 @@
                         pointsCorrect: parseInt(data.pointsCorrect) || 10,
                         pointsNegative: parseInt(data.pointsNegative) || 0
                     };
+                    
+                    // Handle Logo Update Dynamically
+                    const logoLogin = document.getElementById('custom-logo-login');
+                    const defaultLogin = document.getElementById('default-logo-login');
+                    const logoQuiz = document.getElementById('custom-logo-quiz');
+                    const defaultQuiz = document.getElementById('default-logo-quiz');
+                    
+                    if (data.logoBase64) {
+                        if(logoLogin) { logoLogin.src = data.logoBase64; logoLogin.classList.remove('hidden-safe'); defaultLogin.classList.add('hidden-safe'); }
+                        if(logoQuiz) { logoQuiz.src = data.logoBase64; logoQuiz.classList.remove('hidden-safe'); defaultQuiz.classList.add('hidden-safe'); }
+                    } else {
+                        if(logoLogin) { logoLogin.src = ''; logoLogin.classList.add('hidden-safe'); defaultLogin.classList.remove('hidden-safe'); }
+                        if(logoQuiz) { logoQuiz.src = ''; logoQuiz.classList.add('hidden-safe'); defaultQuiz.classList.remove('hidden-safe'); }
+                    }
+
                     if(data.startDate) window.AppState.currentDay = calcCurrentDay(data.startDate);
                     renderInstructions();
                 }
