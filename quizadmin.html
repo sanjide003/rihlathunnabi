@@ -110,6 +110,20 @@
                     </div>
                 </div>
 
+                <div class="pt-4 border-t border-slate-100">
+                    <label class="block text-xs font-bold text-slate-500 mb-1.5 uppercase tracking-wider">Fest Logo (For User App)</label>
+                    <div class="flex items-center space-x-4">
+                        <div class="w-16 h-16 rounded-full bg-slate-100 border border-slate-200 flex items-center justify-center overflow-hidden shrink-0 shadow-inner">
+                            <i class="fa-solid fa-image text-slate-400 text-xl" id="admin-logo-icon"></i>
+                            <img id="admin-logo-preview" src="" class="hidden-safe w-full h-full object-cover">
+                        </div>
+                        <div class="flex-1">
+                            <input type="file" id="setup-logo-input" accept="image/*" class="w-full text-sm text-slate-500 file:mr-4 file:py-2.5 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-black file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100 transition-colors cursor-pointer" onchange="window.handleLogoUpload(event)">
+                            <p class="text-[10px] text-slate-400 mt-1 font-semibold">Recommended: Square PNG/JPG (Max 1MB). Will be converted to Base64.</p>
+                        </div>
+                    </div>
+                </div>
+
                 <div>
                     <label class="block text-xs font-bold text-slate-500 mb-1.5 uppercase tracking-wider">App Instructions (One rule per line)</label>
                     <textarea id="admin-inst-input" rows="4" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-semibold text-slate-700 transition-all" placeholder="Rule 1\nRule 2..."></textarea>
@@ -350,7 +364,7 @@
             adminSelectedSlot: 0, 
             adminSelectedDay: 1, 
             adminPoolSelectedId: null,
-            settings: { startDate: '', questionMode: 'fixed', instructions: '', scoringEnabled: false, pointsCorrect: 10, pointsNegative: 0 }
+            settings: { startDate: '', questionMode: 'fixed', instructions: '', scoringEnabled: false, pointsCorrect: 10, pointsNegative: 0, logoBase64: '' }
         };
 
         function formatDate(dateStr) {
@@ -375,6 +389,14 @@
                     document.getElementById('setup-scoring-toggle').checked = data.scoringEnabled || false;
                     document.getElementById('setup-pts-correct').value = parseInt(data.pointsCorrect) || 10;
                     document.getElementById('setup-pts-negative').value = parseInt(data.pointsNegative) || 0;
+                    window.AppState.settings.logoBase64 = data.logoBase64 || '';
+                    
+                    if (data.logoBase64) {
+                        document.getElementById('admin-logo-icon').classList.add('hidden-safe');
+                        const preview = document.getElementById('admin-logo-preview');
+                        preview.src = data.logoBase64;
+                        preview.classList.remove('hidden-safe');
+                    }
                     
                     window.toggleScoringUI();
                     window.calculateSetupDays();
@@ -461,6 +483,27 @@
             else { box.classList.add('hidden'); box.classList.remove('grid'); }
         };
 
+        window.handleLogoUpload = function(event) {
+            const file = event.target.files[0];
+            if(!file) return;
+            
+            if(file.size > 1024 * 1024) {
+                window.showSysModal("File Too Large", "Please select an image smaller than 1MB to avoid database rejection.", "fa-solid fa-file-image text-rose-500");
+                event.target.value = '';
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                window.AppState.settings.logoBase64 = e.target.result;
+                document.getElementById('admin-logo-icon').classList.add('hidden-safe');
+                const preview = document.getElementById('admin-logo-preview');
+                preview.src = e.target.result;
+                preview.classList.remove('hidden-safe');
+            };
+            reader.readAsDataURL(file);
+        };
+
         window.saveAdminSetup = async function() {
             const startDate = document.getElementById('setup-start').value;
             const endDate = document.getElementById('setup-end').value;
@@ -470,6 +513,7 @@
             const scoringEnabled = document.getElementById('setup-scoring-toggle').checked;
             const pointsCorrect = parseInt(document.getElementById('setup-pts-correct').value) || 10;
             const pointsNegative = parseInt(document.getElementById('setup-pts-negative').value) || 0;
+            const logoBase64 = window.AppState.settings.logoBase64 || '';
             
             let calc = 1;
             if (startDate && endDate) calc = Math.floor(Math.abs(new Date(endDate) - new Date(startDate)) / (1000 * 60 * 60 * 24)) + 1;
@@ -477,7 +521,7 @@
             try {
                 await setDoc(docPath('settings', 'global'), { 
                     startDate, endDate, totalDays: calc, questionsPerDay: qPerDay, questionMode: mode, instructions: inst,
-                    scoringEnabled, pointsCorrect, pointsNegative 
+                    scoringEnabled, pointsCorrect, pointsNegative, logoBase64 
                 }, { merge: true });
                 window.showSysModal("Settings Saved", "Configuration updated successfully.", "fa-solid fa-circle-check text-emerald-500");
                 window.renderAdminQuestionPills();
