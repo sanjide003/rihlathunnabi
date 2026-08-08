@@ -4,376 +4,473 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Fest Quiz - Admin Dashboard</title>
-    
-    <!-- Fonts & Icons -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
-    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    
-    <!-- SheetJS for Excel Upload -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-
+    
     <style>
-        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; color: #1e293b; }
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Manjari:wght@400;700&display=swap');
+        body { font-family: 'Inter', 'Manjari', sans-serif; background-color: #f8fafc; margin: 0; padding: 0; overflow: hidden; height: 100svh; width: 100vw; }
+        
+        /* Strict Hiding to prevent overlap */
         .hidden-safe { display: none !important; }
-        .view-section { display: none; }
-        .view-section.active { display: flex; }
         
-        /* Custom Scrollbar for elegant look */
-        ::-webkit-scrollbar { width: 6px; height: 6px; }
-        ::-webkit-scrollbar-track { background: transparent; }
+        /* Scrollbar styles */
+        ::-webkit-scrollbar { width: 4px; height: 4px; }
         ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
-        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
-        
         .hide-scrollbar::-webkit-scrollbar { display: none; }
-        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-        
-        /* Details Summary Styling */
-        details > summary { list-style: none; outline: none; }
-        details > summary::-webkit-details-marker { display: none; }
-        
-        /* Custom Inputs */
-        input:focus, select:focus, textarea:focus { border-color: #6366f1 !important; ring-color: #6366f1 !important; outline: none; box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2); }
     </style>
 </head>
-<body class="antialiased h-screen flex flex-col overflow-hidden">
+<body class="text-slate-800 antialiased selection:bg-indigo-200 flex flex-col">
 
-    <!-- Premium Dark Header -->
-    <div class="bg-gradient-to-r from-slate-900 via-slate-800 to-indigo-900 p-4 flex justify-between items-center z-30 shrink-0 shadow-lg border-b border-slate-700">
-        <h1 class="font-black text-lg flex items-center tracking-tight text-white">
-            <i class="fa-solid fa-user-shield text-indigo-400 mr-2"></i> ADMIN DASHBOARD
+    <!-- Admin Header (Indigo/Slate Gradient) -->
+    <div class="bg-gradient-to-r from-slate-900 to-indigo-950 text-white p-4 shadow-lg flex justify-between items-center z-30 shrink-0">
+        <h1 class="font-black text-lg flex items-center tracking-wide">
+            <div class="w-8 h-8 bg-indigo-500 rounded-lg flex items-center justify-center mr-3 shadow-inner">
+                <i class="fa-solid fa-shield-halved text-white text-sm"></i>
+            </div>
+            Admin Panel
         </h1>
-        
-        <!-- Hamburger Button -->
-        <button onclick="window.toggleMenu()" class="w-10 h-10 rounded-xl flex items-center justify-center text-white bg-white/10 hover:bg-white/20 border border-white/10 transition-all shadow-sm">
+        <button onclick="window.toggleAdminMenu()" class="w-10 h-10 bg-white/10 rounded-xl flex items-center justify-center hover:bg-white/20 transition-all border border-white/10 shadow-sm">
             <i class="fa-solid fa-bars text-lg"></i>
         </button>
     </div>
 
-    <!-- Dropdown Menu -->
-    <div id="admin-dropdown-menu" class="absolute top-[65px] right-4 bg-white border border-slate-100 rounded-2xl shadow-2xl w-56 z-40 transform origin-top-right scale-0 opacity-0 transition-all duration-200 hidden-safe flex flex-col py-2">
-        <button onclick="window.switchAdminTab('setup')" class="menu-btn text-left px-5 py-3.5 text-sm font-bold text-slate-700 hover:bg-indigo-50 hover:text-indigo-600 flex items-center transition-colors"><i class="fa-solid fa-sliders w-6 text-indigo-400"></i> Program Setup</button>
-        <button onclick="window.switchAdminTab('questions')" class="menu-btn text-left px-5 py-3.5 text-sm font-bold text-slate-700 hover:bg-indigo-50 hover:text-indigo-600 flex items-center transition-colors"><i class="fa-solid fa-file-pen w-6 text-indigo-400"></i> Set Questions</button>
-        <div class="h-px bg-slate-100 my-1"></div>
-        <button onclick="window.switchAdminTab('users')" class="menu-btn text-left px-5 py-3.5 text-sm font-bold text-slate-700 hover:bg-indigo-50 hover:text-indigo-600 flex items-center transition-colors"><i class="fa-solid fa-trophy w-6 text-indigo-400"></i> Leaderboard</button>
+    <!-- Admin Mobile Menu -->
+    <div id="admin-menu" class="absolute top-[70px] right-4 bg-white rounded-2xl shadow-2xl border border-slate-100 z-40 flex flex-col py-2 w-56 origin-top-right transform scale-0 opacity-0 transition-all duration-200">
+        <button onclick="window.switchAdminTab('dashboard')" class="text-left px-5 py-3.5 font-bold text-sm text-slate-700 hover:bg-indigo-50 hover:text-indigo-700 flex items-center transition-colors"><i class="fa-solid fa-chart-pie w-6 text-indigo-400"></i> Dashboard</button>
+        <button onclick="window.switchAdminTab('setup')" class="text-left px-5 py-3.5 font-bold text-sm text-slate-700 hover:bg-indigo-50 hover:text-indigo-700 flex items-center transition-colors border-t border-slate-50"><i class="fa-solid fa-gears w-6 text-indigo-400"></i> Core Settings</button>
+        <button onclick="window.switchAdminTab('questions')" class="text-left px-5 py-3.5 font-bold text-sm text-slate-700 hover:bg-indigo-50 hover:text-indigo-700 flex items-center transition-colors border-t border-slate-50"><i class="fa-solid fa-clipboard-list w-6 text-indigo-400"></i> Set Questions</button>
+        <button onclick="window.switchAdminTab('ads')" class="text-left px-5 py-3.5 font-bold text-sm text-slate-700 hover:bg-indigo-50 hover:text-indigo-700 flex items-center transition-colors border-t border-slate-50"><i class="fa-solid fa-bullhorn w-6 text-amber-500"></i> Ad Management</button>
+        <button onclick="window.switchAdminTab('users')" class="text-left px-5 py-3.5 font-bold text-sm text-slate-700 hover:bg-indigo-50 hover:text-indigo-700 flex items-center transition-colors border-t border-slate-50"><i class="fa-solid fa-ranking-star w-6 text-emerald-500"></i> Leaderboard</button>
     </div>
 
-    <!-- Background Overlay for Menu -->
-    <div id="menu-overlay" onclick="window.toggleMenu()" class="fixed inset-0 z-20 hidden-safe bg-slate-900/20 backdrop-blur-[1px]"></div>
-
-    <!-- Admin Content Area -->
-    <div class="flex-1 overflow-hidden relative p-0 flex flex-col w-full">
+    <!-- Main Content Area -->
+    <div class="flex-1 overflow-hidden relative p-3 sm:p-4 flex flex-col bg-slate-50">
         
-        <!-- ==================== SETUP TAB ==================== -->
-        <div id="admin-setup" class="view-section active flex-col h-full overflow-y-auto w-full max-w-4xl mx-auto p-4 sm:p-6">
-            <div class="space-y-6 bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
-                <h2 class="font-black text-xl text-slate-800 border-b border-slate-100 pb-3 flex items-center"><i class="fa-solid fa-gears text-indigo-500 mr-2"></i> Core Configuration</h2>
+        <!-- ================= DASHBOARD TAB (Default Active) ================= -->
+        <div id="admin-dashboard" class="view-section active flex-col h-full overflow-y-auto max-w-4xl mx-auto w-full space-y-4">
+            
+            <div class="bg-white p-5 sm:p-6 rounded-3xl border border-slate-100 shadow-sm">
+                <h2 class="text-xl font-black text-slate-800 mb-1">System Overview</h2>
+                <p class="text-xs font-bold text-slate-400 mb-6 uppercase tracking-wider">Real-time Platform Statistics</p>
                 
-                <!-- Dates in one row -->
-                <div class="grid grid-cols-2 gap-3 sm:gap-4">
-                    <div>
-                        <label class="block text-[10px] sm:text-xs font-bold text-slate-500 mb-1.5 uppercase tracking-wider">Start Date</label>
-                        <input type="date" id="setup-start" class="w-full px-3 sm:px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm font-semibold text-slate-700 transition-all" onchange="window.calculateSetupDays()">
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <!-- Users Stat -->
+                    <div class="bg-indigo-50 border border-indigo-100 rounded-2xl p-4 flex flex-col relative overflow-hidden group">
+                        <i class="fa-solid fa-users absolute -right-3 -bottom-3 text-5xl text-indigo-500/10 group-hover:scale-110 transition-transform"></i>
+                        <span class="text-[10px] font-black text-indigo-600 uppercase tracking-widest mb-1 relative z-10">Total Users</span>
+                        <span id="dash-users-count" class="text-3xl font-black text-indigo-700 relative z-10">0</span>
                     </div>
-                    <div>
-                        <label class="block text-[10px] sm:text-xs font-bold text-slate-500 mb-1.5 uppercase tracking-wider">End Date</label>
-                        <input type="date" id="setup-end" class="w-full px-3 sm:px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm font-semibold text-slate-700 transition-all" onchange="window.calculateSetupDays()">
+                    
+                    <!-- Current Day Stat -->
+                    <div class="bg-emerald-50 border border-emerald-100 rounded-2xl p-4 flex flex-col relative overflow-hidden group">
+                        <i class="fa-solid fa-calendar-day absolute -right-3 -bottom-3 text-5xl text-emerald-500/10 group-hover:scale-110 transition-transform"></i>
+                        <span class="text-[10px] font-black text-emerald-600 uppercase tracking-widest mb-1 relative z-10">Current Day</span>
+                        <span id="dash-day" class="text-3xl font-black text-emerald-700 relative z-10">Day 1</span>
+                    </div>
+
+                    <!-- Questions Stat -->
+                    <div class="bg-blue-50 border border-blue-100 rounded-2xl p-4 flex flex-col relative overflow-hidden group">
+                        <i class="fa-solid fa-clipboard-question absolute -right-3 -bottom-3 text-5xl text-blue-500/10 group-hover:scale-110 transition-transform"></i>
+                        <span class="text-[10px] font-black text-blue-600 uppercase tracking-widest mb-1 relative z-10">Questions Set</span>
+                        <span id="dash-q-count" class="text-3xl font-black text-blue-700 relative z-10">0</span>
+                    </div>
+
+                    <!-- Ads Stat -->
+                    <div class="bg-amber-50 border border-amber-100 rounded-2xl p-4 flex flex-col relative overflow-hidden group">
+                        <i class="fa-solid fa-bullhorn absolute -right-3 -bottom-3 text-5xl text-amber-500/10 group-hover:scale-110 transition-transform"></i>
+                        <span class="text-[10px] font-black text-amber-600 uppercase tracking-widest mb-1 relative z-10">Ads Status</span>
+                        <span id="dash-ads-status" class="text-2xl font-black text-amber-700 relative z-10 mt-1">Offline</span>
                     </div>
                 </div>
+            </div>
 
-                <!-- Setup inputs in one row -->
-                <div class="grid grid-cols-2 gap-3 sm:gap-4">
+            <!-- Quick Actions -->
+            <div class="bg-white p-5 sm:p-6 rounded-3xl border border-slate-100 shadow-sm flex-1">
+                <h3 class="font-black text-slate-800 text-sm flex items-center border-b border-slate-50 pb-3 mb-4"><i class="fa-solid fa-bolt text-amber-500 mr-2"></i> Quick Actions</h3>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <button onclick="window.switchAdminTab('questions')" class="flex items-center p-4 bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-2xl transition-colors text-left group">
+                        <div class="w-10 h-10 rounded-full bg-white shadow-sm flex items-center justify-center mr-4 text-indigo-500 group-hover:scale-110 transition-transform"><i class="fa-solid fa-pen-to-square"></i></div>
+                        <div>
+                            <div class="font-bold text-sm text-slate-800">Manage Questions</div>
+                            <div class="text-[10px] font-semibold text-slate-500">Add or edit daily quiz questions</div>
+                        </div>
+                    </button>
+                    <button onclick="window.switchAdminTab('users')" class="flex items-center p-4 bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-2xl transition-colors text-left group">
+                        <div class="w-10 h-10 rounded-full bg-white shadow-sm flex items-center justify-center mr-4 text-emerald-500 group-hover:scale-110 transition-transform"><i class="fa-solid fa-ranking-star"></i></div>
+                        <div>
+                            <div class="font-bold text-sm text-slate-800">View Leaderboard</div>
+                            <div class="text-[10px] font-semibold text-slate-500">Check user rankings and history</div>
+                        </div>
+                    </button>
+                    <button onclick="window.switchAdminTab('ads')" class="flex items-center p-4 bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-2xl transition-colors text-left group">
+                        <div class="w-10 h-10 rounded-full bg-white shadow-sm flex items-center justify-center mr-4 text-amber-500 group-hover:scale-110 transition-transform"><i class="fa-solid fa-bullhorn"></i></div>
+                        <div>
+                            <div class="font-bold text-sm text-slate-800">Control Ads</div>
+                            <div class="text-[10px] font-semibold text-slate-500">Update sponsors and banners</div>
+                        </div>
+                    </button>
+                    <button onclick="window.switchAdminTab('setup')" class="flex items-center p-4 bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-2xl transition-colors text-left group">
+                        <div class="w-10 h-10 rounded-full bg-white shadow-sm flex items-center justify-center mr-4 text-blue-500 group-hover:scale-110 transition-transform"><i class="fa-solid fa-gears"></i></div>
+                        <div>
+                            <div class="font-bold text-sm text-slate-800">Platform Settings</div>
+                            <div class="text-[10px] font-semibold text-slate-500">Change dates, rules and logo</div>
+                        </div>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ================= SETUP TAB ================= -->
+        <div id="admin-setup" class="view-section hidden-safe flex-col h-full overflow-y-auto max-w-2xl mx-auto w-full">
+            <div class="bg-white p-5 rounded-3xl border border-slate-100 shadow-sm space-y-5">
+                <h3 class="font-black text-slate-800 text-sm flex items-center border-b border-slate-50 pb-3"><i class="fa-solid fa-gears text-indigo-500 mr-2"></i> Core Configuration</h3>
+                
+                <div class="grid grid-cols-2 gap-4">
                     <div>
-                        <label class="block text-[10px] sm:text-xs font-bold text-slate-500 mb-1.5 uppercase tracking-wider">Qs Per Day</label>
-                        <input type="number" id="setup-q-per-day" min="1" value="3" class="w-full px-3 sm:px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm font-semibold text-slate-700 transition-all" oninput="window.calculateSetupDays()">
+                        <label class="block text-[11px] font-bold text-slate-500 mb-1.5 uppercase tracking-wider">Start Date</label>
+                        <input type="date" id="setup-start" class="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl font-bold text-xs outline-none focus:border-indigo-500 transition-colors" onchange="window.calculateSetupDays()">
                     </div>
                     <div>
-                        <label class="block text-[10px] sm:text-xs font-bold text-slate-500 mb-1.5 uppercase tracking-wider">Question Mode</label>
-                        <select id="setup-q-mode" class="w-full px-3 sm:px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-[11px] sm:text-sm font-semibold text-slate-700 transition-all">
+                        <label class="block text-[11px] font-bold text-slate-500 mb-1.5 uppercase tracking-wider">End Date</label>
+                        <input type="date" id="setup-end" class="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl font-bold text-xs outline-none focus:border-indigo-500 transition-colors" onchange="window.calculateSetupDays()">
+                    </div>
+                </div>
+                
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-[11px] font-bold text-slate-500 mb-1.5 uppercase tracking-wider">Qs Per Day</label>
+                        <input type="number" id="setup-q-per-day" min="1" value="3" class="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl font-bold text-xs outline-none focus:border-indigo-500 transition-colors" oninput="window.calculateSetupDays()">
+                    </div>
+                    <div>
+                        <label class="block text-[11px] font-bold text-slate-500 mb-1.5 uppercase tracking-wider">Mode</label>
+                        <select id="setup-q-mode" class="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl font-bold text-[11px] outline-none focus:border-indigo-500 transition-colors">
                             <option value="fixed">Fixed Daily</option>
                             <option value="random">Random Pool</option>
                         </select>
                     </div>
                 </div>
                 
-                <!-- Highlighted Stats Boxes in one row -->
-                <div class="grid grid-cols-2 gap-3 sm:gap-4">
-                    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between bg-blue-50 border border-blue-100 p-3 sm:p-4 rounded-xl shadow-inner">
-                        <span class="text-[10px] sm:text-sm font-bold text-blue-800 mb-1 sm:mb-0">Program Days:</span>
-                        <span id="setup-total-days" class="text-lg sm:text-xl font-black text-blue-700 leading-none">0</span>
+                <div class="grid grid-cols-2 gap-3">
+                    <div class="flex items-center justify-between bg-blue-50/50 p-3 rounded-xl border border-blue-100">
+                        <span class="text-[10px] sm:text-xs font-bold text-blue-800">Days:</span>
+                        <span id="setup-total-days" class="text-sm font-black text-blue-700 bg-white px-2 py-0.5 rounded shadow-sm">0</span>
                     </div>
-                    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between bg-emerald-50 border border-emerald-100 p-3 sm:p-4 rounded-xl shadow-inner">
-                        <span class="text-[10px] sm:text-sm font-bold text-emerald-800 mb-1 sm:mb-0">Total Qs Needed:</span>
-                        <span id="setup-total-q" class="text-lg sm:text-xl font-black text-emerald-700 leading-none">0</span>
+                    <div class="flex items-center justify-between bg-emerald-50/50 p-3 rounded-xl border border-emerald-100">
+                        <span class="text-[10px] sm:text-xs font-bold text-emerald-800">Total Qs:</span>
+                        <span id="setup-total-q" class="text-sm font-black text-emerald-700 bg-white px-2 py-0.5 rounded shadow-sm">0</span>
                     </div>
                 </div>
 
                 <div class="pt-4 border-t border-slate-100">
-                    <label class="block text-xs font-bold text-slate-500 mb-1.5 uppercase tracking-wider">Fest Logo (For User App)</label>
-                    <div class="flex items-center space-x-4">
-                        <div class="w-16 h-16 rounded-full bg-slate-100 border border-slate-200 flex items-center justify-center overflow-hidden shrink-0 shadow-inner">
-                            <i class="fa-solid fa-image text-slate-400 text-xl" id="admin-logo-icon"></i>
+                    <label class="block text-[11px] font-bold text-slate-500 mb-2 uppercase tracking-wider">Fest Logo (For User App)</label>
+                    <div class="flex items-center space-x-3">
+                        <div class="w-14 h-14 rounded-2xl bg-slate-50 border border-slate-200 flex items-center justify-center overflow-hidden shrink-0 shadow-inner">
+                            <i class="fa-solid fa-image text-slate-300 text-xl" id="admin-logo-icon"></i>
                             <img id="admin-logo-preview" src="" class="hidden-safe w-full h-full object-cover">
                         </div>
                         <div class="flex-1">
-                            <input type="file" id="setup-logo-input" accept="image/*" class="w-full text-sm text-slate-500 file:mr-4 file:py-2.5 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-black file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100 transition-colors cursor-pointer" onchange="window.handleLogoUpload(event)">
-                            <p class="text-[10px] text-slate-400 mt-1 font-semibold">Recommended: Square PNG/JPG (Max 1MB). Will be converted to Base64.</p>
+                            <input type="file" id="setup-logo-input" accept="image/*" class="w-full text-xs text-slate-500 file:mr-3 file:py-2 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100 cursor-pointer transition-colors" onchange="window.handleLogoUpload(event)">
+                            <p class="text-[9px] text-slate-400 mt-1 font-semibold">Max 1MB. Auto-updates in user app.</p>
                         </div>
                     </div>
                 </div>
 
-                <div>
-                    <label class="block text-xs font-bold text-slate-500 mb-1.5 uppercase tracking-wider">App Instructions (One rule per line)</label>
-                    <textarea id="admin-inst-input" rows="4" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-semibold text-slate-700 transition-all" placeholder="Rule 1\nRule 2..."></textarea>
+                <div class="pt-2 border-t border-slate-100">
+                    <label class="block text-[11px] font-bold text-slate-500 mb-1.5 uppercase tracking-wider">Instructions (Bullet points)</label>
+                    <textarea id="admin-inst-input" rows="3" class="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl font-semibold text-xs outline-none focus:border-indigo-500 transition-colors" placeholder="Rule 1\nRule 2..."></textarea>
                 </div>
 
-                <!-- Custom Scoring -->
-                <div class="border border-slate-200 rounded-xl overflow-hidden shadow-sm">
-                    <div class="p-4 bg-slate-50 border-b border-slate-200 flex items-center justify-between">
-                        <h4 class="font-bold text-sm text-slate-700 flex items-center"><i class="fa-solid fa-star-half-stroke text-amber-500 mr-2"></i> Custom Scoring Rules</h4>
+                <div class="pt-2 border-t border-slate-100">
+                    <div class="flex items-center justify-between mb-3">
+                        <h4 class="font-bold text-xs text-slate-700 flex items-center"><i class="fa-solid fa-star-half-stroke text-amber-500 mr-2"></i> Custom Scoring</h4>
                         <label class="relative inline-flex items-center cursor-pointer">
                             <input type="checkbox" id="setup-scoring-toggle" class="sr-only peer" onchange="window.toggleScoringUI()">
-                            <div class="w-11 h-6 bg-slate-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-indigo-500"></div>
+                            <div class="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-indigo-500"></div>
                         </label>
                     </div>
-                    <div id="scoring-rules-box" class="hidden grid-cols-2 gap-4 p-4 bg-white">
+                    <div id="scoring-rules-box" class="hidden grid-cols-2 gap-4 bg-slate-50 p-4 rounded-2xl border border-slate-100 transition-all shadow-inner">
                         <div>
-                            <label class="block text-xs font-bold text-emerald-600 mb-1.5 uppercase tracking-wider">Points (+)</label>
-                            <input type="number" id="setup-pts-correct" value="10" class="w-full px-4 py-2.5 bg-emerald-50 border border-emerald-200 text-emerald-700 rounded-xl font-black text-sm outline-none">
+                            <label class="block text-[10px] font-bold text-emerald-600 mb-1.5 uppercase tracking-wider">Correct Points</label>
+                            <input type="number" id="setup-pts-correct" value="10" class="w-full px-3 py-2.5 bg-white border border-emerald-200 rounded-xl font-black text-emerald-700 text-sm outline-none shadow-sm">
                         </div>
                         <div>
-                            <label class="block text-xs font-bold text-rose-600 mb-1.5 uppercase tracking-wider">Penalty (-)</label>
-                            <input type="number" id="setup-pts-negative" value="0" class="w-full px-4 py-2.5 bg-rose-50 border border-rose-200 text-rose-700 rounded-xl font-black text-sm outline-none">
+                            <label class="block text-[10px] font-bold text-rose-600 mb-1.5 uppercase tracking-wider">Negative Penalty</label>
+                            <input type="number" id="setup-pts-negative" value="0" class="w-full px-3 py-2.5 bg-white border border-rose-200 rounded-xl font-black text-rose-700 text-sm outline-none shadow-sm">
                         </div>
                     </div>
                 </div>
 
-                <button onclick="window.saveAdminSetup()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-black py-4 rounded-xl shadow-lg shadow-indigo-200 transition-transform active:scale-95 text-sm sticky bottom-4 z-10 flex justify-center items-center">
-                    <i class="fa-solid fa-floppy-disk mr-2"></i> SAVE CONFIGURATION
+                <button onclick="window.saveAdminSetup()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-black py-4 rounded-2xl shadow-lg shadow-indigo-200 transition-transform active:scale-95 text-sm sticky bottom-0 z-10 mt-4 flex items-center justify-center">
+                    <i class="fa-solid fa-floppy-disk mr-2 text-lg"></i> SAVE SETTINGS
                 </button>
             </div>
         </div>
 
-        <!-- ==================== QUESTIONS TAB ==================== -->
-        <div id="admin-questions" class="view-section flex-col h-full overflow-hidden w-full max-w-5xl mx-auto">
-            
-            <!-- Question Controls Top -->
-            <div class="p-4 sm:p-6 pb-3 shrink-0 border-b border-slate-200 bg-white shadow-sm z-10">
-                <div class="flex space-x-3 mb-4">
-                    <button onclick="window.downloadExcelTemplate()" class="flex-1 bg-white hover:bg-slate-50 text-slate-700 text-xs font-bold py-3 rounded-xl border-2 border-slate-200 flex justify-center items-center transition-colors">
-                        <i class="fa-solid fa-download mr-2 text-indigo-500"></i> Template
+        <!-- ================= ADS MANAGEMENT TAB ================= -->
+        <div id="admin-ads" class="view-section hidden-safe flex-col h-full overflow-y-auto max-w-2xl mx-auto w-full">
+            <div class="bg-white p-5 rounded-3xl border border-slate-100 shadow-sm space-y-6">
+                
+                <div class="flex items-center justify-between border-b border-slate-100 pb-4">
+                    <h3 class="font-black text-slate-800 text-sm flex items-center"><i class="fa-solid fa-bullhorn text-amber-500 mr-2 text-lg"></i> Ad Management</h3>
+                    <div class="flex items-center">
+                        <span class="text-xs font-bold text-slate-500 mr-3">Master Switch</span>
+                        <label class="relative inline-flex items-center cursor-pointer">
+                            <input type="checkbox" id="ad-master-toggle" class="sr-only peer">
+                            <div class="w-11 h-6 bg-slate-200 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-500"></div>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Zone 1: Login Banner -->
+                <div class="bg-slate-50 border border-slate-200 rounded-2xl p-4">
+                    <div class="flex items-center justify-between mb-4">
+                        <h4 class="font-bold text-sm text-indigo-700"><i class="fa-solid fa-mobile-screen mr-2"></i> Zone 1: Login Banner</h4>
+                        <label class="relative inline-flex items-center cursor-pointer">
+                            <input type="checkbox" id="ad-z1-toggle" class="sr-only peer">
+                            <div class="w-9 h-5 bg-slate-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-indigo-500"></div>
+                        </label>
+                    </div>
+                    <div class="space-y-3">
+                        <div>
+                            <label class="block text-[10px] font-bold text-slate-500 mb-1 uppercase">Sponsor Text</label>
+                            <input type="text" id="ad-z1-text" class="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-xs font-semibold outline-none" placeholder="e.g., Sponsored by ABC Store">
+                        </div>
+                        <div>
+                            <label class="block text-[10px] font-bold text-slate-500 mb-1 uppercase">Banner Image (Landscape)</label>
+                            <input type="file" id="ad-z1-img" accept="image/*" class="w-full text-xs text-slate-500 file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-[10px] file:font-bold file:bg-indigo-50 file:text-indigo-700" onchange="window.handleAdZ1Upload(event)">
+                            <img id="ad-z1-preview" src="" class="hidden-safe h-12 mt-2 rounded-lg object-contain border border-slate-200">
+                        </div>
+                        <div>
+                            <label class="block text-[10px] font-bold text-slate-500 mb-1 uppercase">Target Link (Click URL)</label>
+                            <input type="text" id="ad-z1-link" class="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-xs font-semibold outline-none" placeholder="https://...">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Zone 2: Post Result Ad -->
+                <div class="bg-slate-50 border border-slate-200 rounded-2xl p-4">
+                    <div class="flex items-center justify-between mb-4">
+                        <h4 class="font-bold text-sm text-indigo-700"><i class="fa-solid fa-ticket mr-2"></i> Zone 2: Post-Result Modal</h4>
+                        <label class="relative inline-flex items-center cursor-pointer">
+                            <input type="checkbox" id="ad-z2-toggle" class="sr-only peer">
+                            <div class="w-9 h-5 bg-slate-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-indigo-500"></div>
+                        </label>
+                    </div>
+                    <div class="space-y-3">
+                        <div>
+                            <label class="block text-[10px] font-bold text-slate-500 mb-1 uppercase">Ad Format</label>
+                            <select id="ad-z2-type" onchange="window.toggleAdZ2Type()" class="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-xs font-bold outline-none">
+                                <option value="image">Image Slider</option>
+                                <option value="youtube">YouTube / Shorts</option>
+                            </select>
+                        </div>
+                        
+                        <!-- Image Slider Options -->
+                        <div id="ad-z2-img-sec" class="space-y-3 p-3 bg-white border border-slate-100 rounded-xl shadow-sm">
+                            <div>
+                                <label class="block text-[10px] font-bold text-slate-500 mb-1 uppercase">Add Images (Max 3)</label>
+                                <input type="file" id="ad-z2-imgs" accept="image/*" class="w-full text-xs text-slate-500 file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-[10px] file:font-bold file:bg-emerald-50 file:text-emerald-700" onchange="window.handleAdZ2Upload(event)">
+                                <div id="ad-z2-gallery" class="flex flex-wrap gap-2 mt-2"></div>
+                                <button onclick="window.clearZ2Images()" class="mt-2 text-[10px] text-rose-500 font-bold bg-rose-50 px-2 py-1 rounded">Clear All Images</button>
+                            </div>
+                            <div>
+                                <label class="block text-[10px] font-bold text-slate-500 mb-1 uppercase">Slide Interval (Seconds)</label>
+                                <input type="number" id="ad-z2-interval" value="3" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-xs font-semibold outline-none">
+                            </div>
+                        </div>
+
+                        <!-- YouTube Options -->
+                        <div id="ad-z2-yt-sec" class="hidden-safe space-y-3 p-3 bg-white border border-slate-100 rounded-xl shadow-sm">
+                            <div>
+                                <label class="block text-[10px] font-bold text-slate-500 mb-1 uppercase">YouTube URL</label>
+                                <input type="text" id="ad-z2-yturl" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-xs font-semibold outline-none" placeholder="Paste YouTube or Shorts Link">
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-[10px] font-bold text-slate-500 mb-1 uppercase">Target Link (Click URL)</label>
+                            <input type="text" id="ad-z2-link" class="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-xs font-semibold outline-none" placeholder="https://...">
+                        </div>
+                    </div>
+                </div>
+
+                <button onclick="window.saveAdSettings()" class="w-full bg-amber-500 hover:bg-amber-600 text-white font-black py-4 rounded-2xl shadow-lg shadow-amber-200 transition-transform active:scale-95 text-sm sticky bottom-0 mt-4 flex items-center justify-center">
+                    <i class="fa-solid fa-cloud-arrow-up mr-2 text-lg"></i> SAVE AD SETTINGS
+                </button>
+            </div>
+        </div>
+
+        <!-- ================= QUESTIONS TAB ================= -->
+        <div id="admin-questions" class="view-section hidden-safe flex-col h-full overflow-hidden flex w-full max-w-4xl mx-auto">
+            <div class="bg-white p-3 rounded-2xl border border-slate-100 shadow-sm shrink-0 mb-3 z-10">
+                <div class="flex space-x-2 mb-3">
+                    <button onclick="window.downloadExcelTemplate()" class="flex-1 bg-slate-50 hover:bg-slate-100 text-slate-700 text-xs font-bold py-2.5 rounded-xl transition-colors border border-slate-200 flex justify-center items-center shadow-sm">
+                        <i class="fa-solid fa-download mr-1.5 text-indigo-500"></i> Template
                     </button>
-                    <button onclick="document.getElementById('excel-upload-input').click()" class="flex-1 bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-bold py-3 rounded-xl border border-emerald-600 flex justify-center items-center shadow-md shadow-emerald-200 transition-colors">
-                        <i class="fa-solid fa-file-excel mr-2"></i> Bulk Upload
+                    <button onclick="document.getElementById('excel-upload-input').click()" class="flex-1 bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-bold py-2.5 rounded-xl transition-colors border border-emerald-600 flex justify-center items-center shadow-md shadow-emerald-200">
+                        <i class="fa-solid fa-file-excel mr-1.5"></i> Upload Excel
                     </button>
                     <input type="file" id="excel-upload-input" accept=".xlsx, .xls, .csv" class="hidden-safe" onchange="window.handleExcelUpload(event)">
                 </div>
 
-                <div id="day-select-container" class="flex items-center justify-between mb-3 bg-slate-50 p-2 rounded-xl border border-slate-200">
-                    <button onclick="window.changeAdminDay(-1)" class="w-9 h-9 rounded-lg bg-white border border-slate-200 hover:bg-slate-100 text-slate-600 flex items-center justify-center transition-colors shadow-sm"><i class="fa-solid fa-chevron-left text-sm"></i></button>
-                    <div class="font-black text-sm text-indigo-700 px-4">DAY <span id="admin-day-disp">1</span></div>
-                    <button onclick="window.changeAdminDay(1)" class="w-9 h-9 rounded-lg bg-white border border-slate-200 hover:bg-slate-100 text-slate-600 flex items-center justify-center transition-colors shadow-sm"><i class="fa-solid fa-chevron-right text-sm"></i></button>
+                <div id="day-select-container" class="flex items-center justify-between mb-2 pt-2 border-t border-slate-100">
+                    <button onclick="window.changeAdminDay(-1)" class="w-9 h-9 rounded-xl bg-slate-50 border border-slate-200 hover:bg-slate-100 text-slate-600 flex items-center justify-center transition-colors"><i class="fa-solid fa-chevron-left"></i></button>
+                    <div class="font-black text-sm text-indigo-700 px-4 py-1.5 bg-indigo-50 rounded-xl border border-indigo-100 shadow-inner">DAY <span id="admin-day-disp">1</span></div>
+                    <button onclick="window.changeAdminDay(1)" class="w-9 h-9 rounded-xl bg-slate-50 border border-slate-200 hover:bg-slate-100 text-slate-600 flex items-center justify-center transition-colors"><i class="fa-solid fa-chevron-right"></i></button>
                 </div>
                 
-                <div class="text-[10px] font-bold text-slate-400 mb-2 uppercase tracking-wider" id="q-status-text">Select Slot (Green: Saved):</div>
-                <div class="flex overflow-x-auto pb-2 space-x-2 hide-scrollbar" id="admin-slot-pills">
-                    <!-- Pills injected via JS -->
-                </div>
+                <div class="text-[9px] font-bold text-slate-400 mb-1.5 uppercase tracking-widest" id="q-status-text">Status (Red: Unset, Green: Saved):</div>
+                <div class="flex overflow-x-auto pb-2 space-x-2 hide-scrollbar" id="admin-slot-pills"></div>
             </div>
 
-            <!-- Question Editor Form -->
-            <div class="flex-1 overflow-y-auto p-4 sm:p-6 bg-slate-50/50">
-                <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm max-w-3xl mx-auto">
-                    <div class="flex justify-between items-center mb-5 shrink-0 border-b border-slate-100 pb-4">
-                        <h4 class="font-black text-sm text-slate-800 uppercase tracking-wide flex items-center" id="admin-q-editor-title"><i class="fa-solid fa-pen-to-square text-indigo-500 mr-2"></i> EDIT QUESTION</h4>
-                        <span id="admin-q-status" class="px-2.5 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider bg-rose-100 text-rose-600 border border-rose-200">Unsaved</span>
+            <div class="bg-white p-4 sm:p-5 rounded-3xl border border-slate-100 shadow-sm flex-1 overflow-y-auto relative flex flex-col">
+                <div class="flex justify-between items-center mb-5 shrink-0 border-b border-slate-50 pb-3">
+                    <h4 class="font-black text-xs text-indigo-700 uppercase tracking-widest flex items-center"><i class="fa-solid fa-pen-to-square mr-2"></i> <span id="admin-q-editor-title">EDIT QUESTION</span></h4>
+                    <span id="admin-q-status" class="px-2.5 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider bg-rose-100 text-rose-600">Unsaved</span>
+                </div>
+
+                <div class="space-y-4 flex-1">
+                    <div>
+                        <label class="block text-[11px] font-bold text-slate-500 mb-1.5 uppercase tracking-wider">Question Type</label>
+                        <select id="admin-q-type" onchange="window.toggleAdminQType()" class="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl font-bold text-xs outline-none focus:border-indigo-500 transition-colors">
+                            <option value="mcq">MCQ (4 Options)</option>
+                            <option value="text">Short Text</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-[11px] font-bold text-slate-500 mb-1.5 uppercase tracking-wider">Question Text</label>
+                        <textarea id="admin-q-text" rows="2" class="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl font-semibold text-sm outline-none focus:border-indigo-500 transition-colors" placeholder="Type question here..."></textarea>
                     </div>
 
-                    <div class="space-y-5">
-                        <div>
-                            <label class="block text-xs font-bold text-slate-500 mb-1.5 uppercase tracking-wider">Question Type</label>
-                            <select id="admin-q-type" onchange="window.toggleAdminQType()" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-semibold text-slate-700 transition-all">
-                                <option value="mcq">Multiple Choice (4 Options)</option>
-                                <option value="text">Short Text Answer</option>
+                    <div id="admin-mcq-area" class="space-y-3 pt-3 border-t border-slate-50">
+                        <label class="block text-[11px] font-bold text-slate-500 mb-1.5 uppercase tracking-wider">Options</label>
+                        <div class="grid grid-cols-2 gap-3">
+                            <input type="text" id="admin-opt-a" placeholder="Option A" class="w-full px-3 py-2.5 bg-white border border-slate-200 rounded-xl font-semibold text-xs outline-none focus:border-indigo-500 shadow-sm">
+                            <input type="text" id="admin-opt-b" placeholder="Option B" class="w-full px-3 py-2.5 bg-white border border-slate-200 rounded-xl font-semibold text-xs outline-none focus:border-indigo-500 shadow-sm">
+                            <input type="text" id="admin-opt-c" placeholder="Option C" class="w-full px-3 py-2.5 bg-white border border-slate-200 rounded-xl font-semibold text-xs outline-none focus:border-indigo-500 shadow-sm">
+                            <input type="text" id="admin-opt-d" placeholder="Option D" class="w-full px-3 py-2.5 bg-white border border-slate-200 rounded-xl font-semibold text-xs outline-none focus:border-indigo-500 shadow-sm">
+                        </div>
+                        <div class="pt-2">
+                            <label class="block text-[11px] font-bold text-emerald-600 mb-1.5 uppercase tracking-wider">Correct Option</label>
+                            <select id="admin-mcq-correct" class="w-full px-3 py-2.5 bg-emerald-50 border border-emerald-200 text-emerald-700 rounded-xl font-black text-sm outline-none shadow-sm">
+                                <option value="A">Option A</option>
+                                <option value="B">Option B</option>
+                                <option value="C">Option C</option>
+                                <option value="D">Option D</option>
                             </select>
                         </div>
-                        <div>
-                            <label class="block text-xs font-bold text-slate-500 mb-1.5 uppercase tracking-wider">Question Text</label>
-                            <textarea id="admin-q-text" rows="3" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm font-semibold text-slate-700 transition-all placeholder-slate-400" placeholder="Enter question here..."></textarea>
-                        </div>
-
-                        <div id="admin-mcq-area" class="space-y-4 pt-4 border-t border-slate-100">
-                            <label class="block text-xs font-bold text-slate-500 mb-1.5 uppercase tracking-wider">Options</label>
-                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                                <input type="text" id="admin-opt-a" placeholder="Option A" class="w-full px-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm font-semibold shadow-sm">
-                                <input type="text" id="admin-opt-b" placeholder="Option B" class="w-full px-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm font-semibold shadow-sm">
-                                <input type="text" id="admin-opt-c" placeholder="Option C" class="w-full px-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm font-semibold shadow-sm">
-                                <input type="text" id="admin-opt-d" placeholder="Option D" class="w-full px-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm font-semibold shadow-sm">
-                            </div>
-                            <div class="pt-2">
-                                <label class="block text-xs font-bold text-emerald-600 mb-1.5 uppercase tracking-wider">Correct Answer</label>
-                                <select id="admin-mcq-correct" class="w-full px-4 py-2.5 bg-emerald-50 border border-emerald-200 text-emerald-700 rounded-xl text-sm font-bold shadow-sm">
-                                    <option value="A">Option A</option>
-                                    <option value="B">Option B</option>
-                                    <option value="C">Option C</option>
-                                    <option value="D">Option D</option>
-                                </select>
-                            </div>
-                        </div>
-
-                        <div id="admin-text-area" class="hidden-safe pt-4 border-t border-slate-100">
-                            <label class="block text-xs font-bold text-emerald-600 mb-1.5 uppercase tracking-wider">Exact Correct Answer</label>
-                            <input type="text" id="admin-text-correct" placeholder="E.g. Paris" class="w-full px-4 py-2.5 bg-emerald-50 border border-emerald-200 text-emerald-700 rounded-xl text-sm font-bold shadow-sm">
-                        </div>
-
-                        <div class="pt-4 border-t border-slate-100">
-                            <label class="block text-xs font-bold text-slate-500 mb-1.5 uppercase tracking-wider">Time Limit (Seconds)</label>
-                            <input type="number" id="admin-q-time" value="30" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-semibold text-slate-700">
-                        </div>
                     </div>
-                    
-                    <button onclick="window.saveAdminQuestion()" class="w-full mt-8 bg-indigo-600 hover:bg-indigo-700 text-white font-black py-4 rounded-xl shadow-lg shadow-indigo-200 transition-transform active:scale-95 text-sm flex justify-center items-center">
-                        <i class="fa-solid fa-cloud-arrow-up mr-2 text-lg"></i> SAVE QUESTION
-                    </button>
-                </div>
-            </div>
-        </div>
 
-        <!-- ==================== USERS / LEADERBOARD TAB ==================== -->
-        <div id="admin-users" class="view-section flex-col h-full overflow-hidden w-full max-w-4xl mx-auto p-4 sm:p-6">
-            
-            <div class="flex justify-between items-center mb-5 shrink-0 bg-white p-4 rounded-2xl shadow-sm border border-slate-200">
-                <h2 class="font-black text-lg text-slate-800 flex items-center"><i class="fa-solid fa-ranking-star text-amber-500 mr-2 text-xl"></i> Leaderboard</h2>
-                <button onclick="window.downloadCSV()" class="px-4 py-2 bg-emerald-50 border border-emerald-200 text-emerald-700 rounded-lg text-xs font-bold hover:bg-emerald-100 transition-colors shadow-sm flex items-center">
-                    <i class="fa-solid fa-download mr-1.5"></i> EXPORT
+                    <div id="admin-text-area" class="hidden-safe pt-3 border-t border-slate-50">
+                        <label class="block text-[11px] font-bold text-emerald-600 mb-1.5 uppercase tracking-wider">Exact Correct Answer</label>
+                        <input type="text" id="admin-text-correct" placeholder="E.g. Paris" class="w-full px-3 py-2.5 bg-emerald-50 border border-emerald-200 text-emerald-700 rounded-xl font-black text-sm outline-none shadow-sm">
+                    </div>
+
+                    <div class="pt-3 border-t border-slate-50">
+                        <label class="block text-[11px] font-bold text-slate-500 mb-1.5 uppercase tracking-wider">Time Limit (Secs)</label>
+                        <input type="number" id="admin-q-time" value="30" class="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl font-bold text-xs outline-none focus:border-indigo-500">
+                    </div>
+                </div>
+                
+                <button onclick="window.saveAdminQuestion()" class="w-full bg-slate-900 hover:bg-black text-white font-black py-4 rounded-2xl shadow-xl transition-transform active:scale-95 text-sm shrink-0 mt-5 sticky bottom-0 flex justify-center items-center">
+                    <i class="fa-solid fa-cloud-arrow-up mr-2 text-lg"></i> SAVE QUESTION
                 </button>
             </div>
-            
-            <!-- Search Engine -->
-            <div class="relative mb-5 shrink-0">
-                <i class="fa-solid fa-magnifying-glass absolute left-4 top-3.5 text-indigo-400 text-sm"></i>
-                <input type="text" id="admin-search-users" placeholder="Search by name or phone..." class="w-full pl-11 pr-4 py-3 bg-white border border-slate-200 rounded-xl text-sm font-semibold text-slate-700 transition-all shadow-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 outline-none">
-            </div>
+        </div>
 
-            <!-- List -->
-            <div class="flex-1 overflow-y-auto bg-transparent">
-                <div id="admin-user-list" class="space-y-2">
-                    <!-- Users injected via JS -->
+        <!-- ================= USERS TAB ================= -->
+        <div id="admin-users" class="view-section hidden-safe flex-col h-full overflow-hidden w-full max-w-4xl mx-auto">
+            <div class="bg-white p-4 sm:p-5 rounded-3xl border border-slate-100 shadow-sm h-full flex flex-col">
+                <div class="flex justify-between items-center mb-4 shrink-0">
+                    <h3 class="font-black text-slate-800 text-lg flex items-center"><i class="fa-solid fa-ranking-star text-emerald-500 mr-2"></i> Leaderboard</h3>
+                    <button onclick="window.downloadCSV()" class="px-4 py-2 bg-slate-50 border border-slate-200 text-slate-700 rounded-xl text-xs font-bold hover:bg-slate-100 transition-colors shadow-sm flex items-center">
+                        <i class="fa-solid fa-download mr-1.5 text-indigo-500"></i> Export
+                    </button>
+                </div>
+                
+                <div class="relative mb-4 shrink-0">
+                    <i class="fa-solid fa-magnifying-glass absolute left-4 top-3.5 text-slate-400"></i>
+                    <input type="text" id="admin-search-users" placeholder="Search by name or phone..." class="w-full pl-11 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm font-semibold outline-none focus:border-indigo-500 transition-colors">
+                </div>
+
+                <div class="flex-1 overflow-y-auto">
+                    <div class="space-y-2" id="admin-user-list"></div>
                 </div>
             </div>
         </div>
 
-        <!-- ==================== USER DETAIL FULL PAGE ==================== -->
-        <div id="admin-user-detail" class="view-section flex-col h-full overflow-hidden w-full bg-slate-50 z-20 absolute inset-0">
-            <!-- Header Back button -->
-            <div class="bg-white border-b border-slate-200 p-4 sm:p-5 flex items-center justify-between shrink-0 shadow-sm">
-                <button onclick="window.closeUserHistoryFull()" class="text-sm font-bold text-slate-600 hover:text-indigo-600 bg-slate-50 hover:bg-indigo-50 px-4 py-2 rounded-lg border border-slate-200 transition-colors flex items-center">
+        <!-- ================= FULL PAGE USER DETAIL ================= -->
+        <div id="admin-user-detail" class="view-section hidden-safe flex-col h-full overflow-hidden w-full bg-slate-50 z-20 absolute inset-0">
+            <div class="bg-white border-b border-slate-200 p-4 flex items-center justify-between shrink-0 shadow-sm z-10">
+                <button onclick="window.closeUserHistoryFull()" class="text-xs font-bold text-slate-600 hover:text-indigo-600 bg-slate-50 hover:bg-indigo-50 px-4 py-2 rounded-xl border border-slate-200 transition-colors flex items-center shadow-sm">
                     <i class="fa-solid fa-arrow-left mr-2"></i> Back
                 </button>
                 <div class="text-right">
-                    <h3 class="text-lg font-black text-slate-800 leading-tight" id="hist-name">User Name</h3>
-                    <p class="text-indigo-500 text-xs font-bold mt-0.5 tracking-wide" id="hist-phone">9876543210</p>
+                    <h3 class="text-base font-black text-slate-800 leading-tight" id="hist-name">User Name</h3>
+                    <p class="text-indigo-500 text-[11px] font-bold mt-0.5 tracking-wider" id="hist-phone">9876543210</p>
                 </div>
             </div>
             
-            <!-- Body: Collapsible Days -->
-            <div class="p-4 sm:p-6 overflow-y-auto flex-1 max-w-4xl mx-auto w-full space-y-4" id="hist-body">
-                <!-- Day details injected here -->
-            </div>
+            <div class="p-4 overflow-y-auto flex-1 max-w-3xl mx-auto w-full space-y-3" id="hist-body"></div>
         </div>
     </div>
 
-    <!-- System Modal / Alert (Minimalist) -->
+    <!-- Modals -->
     <div id="sys-modal" class="fixed inset-0 z-[200] hidden-safe bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 opacity-0 transition-opacity">
-        <div class="bg-white rounded-2xl p-6 w-full max-w-sm shadow-2xl transform scale-95 transition-transform" id="sys-modal-card">
-            <div class="text-center mb-3" id="sys-modal-icon"></div>
+        <div class="bg-white rounded-3xl p-6 w-full max-w-sm shadow-2xl transform scale-95 transition-transform" id="sys-modal-card">
+            <div class="text-center mb-4" id="sys-modal-icon"></div>
             <h3 class="text-lg font-black text-slate-800 text-center mb-2" id="sys-modal-title">Title</h3>
             <p class="text-sm text-slate-500 font-semibold text-center mb-6" id="sys-modal-msg">Message</p>
-            <div class="flex space-x-3 justify-center" id="sys-modal-btns">
-                <button onclick="window.closeSysModal()" class="w-full py-3 bg-indigo-600 text-white font-bold rounded-xl text-sm hover:bg-indigo-700 transition-colors shadow-md shadow-indigo-200">OK</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Import Verification Modal (Full Screen White) -->
-    <div id="import-modal" class="fixed inset-0 z-[150] hidden-safe bg-white flex items-start justify-center p-0 opacity-0 transition-opacity">
-        <div class="bg-slate-50 w-full h-full flex flex-col" id="import-modal-card">
-            <div class="bg-white border-b border-slate-200 p-4 sm:p-5 flex justify-between items-center shrink-0 shadow-sm">
-                <h3 class="font-black text-slate-800 flex items-center text-lg"><i class="fa-solid fa-table-list mr-2 text-indigo-500"></i> Verify Import Data</h3>
-                <button onclick="window.closeImportModal()" class="w-10 h-10 rounded-full bg-slate-100 hover:bg-rose-50 hover:text-rose-600 flex items-center justify-center text-slate-500 transition-colors"><i class="fa-solid fa-xmark text-lg"></i></button>
-            </div>
-            
-            <div class="bg-indigo-50 p-3 text-indigo-700 text-xs font-bold shrink-0 border-b border-indigo-100 text-center tracking-wide shadow-inner" id="import-status-bar">Analyzing data...</div>
-            
-            <div class="flex-1 overflow-x-auto overflow-y-auto p-4">
-                <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
-                    <table class="w-full text-left text-xs whitespace-nowrap min-w-[900px]">
-                        <thead class="bg-slate-100 text-slate-600 sticky top-0 z-10 shadow-sm">
-                            <tr>
-                                <th class="p-3 font-bold border-b border-slate-200">Type</th>
-                                <th class="p-3 font-bold border-b border-slate-200">Question</th>
-                                <th class="p-3 font-bold border-b border-slate-200">Opt A</th>
-                                <th class="p-3 font-bold border-b border-slate-200">Opt B</th>
-                                <th class="p-3 font-bold border-b border-slate-200">Opt C</th>
-                                <th class="p-3 font-bold border-b border-slate-200">Opt D</th>
-                                <th class="p-3 font-bold border-b border-slate-200">Correct</th>
-                                <th class="p-3 font-bold border-b border-slate-200">Secs</th>
-                                <th class="p-3 font-bold border-b border-slate-200 text-rose-500">Status</th>
-                            </tr>
-                        </thead>
-                        <tbody id="import-tbody" class="divide-y divide-slate-100"></tbody>
-                    </table>
-                </div>
-            </div>
-            
-            <div class="p-4 sm:p-5 bg-white border-t border-slate-200 shrink-0 flex justify-end space-x-3 shadow-[0_-5px_15px_rgba(0,0,0,0.05)]">
-                <button onclick="window.closeImportModal()" class="px-5 py-3 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-sm transition-colors">Cancel</button>
-                <button onclick="window.processFinalImport()" class="px-6 py-3 rounded-xl bg-emerald-500 text-white font-black text-sm hover:bg-emerald-600 shadow-lg shadow-emerald-200 transition-transform active:scale-95 flex items-center">
-                    <i class="fa-solid fa-cloud-arrow-up mr-2"></i> Import Valid Data
-                </button>
+            <div class="flex space-x-3" id="sys-modal-btns">
+                <button onclick="window.closeModal()" class="w-full bg-slate-900 text-white font-bold py-3.5 rounded-xl transition-colors text-sm">OK</button>
             </div>
         </div>
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { initializeFirestore, collection, doc, setDoc, getDocs, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { initializeFirestore, collection, doc, setDoc, getDoc, getDocs, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-        // IMPORTANT: Replace these with your actual Firebase config keys if needed.
         const firebaseConfig = {
             apiKey: "AIzaSyAfJSonmGHnf0t92B71ycuAZbc-CV3k7LE",
             authDomain: "fest-dsd-003.firebaseapp.com",
             projectId: "fest-dsd-003",
             storageBucket: "fest-dsd-003.firebasestorage.app",
             messagingSenderId: "409596394273",
-            appId: "1:409596394273:web:b930012ce0a845ddb45c60"
+            appId: "1:409596394273:web:b930012ce0a845ddb45c60",
+            measurementId: "G-WSPJPQR032"
         };
 
         const app = initializeApp(firebaseConfig);
         const db = initializeFirestore(app, { experimentalForceLongPolling: true });
-        const docPath = (coll, id) => doc(db, coll, id);
 
         window.AppState = {
-            allQuestions: [],
-            allUsers: [],
-            totalDays: 1,
-            questionsPerDay: 3,
-            currentDay: 1,
-            adminSelectedSlot: 0, 
-            adminSelectedDay: 1, 
-            adminPoolSelectedId: null,
-            settings: { startDate: '', questionMode: 'fixed', instructions: '', scoringEnabled: false, pointsCorrect: 10, pointsNegative: 0, logoBase64: '' }
+            allQuestions: [], allUsers: [],
+            totalDays: 1, questionsPerDay: 3, currentDay: 1,
+            adminSelectedSlot: 0, adminSelectedDay: 1, adminPoolSelectedId: null,
+            settings: { startDate: '', questionMode: 'fixed', instructions: '', scoringEnabled: false, pointsCorrect: 10, pointsNegative: 0, logoBase64: '' },
+            ads: { masterEnabled: false, zone1: {}, zone2: { images: [] } }
         };
 
-        function formatDate(dateStr) {
-            if(!dateStr) return "N/A";
-            const options = { day: '2-digit', month: 'short', year: 'numeric' };
-            return new Date(dateStr).toLocaleDateString('en-GB', options);
-        }
+        const docPath = (coll, id) => doc(db, coll, id);
+
+        window.showModal = function(title, msg, iconClass, customBtns = null) {
+            const m = document.getElementById('sys-modal'); const mc = document.getElementById('sys-modal-card');
+            document.getElementById('sys-modal-title').innerText = title; document.getElementById('sys-modal-msg').innerText = msg;
+            document.getElementById('sys-modal-icon').innerHTML = `<i class="${iconClass} text-5xl"></i>`;
+            if(customBtns) { document.getElementById('sys-modal-btns').innerHTML = customBtns; } 
+            else { document.getElementById('sys-modal-btns').innerHTML = `<button onclick="window.closeModal()" class="w-full bg-slate-900 text-white font-bold py-3.5 rounded-xl text-sm">OK</button>`; }
+            m.classList.remove('hidden-safe'); setTimeout(() => { m.classList.remove('opacity-0'); mc.classList.remove('scale-95'); }, 10);
+        };
+        window.closeModal = function() {
+            const m = document.getElementById('sys-modal'); const mc = document.getElementById('sys-modal-card');
+            m.classList.add('opacity-0'); mc.classList.add('scale-95'); setTimeout(() => m.classList.add('hidden-safe'), 300);
+        };
 
         async function initAdmin() {
+            // Load Settings
             onSnapshot(docPath('settings', 'global'), (snap) => {
                 if (snap.exists()) {
                     const data = snap.data();
@@ -387,535 +484,333 @@
                     document.getElementById('setup-q-mode').value = data.questionMode || 'fixed';
                     document.getElementById('admin-inst-input').value = data.instructions || '';
                     document.getElementById('setup-scoring-toggle').checked = data.scoringEnabled || false;
-                    document.getElementById('setup-pts-correct').value = parseInt(data.pointsCorrect) || 10;
-                    document.getElementById('setup-pts-negative').value = parseInt(data.pointsNegative) || 0;
-                    window.AppState.settings.logoBase64 = data.logoBase64 || '';
+                    document.getElementById('setup-pts-correct').value = data.pointsCorrect || 10;
+                    document.getElementById('setup-pts-negative').value = data.pointsNegative || 0;
                     
                     if (data.logoBase64) {
+                        window.AppState.settings.logoBase64 = data.logoBase64;
                         document.getElementById('admin-logo-icon').classList.add('hidden-safe');
-                        const preview = document.getElementById('admin-logo-preview');
-                        preview.src = data.logoBase64;
-                        preview.classList.remove('hidden-safe');
+                        document.getElementById('admin-logo-preview').src = data.logoBase64;
+                        document.getElementById('admin-logo-preview').classList.remove('hidden-safe');
                     }
-                    
-                    window.toggleScoringUI();
-                    window.calculateSetupDays();
+                    window.toggleScoringUI(); window.calculateSetupDays();
+                    window.updateDashboardStats();
                 }
             });
 
+            // Load Ads Settings
+            onSnapshot(docPath('settings', 'ads'), (snap) => {
+                if (snap.exists()) {
+                    const data = snap.data();
+                    window.AppState.ads = { ...window.AppState.ads, ...data };
+                    if(!window.AppState.ads.zone2.images) window.AppState.ads.zone2.images = [];
+                    
+                    document.getElementById('ad-master-toggle').checked = data.masterEnabled || false;
+                    
+                    if(data.zone1) {
+                        document.getElementById('ad-z1-toggle').checked = data.zone1.enabled || false;
+                        document.getElementById('ad-z1-text').value = data.zone1.text || '';
+                        document.getElementById('ad-z1-link').value = data.zone1.link || '';
+                        if(data.zone1.image) {
+                            document.getElementById('ad-z1-preview').src = data.zone1.image;
+                            document.getElementById('ad-z1-preview').classList.remove('hidden-safe');
+                        }
+                    }
+                    if(data.zone2) {
+                        document.getElementById('ad-z2-toggle').checked = data.zone2.enabled || false;
+                        document.getElementById('ad-z2-type').value = data.zone2.type || 'image';
+                        document.getElementById('ad-z2-interval').value = data.zone2.interval || 3;
+                        document.getElementById('ad-z2-yturl').value = data.zone2.youtubeUrl || '';
+                        document.getElementById('ad-z2-link').value = data.zone2.link || '';
+                        window.renderZ2Images();
+                        window.toggleAdZ2Type();
+                    }
+                    window.updateDashboardStats();
+                }
+            });
+
+            // Load Questions
             onSnapshot(collection(db, "questions"), (snap) => {
                 window.AppState.allQuestions = [];
                 snap.forEach(doc => { window.AppState.allQuestions.push({ id: doc.id, ...doc.data() }); });
                 window.renderAdminQuestionPills();
+                window.updateDashboardStats();
             });
 
             loadUsersForLeaderboard();
-            
-            // Search listener with basic debounce implementation for better performance
-            let timeout = null;
-            document.getElementById('admin-search-users').addEventListener('input', function() {
-                clearTimeout(timeout);
-                timeout = setTimeout(window.filterLeaderboard, 300);
-            });
+            document.getElementById('admin-search-users').addEventListener('input', window.filterLeaderboard);
         }
 
-        window.toggleMenu = function() {
-            const m = document.getElementById('admin-dropdown-menu');
-            const overlay = document.getElementById('menu-overlay');
-            if(m.classList.contains('scale-0')) { 
-                m.classList.remove('hidden-safe'); overlay.classList.remove('hidden-safe');
-                setTimeout(() => { m.classList.remove('scale-0', 'opacity-0'); }, 10);
-            } else { 
-                m.classList.add('scale-0', 'opacity-0'); overlay.classList.add('hidden-safe');
-                setTimeout(() => { m.classList.add('hidden-safe'); }, 200);
+        // Dashboard Auto-Updater
+        window.updateDashboardStats = function() {
+            // Count Users
+            document.getElementById('dash-users-count').innerText = window.AppState.allUsers ? window.AppState.allUsers.length : 0;
+            // Count Questions
+            document.getElementById('dash-q-count').innerText = window.AppState.allQuestions ? window.AppState.allQuestions.length : 0;
+            // Calc Current Day
+            const sDate = window.AppState.settings.startDate;
+            let dNum = 1;
+            if(sDate) {
+                const s = new Date(sDate); s.setHours(0,0,0,0);
+                const n = new Date(); n.setHours(0,0,0,0);
+                dNum = Math.floor(Math.abs(n - s) / (1000 * 60 * 60 * 24)) + 1;
             }
+            document.getElementById('dash-day').innerText = `Day ${dNum > 0 ? dNum : 1}`;
+            // Ad Status
+            const adStatus = window.AppState.ads.masterEnabled;
+            document.getElementById('dash-ads-status').innerText = adStatus ? 'Active' : 'Offline';
+            document.getElementById('dash-ads-status').className = adStatus ? 'text-2xl font-black text-emerald-500 relative z-10 mt-1' : 'text-2xl font-black text-rose-500 relative z-10 mt-1';
+        };
+
+        window.toggleAdminMenu = function() {
+            const m = document.getElementById('admin-menu');
+            if(m.classList.contains('scale-0')) { m.classList.remove('scale-0', 'opacity-0'); } 
+            else { m.classList.add('scale-0', 'opacity-0'); }
         };
 
         window.switchAdminTab = function(tabId) {
-            document.getElementById('admin-user-detail').classList.remove('active');
-            document.getElementById('admin-user-detail').classList.add('hidden-safe');
-
+            // Hide all sections first securely
             document.querySelectorAll('.view-section:not(#admin-user-detail)').forEach(el => { 
-                el.classList.remove('active'); el.classList.add('hidden-safe'); 
+                el.classList.remove('active'); 
+                el.classList.add('hidden-safe'); 
             });
+            // Show target section
             const target = document.getElementById(`admin-${tabId}`);
-            if(target) { target.classList.remove('hidden-safe'); target.classList.add('active'); }
+            if(target) {
+                target.classList.remove('hidden-safe'); 
+                target.classList.add('active');
+            }
             
-            window.toggleMenu(); 
-            if(tabId === 'users') loadUsersForLeaderboard();
+            document.getElementById('admin-user-detail').classList.add('hidden-safe'); 
+            document.getElementById('admin-user-detail').classList.remove('active');
+            
+            // Close menu if open
+            const m = document.getElementById('admin-menu');
+            if(!m.classList.contains('scale-0')) { m.classList.add('scale-0', 'opacity-0'); }
         };
 
-        window.showSysModal = function(title, msg, iconClass = "") {
-            const m = document.getElementById('sys-modal');
-            const mc = document.getElementById('sys-modal-card');
-            document.getElementById('sys-modal-title').innerText = title;
-            document.getElementById('sys-modal-msg').innerText = msg;
-            document.getElementById('sys-modal-icon').innerHTML = iconClass ? `<i class="${iconClass} text-5xl mb-2"></i>` : '';
-            
-            m.classList.remove('hidden-safe');
-            setTimeout(() => { m.classList.remove('opacity-0'); mc.classList.remove('scale-95'); }, 10);
+        // Ad Management Functions
+        window.toggleAdZ2Type = function() {
+            const val = document.getElementById('ad-z2-type').value;
+            if(val === 'image') { document.getElementById('ad-z2-img-sec').classList.remove('hidden-safe'); document.getElementById('ad-z2-yt-sec').classList.add('hidden-safe'); } 
+            else { document.getElementById('ad-z2-img-sec').classList.add('hidden-safe'); document.getElementById('ad-z2-yt-sec').classList.remove('hidden-safe'); }
         };
 
-        window.closeSysModal = function() {
-            const m = document.getElementById('sys-modal');
-            const mc = document.getElementById('sys-modal-card');
-            m.classList.add('opacity-0'); mc.classList.add('scale-95');
-            setTimeout(() => m.classList.add('hidden-safe'), 300);
+        window.handleAdZ1Upload = function(e) {
+            const f = e.target.files[0]; if(!f) return;
+            if(f.size > 500 * 1024) return window.showModal("File Large", "Keep ad image under 500KB.", "fa-solid fa-triangle-exclamation text-amber-500");
+            const reader = new FileReader();
+            reader.onload = function(ev) {
+                window.AppState.ads.zone1.image = ev.target.result;
+                document.getElementById('ad-z1-preview').src = ev.target.result;
+                document.getElementById('ad-z1-preview').classList.remove('hidden-safe');
+            };
+            reader.readAsDataURL(f);
+        };
+
+        window.handleAdZ2Upload = function(e) {
+            const f = e.target.files[0]; if(!f) return;
+            if(window.AppState.ads.zone2.images.length >= 3) return window.showModal("Limit Reached", "Max 3 images allowed for slider.", "fa-solid fa-hand text-amber-500");
+            if(f.size > 500 * 1024) return window.showModal("File Large", "Keep ad image under 500KB.", "fa-solid fa-triangle-exclamation text-amber-500");
+            const reader = new FileReader();
+            reader.onload = function(ev) {
+                window.AppState.ads.zone2.images.push(ev.target.result);
+                window.renderZ2Images();
+            };
+            reader.readAsDataURL(f);
+        };
+
+        window.renderZ2Images = function() {
+            const gal = document.getElementById('ad-z2-gallery'); gal.innerHTML = '';
+            window.AppState.ads.zone2.images.forEach(img => {
+                gal.innerHTML += `<div class="w-16 h-16 rounded-lg bg-slate-100 border border-slate-200 overflow-hidden"><img src="${img}" class="w-full h-full object-cover"></div>`;
+            });
+        };
+
+        window.clearZ2Images = function() {
+            window.AppState.ads.zone2.images = []; window.renderZ2Images();
+        };
+
+        window.saveAdSettings = async function() {
+            const data = {
+                masterEnabled: document.getElementById('ad-master-toggle').checked,
+                zone1: {
+                    enabled: document.getElementById('ad-z1-toggle').checked,
+                    text: document.getElementById('ad-z1-text').value.trim(),
+                    image: window.AppState.ads.zone1.image || '',
+                    link: document.getElementById('ad-z1-link').value.trim()
+                },
+                zone2: {
+                    enabled: document.getElementById('ad-z2-toggle').checked,
+                    type: document.getElementById('ad-z2-type').value,
+                    images: window.AppState.ads.zone2.images || [],
+                    interval: parseInt(document.getElementById('ad-z2-interval').value) || 3,
+                    youtubeUrl: document.getElementById('ad-z2-yturl').value.trim(),
+                    link: document.getElementById('ad-z2-link').value.trim()
+                }
+            };
+            try {
+                await setDoc(docPath('settings', 'ads'), data);
+                window.showModal("Saved", "Advertisement settings updated.", "fa-solid fa-check text-emerald-500");
+            } catch(e) { window.showModal("Error", e.message, "fa-solid fa-triangle-exclamation text-rose-500"); }
         };
 
         window.calculateSetupDays = function() {
-            const s = document.getElementById('setup-start').value;
-            const e = document.getElementById('setup-end').value;
-            const q = parseInt(document.getElementById('setup-q-per-day').value) || 0;
-            let days = 0;
-            if(s && e) {
-                days = Math.floor(Math.abs(new Date(e) - new Date(s)) / (1000 * 60 * 60 * 24)) + 1;
-                if(days < 0) days = 0;
-            }
-            document.getElementById('setup-total-days').innerText = days;
-            document.getElementById('setup-total-q').innerText = days * q;
+            const s = document.getElementById('setup-start').value; const e = document.getElementById('setup-end').value; const q = parseInt(document.getElementById('setup-q-per-day').value) || 0;
+            let days = 0; if(s && e) { days = Math.floor(Math.abs(new Date(e) - new Date(s)) / (1000 * 60 * 60 * 24)) + 1; if(days < 0) days = 0; }
+            document.getElementById('setup-total-days').innerText = days; document.getElementById('setup-total-q').innerText = days * q;
         };
-
         window.toggleScoringUI = function() {
-            const isChecked = document.getElementById('setup-scoring-toggle').checked;
             const box = document.getElementById('scoring-rules-box');
-            if(isChecked) { box.classList.remove('hidden'); box.classList.add('grid'); } 
-            else { box.classList.add('hidden'); box.classList.remove('grid'); }
+            if(document.getElementById('setup-scoring-toggle').checked) { box.classList.remove('hidden'); box.classList.add('grid'); } else { box.classList.add('hidden'); box.classList.remove('grid'); }
         };
-
-        window.handleLogoUpload = function(event) {
-            const file = event.target.files[0];
-            if(!file) return;
-            
-            if(file.size > 1024 * 1024) {
-                window.showSysModal("File Too Large", "Please select an image smaller than 1MB to avoid database rejection.", "fa-solid fa-file-image text-rose-500");
-                event.target.value = '';
-                return;
-            }
-
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                window.AppState.settings.logoBase64 = e.target.result;
-                document.getElementById('admin-logo-icon').classList.add('hidden-safe');
-                const preview = document.getElementById('admin-logo-preview');
-                preview.src = e.target.result;
-                preview.classList.remove('hidden-safe');
-            };
-            reader.readAsDataURL(file);
+        window.handleLogoUpload = function(e) {
+            const f = e.target.files[0]; if(!f) return;
+            if(f.size > 1024*1024) return window.showModal("Error", "Logo must be under 1MB", "fa-solid fa-triangle-exclamation text-rose-500");
+            const r = new FileReader(); r.onload = function(ev) { window.AppState.settings.logoBase64 = ev.target.result; document.getElementById('admin-logo-icon').classList.add('hidden-safe'); document.getElementById('admin-logo-preview').src = ev.target.result; document.getElementById('admin-logo-preview').classList.remove('hidden-safe'); }; r.readAsDataURL(f);
         };
-
         window.saveAdminSetup = async function() {
-            const startDate = document.getElementById('setup-start').value;
-            const endDate = document.getElementById('setup-end').value;
-            const qPerDay = parseInt(document.getElementById('setup-q-per-day').value) || 3;
-            const mode = document.getElementById('setup-q-mode').value;
-            const inst = document.getElementById('admin-inst-input').value;
-            const scoringEnabled = document.getElementById('setup-scoring-toggle').checked;
-            const pointsCorrect = parseInt(document.getElementById('setup-pts-correct').value) || 10;
-            const pointsNegative = parseInt(document.getElementById('setup-pts-negative').value) || 0;
-            const logoBase64 = window.AppState.settings.logoBase64 || '';
-            
-            let calc = 1;
-            if (startDate && endDate) calc = Math.floor(Math.abs(new Date(endDate) - new Date(startDate)) / (1000 * 60 * 60 * 24)) + 1;
-
-            try {
-                await setDoc(docPath('settings', 'global'), { 
-                    startDate, endDate, totalDays: calc, questionsPerDay: qPerDay, questionMode: mode, instructions: inst,
-                    scoringEnabled, pointsCorrect, pointsNegative, logoBase64 
-                }, { merge: true });
-                window.showSysModal("Settings Saved", "Configuration updated successfully.", "fa-solid fa-circle-check text-emerald-500");
-                window.renderAdminQuestionPills();
-            } catch(e) { window.showSysModal("Error", e.message, "fa-solid fa-triangle-exclamation text-rose-500"); }
+            const data = {
+                startDate: document.getElementById('setup-start').value, endDate: document.getElementById('setup-end').value,
+                totalDays: parseInt(document.getElementById('setup-total-days').innerText) || 1, questionsPerDay: parseInt(document.getElementById('setup-q-per-day').value) || 3,
+                questionMode: document.getElementById('setup-q-mode').value, instructions: document.getElementById('admin-inst-input').value,
+                scoringEnabled: document.getElementById('setup-scoring-toggle').checked, pointsCorrect: parseInt(document.getElementById('setup-pts-correct').value) || 10,
+                pointsNegative: parseInt(document.getElementById('setup-pts-negative').value) || 0, logoBase64: window.AppState.settings.logoBase64 || ''
+            };
+            try { await setDoc(docPath('settings', 'global'), data, {merge:true}); window.showModal("Saved", "Core configuration saved.", "fa-solid fa-check text-emerald-500"); window.renderAdminQuestionPills(); } catch(e) {}
         };
 
-        window.changeAdminDay = function(dir) {
-            let n = window.AppState.adminSelectedDay + dir;
-            if(n < 1) n = 1;
-            if(n > window.AppState.totalDays) n = window.AppState.totalDays;
-            window.AppState.adminSelectedDay = n;
-            document.getElementById('admin-day-disp').innerText = n;
-            window.renderAdminQuestionPills();
-        };
-
+        window.changeAdminDay = function(dir) { let n = window.AppState.adminSelectedDay + dir; if(n<1) n=1; if(n>window.AppState.totalDays) n=window.AppState.totalDays; window.AppState.adminSelectedDay = n; document.getElementById('admin-day-disp').innerText = n; window.renderAdminQuestionPills(); };
         window.renderAdminQuestionPills = function() {
-            const mode = window.AppState.settings.questionMode;
-            const cont = document.getElementById('admin-slot-pills');
-            cont.innerHTML = '';
-            
+            const mode = window.AppState.settings.questionMode; const cont = document.getElementById('admin-slot-pills'); cont.innerHTML = '';
             if(mode === 'random') {
                 document.getElementById('day-select-container').classList.add('hidden-safe');
-                document.getElementById('q-status-text').innerText = "Pool Questions (Green: Saved):";
                 const pool = window.AppState.allQuestions.filter(q => q.mode === 'random');
-                pool.forEach((q, idx) => {
-                    cont.innerHTML += `<button onclick="window.loadAdminQuestion('random', null, '${q.id}')" class="w-10 h-10 rounded-full shadow flex-shrink-0 text-white font-bold text-xs bg-emerald-500 hover:scale-105 transition-transform">Q${idx+1}</button>`;
-                });
-                cont.innerHTML += `<button onclick="window.loadAdminQuestion('random', null, 'new')" class="w-10 h-10 rounded-full flex-shrink-0 text-indigo-500 border-2 border-dashed border-indigo-300 font-bold text-lg hover:bg-indigo-50 transition-colors"><i class="fa-solid fa-plus"></i></button>`;
-                if(window.AppState.adminPoolSelectedId === null) window.loadAdminQuestion('random', null, pool.length > 0 ? pool[0].id : 'new');
+                pool.forEach((q, idx) => { cont.innerHTML += `<button onclick="window.loadAdminQuestion('random', null, '${q.id}')" class="w-10 h-10 rounded-xl shadow-sm flex-shrink-0 text-white font-bold text-xs bg-emerald-500 hover:scale-105">Q${idx+1}</button>`; });
+                cont.innerHTML += `<button onclick="window.loadAdminQuestion('random', null, 'new')" class="w-10 h-10 rounded-xl flex-shrink-0 text-indigo-500 border-2 border-dashed border-indigo-300 font-bold text-lg hover:bg-indigo-50"><i class="fa-solid fa-plus"></i></button>`;
+                if(window.AppState.adminPoolSelectedId === null) window.loadAdminQuestion('random', null, pool.length>0?pool[0].id:'new');
             } else {
                 document.getElementById('day-select-container').classList.remove('hidden-safe');
-                document.getElementById('q-status-text').innerText = "Select Slot (Green: Saved, Gray: Empty):";
                 for(let i=1; i<=window.AppState.questionsPerDay; i++) {
-                    const exists = window.AppState.allQuestions.find(q => q.mode !== 'random' && parseInt(q.day) === window.AppState.adminSelectedDay && parseInt(q.slotIndex) === i);
-                    const color = exists ? 'bg-emerald-500 text-white shadow shadow-emerald-200' : 'bg-slate-100 text-slate-500 border border-slate-200';
-                    cont.innerHTML += `<button onclick="window.loadAdminQuestion('fixed', ${i}, null)" class="w-10 h-10 rounded-full flex-shrink-0 font-bold text-xs ${color} hover:scale-105 transition-transform">${i}</button>`;
+                    const ex = window.AppState.allQuestions.find(q => q.mode !== 'random' && parseInt(q.day) === window.AppState.adminSelectedDay && parseInt(q.slotIndex) === i);
+                    const col = ex ? 'bg-emerald-500 text-white shadow-sm shadow-emerald-200 border-0' : 'bg-slate-50 text-slate-400 border border-slate-200';
+                    cont.innerHTML += `<button onclick="window.loadAdminQuestion('fixed', ${i}, null)" class="w-10 h-10 rounded-xl flex-shrink-0 font-bold text-xs ${col} hover:scale-105 transition-transform">${i}</button>`;
                 }
                 if(window.AppState.adminSelectedSlot === 0) window.loadAdminQuestion('fixed', 1, null);
             }
         };
-
+        
         window.loadAdminQuestion = function(mode, slot, poolId) {
-            window.AppState.adminSelectedSlot = slot;
-            window.AppState.adminPoolSelectedId = poolId;
-            let q = null;
+            window.AppState.adminSelectedSlot = slot; window.AppState.adminPoolSelectedId = poolId; let q = null;
+            if(mode === 'random') { document.getElementById('admin-q-editor-title').innerText = (poolId==='new')?"ADD POOL QUESTION":"EDIT POOL QUESTION"; if(poolId!=='new') q = window.AppState.allQuestions.find(x=>x.id===poolId); }
+            else { document.getElementById('admin-q-editor-title').innerText = `DAY ${window.AppState.adminSelectedDay} - SLOT ${slot}`; q = window.AppState.allQuestions.find(x=>x.mode!=='random' && parseInt(x.day)===window.AppState.adminSelectedDay && parseInt(x.slotIndex)===slot); }
             
-            if(mode === 'random') {
-                document.getElementById('admin-q-editor-title').innerHTML = (poolId === 'new') ? "<i class='fa-solid fa-plus-circle text-indigo-500 mr-2'></i> ADD NEW POOL QUESTION" : "<i class='fa-solid fa-pen-to-square text-indigo-500 mr-2'></i> EDIT POOL QUESTION";
-                if(poolId !== 'new') q = window.AppState.allQuestions.find(x => x.id === poolId);
-            } else {
-                document.getElementById('admin-q-editor-title').innerHTML = `<i class='fa-solid fa-calendar-day text-indigo-500 mr-2'></i> DAY ${window.AppState.adminSelectedDay} - SLOT ${slot}`;
-                q = window.AppState.allQuestions.find(x => x.mode !== 'random' && parseInt(x.day) === window.AppState.adminSelectedDay && parseInt(x.slotIndex) === slot);
-            }
-
             const stat = document.getElementById('admin-q-status');
             if(q) {
-                stat.innerText = 'Saved'; stat.className = 'px-2.5 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider bg-emerald-100 text-emerald-700 border border-emerald-200';
-                document.getElementById('admin-q-type').value = q.type;
-                document.getElementById('admin-q-text').value = q.text;
-                document.getElementById('admin-q-time').value = q.timeLimit || 30;
-                if(q.type === 'mcq') {
-                    document.getElementById('admin-opt-a').value = q.options[0]; document.getElementById('admin-opt-b').value = q.options[1];
-                    document.getElementById('admin-opt-c').value = q.options[2]; document.getElementById('admin-opt-d').value = q.options[3];
-                    document.getElementById('admin-mcq-correct').value = q.correctOptionKey || 'A';
-                } else { document.getElementById('admin-text-correct').value = q.answer; }
+                stat.innerText = 'Saved'; stat.className = 'px-2.5 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider bg-emerald-100 text-emerald-700';
+                document.getElementById('admin-q-type').value = q.type; document.getElementById('admin-q-text').value = q.text; document.getElementById('admin-q-time').value = q.timeLimit || 30;
+                if(q.type==='mcq') { document.getElementById('admin-opt-a').value=q.options[0]; document.getElementById('admin-opt-b').value=q.options[1]; document.getElementById('admin-opt-c').value=q.options[2]; document.getElementById('admin-opt-d').value=q.options[3]; document.getElementById('admin-mcq-correct').value=q.correctOptionKey||'A'; }
+                else { document.getElementById('admin-text-correct').value = q.answer; }
             } else {
-                stat.innerText = 'Unsaved'; stat.className = 'px-2.5 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider bg-rose-100 text-rose-600 border border-rose-200';
-                document.getElementById('admin-q-text').value = '';
-                document.getElementById('admin-opt-a').value = ''; document.getElementById('admin-opt-b').value = '';
-                document.getElementById('admin-opt-c').value = ''; document.getElementById('admin-opt-d').value = '';
-                document.getElementById('admin-text-correct').value = '';
+                stat.innerText = 'Unsaved'; stat.className = 'px-2.5 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider bg-rose-100 text-rose-600';
+                document.getElementById('admin-q-text').value=''; document.getElementById('admin-opt-a').value=''; document.getElementById('admin-opt-b').value=''; document.getElementById('admin-opt-c').value=''; document.getElementById('admin-opt-d').value=''; document.getElementById('admin-text-correct').value='';
             }
             window.toggleAdminQType();
         };
-
         window.toggleAdminQType = function() {
-            if(document.getElementById('admin-q-type').value === 'mcq') {
-                document.getElementById('admin-mcq-area').classList.remove('hidden-safe');
-                document.getElementById('admin-text-area').classList.add('hidden-safe');
-            } else {
-                document.getElementById('admin-mcq-area').classList.add('hidden-safe');
-                document.getElementById('admin-text-area').classList.remove('hidden-safe');
-            }
+            if(document.getElementById('admin-q-type').value === 'mcq') { document.getElementById('admin-mcq-area').classList.remove('hidden-safe'); document.getElementById('admin-text-area').classList.add('hidden-safe'); }
+            else { document.getElementById('admin-mcq-area').classList.add('hidden-safe'); document.getElementById('admin-text-area').classList.remove('hidden-safe'); }
         };
-
         window.saveAdminQuestion = async function() {
-            const mode = window.AppState.settings.questionMode;
-            const type = document.getElementById('admin-q-type').value;
-            const text = document.getElementById('admin-q-text').value.trim();
-            const time = parseInt(document.getElementById('admin-q-time').value) || 30;
-            
-            if(!text) return window.showSysModal("Error", "Question text cannot be empty.", "fa-solid fa-triangle-exclamation text-rose-500");
-            
+            const mode = window.AppState.settings.questionMode; const type = document.getElementById('admin-q-type').value; const text = document.getElementById('admin-q-text').value.trim(); const time = parseInt(document.getElementById('admin-q-time').value)||30;
+            if(!text) return window.showModal("Error", "Question text required.", "fa-solid fa-triangle-exclamation text-rose-500");
             let data = { type, text, timeLimit: time, updatedAt: new Date().toISOString() };
-            if(type === 'mcq') {
-                const oA = document.getElementById('admin-opt-a').value.trim(); const oB = document.getElementById('admin-opt-b').value.trim();
-                const oC = document.getElementById('admin-opt-c').value.trim(); const oD = document.getElementById('admin-opt-d').value.trim();
-                if(!oA || !oB) return window.showSysModal("Error", "Options A and B are mandatory for MCQ.", "fa-solid fa-triangle-exclamation text-rose-500");
-                data.options = [oA, oB, oC, oD]; data.correctOptionKey = document.getElementById('admin-mcq-correct').value;
-                data.answer = data.correctOptionKey === 'A' ? oA : (data.correctOptionKey === 'B' ? oB : (data.correctOptionKey === 'C' ? oC : oD));
-            } else {
-                const ans = document.getElementById('admin-text-correct').value.trim();
-                if(!ans) return window.showSysModal("Error", "Exact correct answer is required.", "fa-solid fa-triangle-exclamation text-rose-500");
-                data.answer = ans;
-            }
-
-            let docId = mode === 'random' ? (window.AppState.adminPoolSelectedId === 'new' ? `pool_${Date.now()}` : window.AppState.adminPoolSelectedId) : `q_day${window.AppState.adminSelectedDay}_slot${window.AppState.adminSelectedSlot}`;
-            data.mode = mode;
-            if(mode === 'fixed') { data.day = window.AppState.adminSelectedDay; data.slotIndex = window.AppState.adminSelectedSlot; }
-
-            try {
-                await setDoc(docPath('questions', docId), data);
-                if(mode === 'random' && window.AppState.adminPoolSelectedId === 'new') window.AppState.adminPoolSelectedId = docId;
-                window.renderAdminQuestionPills();
-                window.showSysModal("Success", "Question saved to database.", "fa-solid fa-circle-check text-emerald-500");
-            } catch(e) { window.showSysModal("Error", e.message, "fa-solid fa-triangle-exclamation text-rose-500"); }
-        };
-
-        window.downloadExcelTemplate = function() {
-            if(!window.XLSX) return alert("Library loading...");
-            const ws_data = [
-                ["Type (mcq/text)", "Question Text", "Option A", "Option B", "Option C", "Option D", "Correct (A/B/C/D) or Text Ans", "Time Limit (sec)"],
-                ["mcq", "Which planet is known as the Red Planet?", "Earth", "Mars", "Jupiter", "Venus", "B", 30],
-                ["text", "What is the capital of France?", "", "", "", "", "Paris", 30]
-            ];
-            const ws = XLSX.utils.aoa_to_sheet(ws_data);
-            ws['!cols'] = [{wch:15}, {wch:40}, {wch:15}, {wch:15}, {wch:15}, {wch:15}, {wch:25}, {wch:15}];
-            const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, "Template");
-            XLSX.writeFile(wb, "FestQuiz_Template.xlsx");
-        };
-
-        window.handleExcelUpload = function(event) {
-            const file = event.target.files[0]; if(!file) return;
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                const data = new Uint8Array(e.target.result);
-                const workbook = XLSX.read(data, {type: 'array'});
-                const json = XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]], {header: 1, defval: ""});
-                window.renderImportModal(json);
-                event.target.value = ''; 
-            };
-            reader.readAsArrayBuffer(file);
-        };
-
-        window.renderImportModal = function(data) {
-            let tbody = ''; let errCount = 0;
-            data.forEach((row, i) => {
-                if(i === 0 || row.length === 0 || (!row[0] && !row[1])) return;
-                let type = (row[0] || '').toString().toLowerCase().trim(); let text = (row[1] || '').toString().trim();
-                let oA = (row[2] || '').toString().trim(); let oB = (row[3] || '').toString().trim();
-                let oC = (row[4] || '').toString().trim(); let oD = (row[5] || '').toString().trim();
-                let ans = (row[6] || '').toString().trim(); let time = parseInt(row[7]) || 30;
-                let error = '';
-                if(type !== 'mcq' && type !== 'text') type = 'mcq'; 
-                if(!text) error = 'Missing Question. ';
-                if(type === 'mcq' && (!oA || !oB || !['A','B','C','D'].includes(ans.toUpperCase()))) error += 'Invalid MCQ data. ';
-                if(type === 'text' && !ans) error += 'Missing answer. ';
-
-                if(error) errCount++;
-                let trClass = error ? 'bg-rose-50' : 'bg-white';
-                
-                tbody += `<tr class="border-b border-slate-100 ${trClass} import-row">
-                    <td class="p-2 border-r border-slate-100"><input type="text" class="imp-type w-16 bg-transparent border-0 text-xs font-bold uppercase focus:ring-0" value="${type}" disabled></td>
-                    <td class="p-2 border-r border-slate-100"><input type="text" class="imp-text w-full bg-transparent border-slate-300 rounded-lg text-xs focus:border-indigo-500 focus:ring-1 focus:ring-indigo-200" value="${text}"></td>
-                    <td class="p-2 border-r border-slate-100"><input type="text" class="imp-a w-full bg-transparent border-slate-300 rounded-lg text-xs focus:border-indigo-500" value="${oA}"></td>
-                    <td class="p-2 border-r border-slate-100"><input type="text" class="imp-b w-full bg-transparent border-slate-300 rounded-lg text-xs focus:border-indigo-500" value="${oB}"></td>
-                    <td class="p-2 border-r border-slate-100"><input type="text" class="imp-c w-full bg-transparent border-slate-300 rounded-lg text-xs focus:border-indigo-500" value="${oC}"></td>
-                    <td class="p-2 border-r border-slate-100"><input type="text" class="imp-d w-full bg-transparent border-slate-300 rounded-lg text-xs focus:border-indigo-500" value="${oD}"></td>
-                    <td class="p-2 border-r border-slate-100"><input type="text" class="imp-ans w-16 bg-transparent border-slate-300 rounded-lg text-xs font-black uppercase focus:border-indigo-500 text-center" value="${ans}"></td>
-                    <td class="p-2 border-r border-slate-100"><input type="number" class="imp-time w-16 bg-transparent border-slate-300 rounded-lg text-xs focus:border-indigo-500 text-center" value="${time}"></td>
-                    <td class="p-2 text-rose-600 font-bold text-[10px] whitespace-normal min-w-[150px]">${error}</td>
-                </tr>`;
-            });
-            document.getElementById('import-tbody').innerHTML = tbody;
-            document.getElementById('import-status-bar').innerHTML = `Scanned ${document.querySelectorAll('.import-row').length} rows | <span class="${errCount > 0 ? 'text-rose-600' : 'text-emerald-600'}">${errCount} Errors found</span>`;
+            if(type==='mcq') {
+                const oA=document.getElementById('admin-opt-a').value.trim(), oB=document.getElementById('admin-opt-b').value.trim(), oC=document.getElementById('admin-opt-c').value.trim(), oD=document.getElementById('admin-opt-d').value.trim();
+                if(!oA||!oB) return window.showModal("Error", "Options A & B required.", "fa-solid fa-triangle-exclamation text-rose-500");
+                data.options=[oA,oB,oC,oD]; data.correctOptionKey=document.getElementById('admin-mcq-correct').value; data.answer = data.correctOptionKey==='A'?oA:(data.correctOptionKey==='B'?oB:(data.correctOptionKey==='C'?oC:oD));
+            } else { const ans=document.getElementById('admin-text-correct').value.trim(); if(!ans) return window.showModal("Error", "Answer required.", "fa-solid fa-triangle-exclamation text-rose-500"); data.answer=ans; }
             
-            const modal = document.getElementById('import-modal');
-            modal.classList.remove('hidden-safe');
-            setTimeout(() => { modal.classList.remove('opacity-0'); }, 10);
-        };
-
-        window.closeImportModal = function() {
-            const modal = document.getElementById('import-modal');
-            modal.classList.add('opacity-0');
-            setTimeout(() => { modal.classList.add('hidden-safe'); }, 300);
-        };
-
-        window.processFinalImport = async function() {
-            const rows = document.querySelectorAll('.import-row');
-            let validDocs = []; let importedSlots = [];
-            const mode = window.AppState.settings.questionMode;
-
-            rows.forEach(row => {
-                const type = row.querySelector('.imp-type').value; const text = row.querySelector('.imp-text').value.trim();
-                const oA = row.querySelector('.imp-a').value.trim(); const oB = row.querySelector('.imp-b').value.trim();
-                const oC = row.querySelector('.imp-c').value.trim(); const oD = row.querySelector('.imp-d').value.trim();
-                const ans = row.querySelector('.imp-ans').value.trim(); const time = parseInt(row.querySelector('.imp-time').value) || 30;
-
-                let hasError = !text || (type === 'mcq' && (!oA || !oB || !['A','B','C','D'].includes(ans.toUpperCase()))) || (type === 'text' && !ans);
-                if(!hasError) {
-                    let data = { text, type, timeLimit: time, updatedAt: new Date().toISOString() };
-                    if(type === 'mcq') {
-                        data.options = [oA, oB, oC, oD]; data.correctOptionKey = ans.toUpperCase();
-                        data.answer = (data.correctOptionKey === 'A') ? oA : (data.correctOptionKey === 'B') ? oB : (data.correctOptionKey === 'C') ? oC : oD;
-                    } else { data.answer = ans; }
-                    validDocs.push(data);
-                }
-            });
-
-            if(validDocs.length === 0) return window.showSysModal("Wait", "No valid data to import.", "fa-solid fa-hand text-amber-500");
-            let success = 0;
-            for(let i=0; i<validDocs.length; i++) {
-                let docId = "";
-                if(mode === 'random') { docId = `pool_${Date.now()}_${i}`; validDocs[i].mode = 'random'; }
-                else {
-                    let eDay = 1, eSlot = 1, found = false;
-                    for(let d=1; d<=window.AppState.totalDays; d++) {
-                        for(let s=1; s<=window.AppState.questionsPerDay; s++) {
-                            if(!window.AppState.allQuestions.find(q => q.mode !== 'random' && parseInt(q.day) === d && parseInt(q.slotIndex) === s) && !importedSlots.includes(`${d}_${s}`)) { eDay = d; eSlot = s; found = true; break; }
-                        }
-                        if(found) break;
-                    }
-                    if(!found) continue;
-                    docId = `q_day${eDay}_slot${eSlot}`;
-                    validDocs[i].mode = 'fixed'; validDocs[i].day = eDay; validDocs[i].slotIndex = eSlot;
-                    importedSlots.push(`${eDay}_${eSlot}`);
-                }
-                try { await setDoc(docPath('questions', docId), validDocs[i]); success++; } catch(e) {}
-            }
-            window.closeImportModal();
-            window.showSysModal("Import Success", `Successfully saved ${success} questions to the database.`, "fa-solid fa-circle-check text-emerald-500");
+            let docId = mode==='random' ? (window.AppState.adminPoolSelectedId==='new' ? `pool_${Date.now()}` : window.AppState.adminPoolSelectedId) : `q_day${window.AppState.adminSelectedDay}_slot${window.AppState.adminSelectedSlot}`;
+            data.mode = mode; if(mode==='fixed') { data.day=window.AppState.adminSelectedDay; data.slotIndex=window.AppState.adminSelectedSlot; }
+            try { await setDoc(docPath('questions', docId), data); if(mode==='random' && window.AppState.adminPoolSelectedId==='new') window.AppState.adminPoolSelectedId=docId; window.renderAdminQuestionPills(); window.showModal("Saved", "Question updated.", "fa-solid fa-check text-emerald-500"); } catch(e){}
         };
 
         async function loadUsersForLeaderboard() {
-            const list = document.getElementById('admin-user-list');
-            list.innerHTML = '<div class="text-sm p-6 text-center text-slate-500 font-semibold"><i class="fa-solid fa-spinner fa-spin text-2xl mb-3 text-indigo-500"></i><br>Loading Users...</div>';
+            const list = document.getElementById('admin-user-list'); list.innerHTML = '<div class="text-sm p-6 text-center text-slate-500 font-semibold"><i class="fa-solid fa-spinner fa-spin text-2xl mb-3 text-indigo-500"></i><br>Loading...</div>';
             try {
-                const snap = await getDocs(collection(db, "users"));
-                let users = [];
-                snap.forEach(doc => { users.push({ id: doc.id, ...doc.data() }); });
-                
-                users.sort((a,b) => b.totalScore - a.totalScore);
-                
-                let actualRank = 1, prevScore = null;
-                users.forEach((u, i) => {
-                    if (u.totalScore !== prevScore && i !== 0) actualRank = i + 1;
-                    u.rank = actualRank; prevScore = u.totalScore;
-                });
-                
-                window.AppState.allUsers = users;
-                window.dlData = [["Rank", "Name", "Phone", "Gender", "Total Score"]];
+                const snap = await getDocs(collection(db, "users")); let users = []; snap.forEach(doc => { users.push({ id: doc.id, ...doc.data() }); });
+                users.sort((a,b) => b.totalScore - a.totalScore); let r = 1, prev = null;
+                users.forEach((u, i) => { if(u.totalScore !== prev && i !== 0) r = i+1; u.rank = r; prev = u.totalScore; });
+                window.AppState.allUsers = users; window.dlData = [["Rank", "Name", "Phone", "Gender", "Total Score"]];
                 users.forEach(u => window.dlData.push([u.rank, u.name, u.id, u.gender, u.totalScore]));
-                
                 window.filterLeaderboard();
-            } catch(e) { list.innerHTML = `<div class="text-sm p-5 text-rose-500">Error loading data: ${e.message}</div>`; }
+                window.updateDashboardStats(); // update dash after load
+            } catch(e) {}
         }
-
+        
         window.filterLeaderboard = function() {
-            const term = (document.getElementById('admin-search-users').value || '').toLowerCase();
-            const list = document.getElementById('admin-user-list');
-            list.innerHTML = '';
-            
+            const term = (document.getElementById('admin-search-users').value||'').toLowerCase(); const list = document.getElementById('admin-user-list'); list.innerHTML = '';
             const filtered = window.AppState.allUsers.filter(u => u.name.toLowerCase().includes(term) || u.id.includes(term));
-            if(filtered.length === 0) { list.innerHTML = '<div class="text-sm p-6 text-slate-400 text-center bg-white rounded-xl border border-slate-200">No users found matching your search.</div>'; return; }
-            
             filtered.forEach(u => {
-                const absScore = Math.abs(u.totalScore);
-                const scoreColor = u.totalScore >= 0 ? "text-emerald-600 bg-emerald-50 border border-emerald-200" : "text-rose-600 bg-rose-50 border border-rose-200";
-                
+                const col = u.totalScore >= 0 ? "text-emerald-700 bg-emerald-50 border-emerald-200" : "text-rose-700 bg-rose-50 border-rose-200";
                 list.innerHTML += `
-                    <div onclick="window.openUserHistoryFull('${u.id}')" class="flex items-center justify-between p-4 bg-white hover:bg-indigo-50/50 border border-slate-200 rounded-2xl shadow-sm cursor-pointer transition-all group">
+                    <div onclick="window.openUserHistoryFull('${u.id}')" class="flex items-center justify-between p-3 bg-white hover:bg-slate-50 border border-slate-100 rounded-2xl shadow-sm cursor-pointer transition-colors group">
                         <div class="flex items-center w-2/3">
-                            <div class="w-10 h-10 rounded-full bg-slate-100 text-slate-700 group-hover:bg-indigo-100 group-hover:text-indigo-700 flex items-center justify-center font-black text-sm mr-4 transition-colors shrink-0">${u.rank}</div>
-                            <div class="truncate pr-2">
-                                <div class="font-black text-sm text-slate-800 group-hover:text-indigo-700 transition-colors truncate">${u.name}</div>
-                                <div class="text-xs font-semibold text-slate-500 mt-0.5">${u.id}</div>
+                            <div class="w-10 h-10 rounded-full bg-slate-50 border border-slate-200 text-slate-700 flex items-center justify-center font-black text-xs mr-3 shrink-0">${u.rank}</div>
+                            <div class="truncate">
+                                <div class="font-bold text-sm text-slate-800 truncate">${u.name}</div>
+                                <div class="text-[10px] font-bold text-slate-500 mt-0.5 flex items-center space-x-2">
+                                    <span><i class="fa-solid fa-phone text-slate-400 mr-1"></i>${u.id}</span>
+                                    <span class="text-slate-300">|</span>
+                                    <span class="text-indigo-500"><i class="fa-solid fa-lock text-indigo-400 mr-1"></i>${u.password || 'N/A'}</span>
+                                </div>
                             </div>
                         </div>
-                        <div class="px-3 py-1.5 rounded-lg font-black text-sm ${scoreColor} shadow-sm whitespace-nowrap">${absScore} pts</div>
+                        <div class="px-3 py-1.5 rounded-lg font-black text-xs border ${col} whitespace-nowrap shrink-0 ml-2">${Math.abs(u.totalScore)} pts</div>
                     </div>`;
             });
         };
-
-        window.openUserHistoryFull = function(userId) {
-            const user = window.AppState.allUsers.find(u => u.id === userId);
-            if(!user) return;
-            
+        
+        window.openUserHistoryFull = function(uid) {
+            const user = window.AppState.allUsers.find(u => u.id === uid); if(!user) return;
             document.querySelectorAll('.view-section').forEach(el => el.classList.add('hidden-safe'));
-            const detailView = document.getElementById('admin-user-detail');
-            detailView.classList.remove('hidden-safe');
-            detailView.classList.add('active');
-
-            document.getElementById('hist-name').innerText = user.name;
-            document.getElementById('hist-phone').innerText = user.id;
+            document.getElementById('admin-user-detail').classList.remove('hidden-safe'); document.getElementById('admin-user-detail').classList.add('active');
+            document.getElementById('hist-name').innerText = user.name; 
+            document.getElementById('hist-phone').innerHTML = `<i class="fa-solid fa-phone text-slate-400 mr-1"></i>${user.id} <span class="text-slate-300 mx-1">|</span> <i class="fa-solid fa-lock text-indigo-400 mr-1"></i>${user.password || 'N/A'}`;
             
-            const body = document.getElementById('hist-body');
-            body.innerHTML = '';
+            const body = document.getElementById('hist-body'); body.innerHTML = '';
+            if(!user.history || Object.keys(user.history).length===0) { body.innerHTML = '<div class="text-center p-8 text-sm font-semibold text-slate-500 bg-white border border-slate-200 rounded-3xl shadow-sm">No history found.</div>'; return; }
             
-            if(!user.history || Object.keys(user.history).length === 0) {
-                body.innerHTML = '<div class="text-center p-8 text-sm font-semibold text-slate-500 bg-white border border-slate-200 rounded-2xl shadow-sm">No participation history found for this user.</div>';
-                return;
-            }
-
-            let historyByDay = {};
-            const startDate = window.AppState.settings.startDate ? new Date(window.AppState.settings.startDate) : new Date();
-            startDate.setHours(0,0,0,0);
-
+            let histByDay = {}; const startDate = window.AppState.settings.startDate ? new Date(window.AppState.settings.startDate) : new Date(); startDate.setHours(0,0,0,0);
             Object.keys(user.history).forEach(qId => {
-                const rec = user.history[qId];
-                const q = window.AppState.allQuestions.find(x => x.id === qId);
-                
-                let dayNum = 1;
-                if (rec.timeAt) {
-                    let t = new Date(rec.timeAt); t.setHours(0,0,0,0);
-                    dayNum = Math.floor((t - startDate) / (1000*60*60*24)) + 1;
-                } else if (q && q.day) { dayNum = parseInt(q.day); }
-                if(dayNum < 1) dayNum = 1;
-
-                if(!historyByDay[dayNum]) historyByDay[dayNum] = { records: [], totalPoints: 0, date: rec.timeAt };
-
-                let pts = 0;
-                if(rec.correct) pts = window.AppState.settings.scoringEnabled ? window.AppState.settings.pointsCorrect : 10;
-                else if(rec.answer) pts = -(window.AppState.settings.scoringEnabled ? window.AppState.settings.pointsNegative : 0);
-                
-                historyByDay[dayNum].totalPoints += pts;
-                historyByDay[dayNum].records.push({ 
-                    qText: q ? q.text : "Unknown Question", 
-                    uAns: rec.answer || "Skipped / Timeout", 
-                    cAns: q ? q.answer : "N/A", 
-                    pts: pts 
-                });
+                const rec = user.history[qId]; const q = window.AppState.allQuestions.find(x=>x.id===qId);
+                let dNum = 1; if(rec.timeAt) { let t=new Date(rec.timeAt); t.setHours(0,0,0,0); dNum=Math.floor((t-startDate)/(1000*60*60*24))+1; } else if(q && q.day) dNum=parseInt(q.day); if(dNum<1) dNum=1;
+                if(!histByDay[dNum]) histByDay[dNum] = { records: [], pts: 0, date: rec.timeAt };
+                let pts = 0; if(rec.correct) pts = window.AppState.settings.scoringEnabled ? window.AppState.settings.pointsCorrect : 10; else if(rec.answer) pts = -(window.AppState.settings.scoringEnabled ? window.AppState.settings.pointsNegative : 0);
+                histByDay[dNum].pts += pts; histByDay[dNum].records.push({ q: q?q.text:"Unknown", u: rec.answer||"Skipped", c: q?q.answer:"N/A", p: pts });
             });
-
-            const today = new Date(); today.setHours(0,0,0,0);
-            const currentActiveDayNum = Math.floor((today - startDate) / (1000*60*60*24)) + 1;
-
-            Object.keys(historyByDay).sort((a,b) => parseInt(a) - parseInt(b)).forEach(dayKey => {
-                const dayData = historyByDay[dayKey];
-                const isOpen = parseInt(dayKey) === currentActiveDayNum ? 'open' : '';
-                
-                const absTotal = Math.abs(dayData.totalPoints);
-                const colorClass = dayData.totalPoints >= 0 ? "bg-emerald-100 text-emerald-700 border-emerald-200" : "bg-rose-100 text-rose-700 border-rose-200";
-                
-                let detailsHTML = `
-                    <details class="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden group transition-all" ${isOpen}>
-                        <summary class="flex justify-between items-center p-4 sm:p-5 cursor-pointer bg-slate-50 hover:bg-slate-100 transition-colors select-none">
-                            <div class="flex items-center">
-                                <i class="fa-solid fa-chevron-right text-slate-400 text-sm w-6 transition-transform group-open:rotate-90"></i>
-                                <span class="font-black text-sm text-slate-800 mr-3 tracking-wide">Day ${dayKey}</span>
-                                <span class="text-[10px] sm:text-xs font-bold text-slate-500 bg-white px-2 py-1 rounded-lg border border-slate-200 shadow-sm whitespace-nowrap">${formatDate(dayData.date)}</span>
-                            </div>
-                            <div class="font-black text-sm px-3 py-1.5 rounded-lg border shadow-sm ${colorClass}">Total: ${absTotal}</div>
-                        </summary>
-                        <div class="p-0 border-t border-slate-200 bg-white divide-y divide-slate-100">
-                `;
-
-                dayData.records.forEach((rec, idx) => {
-                    const ansColor = rec.pts > 0 ? "text-emerald-600" : (rec.pts < 0 ? "text-rose-600" : "text-slate-500");
-                    const icon = rec.pts > 0 ? `<i class="fa-solid fa-circle-check mr-1.5 text-emerald-500"></i>` : (rec.pts < 0 ? `<i class="fa-solid fa-circle-xmark mr-1.5 text-rose-500"></i>` : `<i class="fa-solid fa-circle-minus mr-1.5 text-slate-400"></i>`);
-                    
-                    detailsHTML += `
-                        <div class="p-4 sm:p-5 hover:bg-slate-50 transition-colors">
-                            <p class="font-bold text-sm text-slate-800 mb-3 leading-snug"><span class="text-indigo-500 mr-1">Q${idx+1}.</span> ${rec.qText}</p>
-                            <div class="flex flex-col sm:flex-row sm:justify-between sm:items-end gap-3 text-xs">
-                                <div class="space-y-1.5 flex-1">
-                                    <div class="flex items-center"><span class="text-slate-400 w-16 font-semibold">User:</span> <span class="font-black ${ansColor} bg-slate-50 px-2 py-0.5 rounded border border-slate-100">${icon}${rec.uAns}</span></div>
-                                    <div class="flex items-center"><span class="text-slate-400 w-16 font-semibold">Correct:</span> <span class="font-black text-slate-700 px-2 py-0.5">${rec.cAns}</span></div>
-                                </div>
-                                <div class="font-black ${ansColor} text-sm bg-slate-50 px-3 py-1.5 rounded-lg border border-slate-100 shadow-sm shrink-0">Points: ${Math.abs(rec.pts)}</div>
-                            </div>
-                        </div>
-                    `;
-                });
-                
-                detailsHTML += `</div></details>`;
-                body.innerHTML += detailsHTML;
+            Object.keys(histByDay).sort((a,b)=>a-b).forEach(d => {
+                const dat = histByDay[d]; const col = dat.pts>=0 ? "bg-emerald-50 text-emerald-700 border-emerald-200":"bg-rose-50 text-rose-700 border-rose-200";
+                const dStr = dat.date ? new Date(dat.date).toLocaleDateString('en-GB',{day:'2-digit',month:'short'}) : 'N/A';
+                let html = `<details class="bg-white border border-slate-200 rounded-3xl shadow-sm overflow-hidden group mb-3"><summary class="flex justify-between items-center p-4 cursor-pointer bg-slate-50 hover:bg-slate-100 select-none"><div class="flex items-center"><i class="fa-solid fa-chevron-right text-slate-400 text-xs w-5 transition-transform group-open:rotate-90"></i><span class="font-black text-sm text-slate-800 mr-2">Day ${d}</span><span class="text-[9px] font-bold text-slate-500 bg-white px-2 py-0.5 rounded shadow-sm border border-slate-100">${dStr}</span></div><div class="font-black text-[11px] px-2.5 py-1 rounded-lg border ${col}">${Math.abs(dat.pts)}</div></summary><div class="p-0 border-t border-slate-200 bg-white divide-y divide-slate-50">`;
+                dat.records.forEach((r,i) => {
+                    const ac = r.p>0?"text-emerald-600":(r.p<0?"text-rose-600":"text-slate-400"); const ic = r.p>0?'fa-circle-check text-emerald-500':(r.p<0?'fa-circle-xmark text-rose-500':'fa-circle-minus text-slate-400');
+                    html += `<div class="p-4"><p class="font-bold text-xs text-slate-800 mb-2 leading-snug"><span class="text-indigo-400 mr-1">Q${i+1}.</span> ${r.q}</p><div class="flex justify-between items-end text-[11px]"><div class="space-y-1"><div class="flex items-center"><span class="text-slate-400 w-12 font-semibold">User:</span> <span class="font-black ${ac}"><i class="fa-solid ${ic} mr-1"></i>${r.u}</span></div><div class="flex items-center"><span class="text-slate-400 w-12 font-semibold">Real:</span> <span class="font-black text-slate-700 px-1">${r.c}</span></div></div><div class="font-black ${ac} text-xs bg-slate-50 px-2 py-1 rounded shadow-sm border border-slate-100">${Math.abs(r.p)}</div></div></div>`;
+                }); html += `</div></details>`; body.innerHTML += html;
             });
         };
-
-        window.closeUserHistoryFull = function() {
-            document.getElementById('admin-user-detail').classList.remove('active');
-            document.getElementById('admin-user-detail').classList.add('hidden-safe');
-            document.getElementById('admin-users').classList.remove('hidden-safe');
-            document.getElementById('admin-users').classList.add('active');
+        
+        window.closeUserHistoryFull = function() { 
+            document.getElementById('admin-user-detail').classList.remove('active'); 
+            document.getElementById('admin-user-detail').classList.add('hidden-safe'); 
+            document.getElementById('admin-users').classList.remove('hidden-safe'); 
+            document.getElementById('admin-users').classList.add('active'); 
         };
+        
+        window.downloadCSV = function() { if(!window.dlData) return; let csv=window.dlData.map(r=>r.join(",")).join("\n"); let a=document.createElement('a'); a.href=window.URL.createObjectURL(new Blob([csv],{type:'text/csv'})); a.download='Quiz_Leaderboard.csv'; a.click(); };
 
-        window.downloadCSV = function() {
-            if(!window.dlData || window.dlData.length === 0) return window.showSysModal("Empty", "No data to export.", "fa-solid fa-file-csv text-slate-400");
-            let csv = window.dlData.map(r => r.join(",")).join("\n");
-            let blob = new Blob([csv], { type: 'text/csv' });
-            let url = window.URL.createObjectURL(blob);
-            let a = document.createElement('a'); a.href = url; a.download = 'Quiz_Leaderboard.csv'; a.click();
-        };
-
+        // Start App
         window.onload = initAdmin;
     </script>
 </body>
