@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Fest Quiz</title>
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;600;700;900&family=Nunito:wght@400;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { font-family: 'Nunito', sans-serif; margin: 0; padding: 0; height: 100svh; width: 100vw; overflow: hidden; -webkit-user-select: none; -webkit-touch-callout: none; }
+        input, textarea, select { font-size: 16px; -webkit-user-select: text; }
+        .festive-art-bg { background-color: #fdf2f8; background-image: radial-gradient(circle at 10% 10%, rgba(253, 164, 175, 0.5) 0%, transparent 50%), radial-gradient(circle at 90% 20%, rgba(147, 197, 253, 0.5) 0%, transparent 50%), radial-gradient(circle at 50% 80%, rgba(216, 180, 254, 0.5) 0%, transparent 60%), radial-gradient(circle at 80% 90%, rgba(134, 239, 172, 0.4) 0%, transparent 50%); background-size: cover; position: fixed; inset: 0; z-index: -2; }
+        .glass-card { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(15px); border-radius: 2.5rem; box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.1), 0 0 20px rgba(255, 255, 255, 0.6) inset; }
+        .option-radio:checked + label { background-color: #ecfdf5 !important; border-color: #10b981 !important; box-shadow: 0 4px 15px rgba(16, 185, 129, 0.1); }
+        .option-radio:checked + label .opt-letter { background-color: #10b981 !important; color: white !important; }
+        .option-radio:checked + label .opt-check { opacity: 1 !important; transform: scale(1) !important; }
+        .opt-check { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+        .timer-circle { position: relative; width: 150px; height: 150px; border-radius: 50%; overflow: hidden; background: #ffffff; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1), inset 0 0 10px rgba(0,0,0,0.05); display: flex; align-items: center; justify-content: center; }
+        .wave, .wave-fill { position: absolute; left: -50%; width: 200%; height: 200%; border-radius: 40%; transition: top 1s linear, background-color 1s ease; z-index: 1; }
+        .wave { background: rgba(52, 211, 153, 0.2); animation: spin 6s infinite linear; }
+        .wave-fill { background: rgba(52, 211, 153, 0.5); border-radius: 43%; animation: spin 7s infinite linear; }
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+        .timer-border { position: absolute; inset: 0; border-radius: 50%; padding: 6px; background: linear-gradient(135deg, #f43f5e, #8b5cf6, #3b82f6); -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0); -webkit-mask-composite: xor; mask-composite: exclude; z-index: 3; }
+        .timer-content { position: relative; z-index: 10; text-align: center; }
+        .hidden-safe { display: none !important; }
+        @keyframes slideUpAd { from { transform: translateY(100%); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        .ad-banner-enter { animation: slideUpAd 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+        /* Winner Card Styles */
+        .rank-gold { background: linear-gradient(135deg, #fef08a, #f59e0b); border: 2px solid #fbbf24; }
+        .rank-silver { background: linear-gradient(135deg, #f3f4f6, #9ca3af); border: 2px solid #d1d5db; }
+        .rank-bronze { background: linear-gradient(135deg, #ffedd5, #b45309); border: 2px solid #f59e0b; }
+    </style>
+</head>
+<body class="text-slate-800 antialiased selection:bg-pink-200">
+    <div class="festive-art-bg"></div>
+
+    <div id="loader" class="fixed inset-0 z-[500] flex flex-col items-center justify-center bg-white/70 backdrop-blur-md hidden-safe transition-opacity"><div class="animate-spin rounded-full h-14 w-14 border-4 border-slate-200 border-t-pink-500 mb-4 shadow-lg"></div><p class="text-sm font-bold text-slate-600 tracking-wider">LOADING...</p></div>
+    
+    <div id="instructions-modal" class="fixed inset-0 z-[150] hidden-safe bg-slate-900/80 backdrop-blur-md flex items-center justify-center p-4">
+        <div class="bg-white rounded-[2.5rem] w-full max-w-md shadow-2xl overflow-hidden flex flex-col max-h-[85vh]">
+            <div class="bg-gradient-to-r from-pink-500 to-purple-500 p-6 text-white text-center shrink-0"><h2 class="text-2xl font-black flex items-center justify-center font-['Quicksand']"><i class="fa-solid fa-scroll mr-2"></i> Quiz Rules</h2></div>
+            <div class="p-6 overflow-y-auto flex-1 bg-slate-50/50"><ul id="instructions-content" class="text-sm text-slate-700 font-bold leading-relaxed space-y-3"></ul></div>
+            <div class="p-5 bg-white shrink-0"><button onclick="window.closeInstructions()" class="w-full bg-slate-900 hover:bg-black text-white font-black py-4 rounded-2xl shadow-xl transition-transform active:scale-95 flex justify-center items-center text-lg">I Agree & Continue <i class="fa-solid fa-arrow-right ml-2"></i></button></div>
+        </div>
+    </div>
+
+    <div id="sys-modal" class="fixed inset-0 z-[200] hidden-safe bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-5 opacity-0 transition-opacity">
+        <div class="bg-white rounded-[2rem] p-6 w-full max-w-sm shadow-2xl transform scale-95 transition-transform" id="sys-modal-card">
+            <div class="text-center mb-4" id="sys-modal-icon"></div><h3 class="text-xl font-black text-slate-800 text-center mb-2 font-['Quicksand']" id="sys-modal-title">Title</h3><p class="text-sm text-slate-600 font-semibold text-center mb-6 leading-relaxed" id="sys-modal-msg">Message</p>
+            <div class="flex space-x-3" id="sys-modal-btns"></div>
+        </div>
+    </div>
+
+    <div id="interstitial-ad-modal" class="fixed inset-0 z-[250] hidden-safe bg-slate-900/90 backdrop-blur-lg flex items-center justify-center p-0 sm:p-6 opacity-0 transition-opacity duration-300">
+        <div class="w-full h-full sm:max-w-md sm:h-[80vh] bg-black sm:rounded-3xl shadow-2xl overflow-hidden relative flex flex-col">
+            <button onclick="window.closeInterstitialAd()" class="absolute top-4 right-4 w-10 h-10 bg-white/20 hover:bg-white/40 backdrop-blur-md rounded-full flex items-center justify-center text-white z-50 transition-colors shadow-lg"><i class="fa-solid fa-xmark text-lg"></i></button>
+            <div class="absolute top-5 left-5 text-[10px] font-black text-white/50 tracking-widest uppercase z-50">Advertisement</div>
+            <div id="ad-content-box" class="flex-1 w-full h-full relative cursor-pointer" onclick="window.openAdLink()"></div>
+            <div id="ad-cta-box" class="hidden-safe shrink-0 p-5 bg-gradient-to-t from-black to-transparent absolute bottom-0 left-0 right-0 z-40"><button onclick="window.openAdLink()" class="w-full bg-blue-600 text-white font-black py-3.5 rounded-2xl shadow-xl flex justify-center items-center hover:bg-blue-700 transition-colors">Visit Sponsor <i class="fa-solid fa-arrow-up-right-from-square ml-2"></i></button></div>
+        </div>
+    </div>
+
+    <div id="user-app" class="h-full flex flex-col relative">
+        <div class="flex-1 overflow-y-auto w-full max-w-[440px] mx-auto px-4 py-8 flex flex-col justify-center min-h-full">
+            
+            <div id="auth-section" class="w-full glass-card p-8 transition-all duration-500 transform relative z-10 mb-20">
+                <button onclick="document.getElementById('instructions-modal').classList.remove('hidden-safe')" class="absolute top-5 right-5 flex flex-col items-center justify-center text-pink-500 hover:text-pink-600 transition-transform active:scale-90 group cursor-pointer z-20">
+                    <div class="w-10 h-10 bg-pink-100/90 rounded-full flex items-center justify-center shadow-md animate-bounce border border-pink-200 group-hover:bg-pink-200"><i class="fa-solid fa-scroll text-base text-pink-600"></i></div>
+                    <span class="text-[9px] font-black tracking-widest text-pink-600 animate-pulse mt-0.5">README</span>
+                </button>
+
+                <div class="text-center mb-8 relative">
+                    <div class="w-24 h-24 bg-white rounded-full flex items-center justify-center mx-auto mb-4 shadow-[0_10px_25px_rgba(236,72,153,0.25)] overflow-hidden border-2 border-white"><i class="fa-solid fa-masks-theater text-5xl text-pink-500" id="default-logo-login"></i><img id="custom-logo-login" src="" class="hidden-safe w-full h-full object-cover"></div>
+                    <h2 class="text-3xl font-black text-slate-800 font-['Quicksand'] tracking-tight">Join Fest Quiz</h2><p class="text-sm text-slate-500 font-bold mt-1">Enter details to start the challenge</p>
+                </div>
+                
+                <div class="space-y-4">
+                    <div class="relative"><i class="fa-solid fa-phone absolute left-4 top-4 text-slate-400"></i><input type="tel" id="login-phone" maxlength="10" class="w-full pl-12 pr-4 py-3.5 bg-slate-50/80 border-2 border-slate-100 rounded-2xl font-bold text-slate-700 outline-none focus:bg-white focus:border-pink-400" placeholder="10 Digit Phone Number" oninput="window.handlePhoneInput(this.value)"></div>
+                    <div class="relative"><i class="fa-solid fa-venus-mars absolute left-4 top-4 text-slate-400"></i><select id="login-gender" class="w-full pl-12 pr-4 py-3.5 bg-slate-50/80 border-2 border-slate-100 rounded-2xl font-bold text-slate-700 outline-none focus:bg-white focus:border-pink-400 appearance-none"><option value="" disabled selected>Select Gender</option><option value="Male">Male</option><option value="Female">Female</option></select><i class="fa-solid fa-chevron-down absolute right-4 top-4.5 text-slate-400 text-xs pointer-events-none"></i></div>
+                    <div class="relative"><i class="fa-solid fa-user absolute left-4 top-4 text-slate-400"></i><input type="text" id="login-name" class="w-full pl-12 pr-4 py-3.5 bg-slate-50/80 border-2 border-slate-100 rounded-2xl font-bold text-slate-700 outline-none focus:bg-white focus:border-pink-400" placeholder="Full Name"></div>
+                    <div class="relative"><i class="fa-solid fa-lock absolute left-4 top-4 text-slate-400"></i><input type="password" id="login-password" class="w-full pl-12 pr-4 py-3.5 bg-slate-50/80 border-2 border-slate-100 rounded-2xl font-bold text-slate-700 outline-none focus:bg-white focus:border-pink-400" placeholder="Password (Min 4 chars)"></div>
+                    <button onclick="window.handleLogin()" class="w-full bg-gradient-to-r from-pink-500 to-rose-500 hover:from-pink-600 hover:to-rose-600 text-white font-black py-4 rounded-2xl shadow-xl shadow-pink-200 transition-transform active:scale-95 flex justify-center items-center mt-6 text-lg tracking-wide">START QUIZ <i class="fa-solid fa-play ml-2"></i></button>
+                </div>
+            </div>
+
+            <div id="login-ad-banner" onclick="window.openZ1Link()" class="hidden-safe fixed bottom-4 left-4 right-4 max-w-sm mx-auto bg-white/95 backdrop-blur-md p-2 rounded-2xl shadow-[0_-10px_30px_rgba(0,0,0,0.1)] border border-slate-100 z-30 cursor-pointer ad-banner-enter flex items-center hover:bg-slate-50 transition-colors">
+                <div class="w-16 h-12 bg-slate-100 rounded-xl mr-3 flex-shrink-0 overflow-hidden border border-slate-200 flex items-center justify-center"><img id="z1-img" src="" class="w-full h-full object-contain p-1"></div>
+                <div class="flex-1 pr-2"><p class="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-0.5">Advertisement</p><p id="z1-text" class="text-xs font-bold text-slate-700 leading-tight line-clamp-2">Sponsored Partner</p></div>
+                <div class="w-8 h-8 rounded-full bg-indigo-50 flex items-center justify-center text-indigo-500 shrink-0"><i class="fa-solid fa-chevron-right text-xs"></i></div>
+            </div>
+
+            <div id="quiz-section" class="w-full hidden-safe flex-col items-center relative z-10">
+                <div class="bg-white/95 backdrop-blur-md px-6 py-2 rounded-full shadow-lg text-pink-600 font-black tracking-widest text-sm mb-6 border border-white flex items-center"><i class="fa-solid fa-layer-group mr-2 opacity-70"></i> QUESTION <span id="q-counter" class="ml-1 text-slate-800">1/3</span></div>
+                <div class="timer-circle mx-auto mb-8"><div class="timer-border"></div><div id="wave-bg" class="wave" style="top: 100%;"></div><div id="wave-fg" class="wave-fill" style="top: 100%;"></div><div class="timer-content"><div id="timer-text" class="text-6xl font-black text-rose-500 tracking-tighter">30</div><div id="timer-label" class="text-[11px] font-black text-rose-400 uppercase tracking-widest mt-1">SEC LEFT</div></div></div>
+                <div class="glass-card w-full p-6 sm:p-8 flex flex-col relative overflow-hidden">
+                    <div class="flex items-start mb-6 border-b border-slate-100 pb-5">
+                        <div class="w-12 h-12 rounded-full bg-pink-100 flex items-center justify-center shrink-0 mr-4 shadow-inner overflow-hidden border border-pink-200"><i class="fa-solid fa-palette text-2xl text-pink-500" id="default-logo-quiz"></i><img id="custom-logo-quiz" src="" class="hidden-safe w-full h-full object-cover"></div>
+                        <h3 id="quiz-question-text" class="text-lg sm:text-xl font-black text-slate-800 leading-relaxed pt-1">Loading question...</h3>
+                    </div>
+                    <div id="quiz-options-container" class="space-y-3 flex-1 mb-8"></div>
+                    <div class="flex space-x-3 mt-auto" id="quiz-action-buttons">
+                        <button id="btn-skip" onclick="window.handleAction('skip')" class="flex-1 bg-rose-50 text-rose-600 border-2 border-rose-100 font-black py-4 rounded-2xl transition-transform active:scale-95 flex justify-center items-center"><i class="fa-solid fa-forward-step mr-2"></i> SKIP</button>
+                        <button id="btn-submit" onclick="window.handleAction('submit')" class="flex-[1.5] bg-[#10b981] hover:bg-[#059669] text-white font-black py-4 rounded-2xl shadow-xl shadow-emerald-200 transition-transform active:scale-95 flex justify-center items-center">SUBMIT <i class="fa-solid fa-check ml-2 text-xl"></i></button>
+                        <button id="btn-next" onclick="window.handleAction('next')" class="hidden-safe w-full bg-slate-900 text-white font-black py-4 rounded-2xl shadow-xl transition-transform active:scale-95 justify-center items-center text-lg tracking-wide">NEXT QUESTION <i class="fa-solid fa-arrow-right ml-2"></i></button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="result-section" class="w-full glass-card p-8 hidden-safe text-center transform transition-all duration-500 scale-95 opacity-0 relative z-10">
+                <div class="w-24 h-24 bg-white rounded-full flex items-center justify-center mx-auto mb-5 shadow-[0_10px_25px_rgba(0,0,0,0.1)] overflow-hidden border-4 border-white"><i class="fa-solid fa-trophy text-5xl text-emerald-500" id="default-logo-result"></i><img id="custom-logo-result" src="" class="hidden-safe w-full h-full object-cover"></div>
+                <h2 class="text-3xl font-black text-slate-800 font-['Quicksand'] mb-1" id="res-day-title">Day 1 Result</h2><p class="text-sm text-slate-500 font-bold mb-6">You have completed today's challenge!</p>
+                <div id="res-net-box" class="bg-indigo-50 border-2 border-indigo-100 p-5 rounded-[2rem] relative overflow-hidden mb-5 shadow-inner flex flex-col items-center justify-center transition-colors"><div class="absolute -right-2 -bottom-2 opacity-10"><i id="res-net-icon" class="fa-solid fa-ranking-star text-7xl text-indigo-500"></i></div><div id="res-net-label" class="text-[11px] text-indigo-600 font-black uppercase tracking-widest mb-1.5 relative z-10">Total Points Today</div><div class="text-6xl font-black text-indigo-700 relative z-10 font-['Quicksand'] tracking-tighter" id="res-net-score">0</div></div>
+                <div class="grid grid-cols-2 gap-4 mb-8">
+                    <div class="bg-emerald-50/80 border-2 border-emerald-100 p-4 rounded-3xl relative overflow-hidden"><div class="text-[10px] text-emerald-600 font-black uppercase tracking-wider mb-1">Earned</div><div class="text-2xl font-black text-emerald-600" id="res-earned">+0</div></div>
+                    <div class="bg-rose-50/80 border-2 border-rose-100 p-4 rounded-3xl relative overflow-hidden"><div class="text-[10px] text-rose-600 font-black uppercase tracking-wider mb-1">Lost</div><div class="text-2xl font-black text-rose-600" id="res-lost">-0</div></div>
+                </div>
+                <button onclick="window.handlePostResultAction()" class="w-full bg-slate-900 hover:bg-black text-white font-black py-4 rounded-2xl shadow-xl transition-transform active:scale-95 text-lg tracking-wide">OK</button>
+            </div>
+
+            <div id="public-leaderboard-section" class="w-full hidden-safe flex-col relative z-10">
+                <div class="text-center mb-8">
+                    <h2 class="text-4xl font-black text-slate-800 font-['Quicksand'] tracking-tight mb-2">Final Results</h2>
+                    <p class="text-sm font-bold text-slate-500">The fest quiz has concluded! Here are the top champions.</p>
+                </div>
+                
+                <div id="podium-container" class="flex items-end justify-center space-x-2 mb-10 h-48"></div>
+                
+                <div class="glass-card w-full p-4 flex flex-col space-y-3" id="public-list-container"></div>
+                
+                <!-- Hidden components for poster generator -->
+                <input type="file" id="poster-upload" accept="image/*" class="hidden-safe" onchange="window.generatePoster(event)">
+                <canvas id="poster-canvas" width="1080" height="1080" class="hidden-safe"></canvas>
+            </div>
+
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { initializeFirestore, collection, doc, getDoc, getDocs, onSnapshot, updateDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        const firebaseConfig = { apiKey: "AIzaSyAfJSonmGHnf0t92B71ycuAZbc-CV3k7LE", authDomain: "fest-dsd-003.firebaseapp.com", projectId: "fest-dsd-003", storageBucket: "fest-dsd-003.firebasestorage.app", messagingSenderId: "409596394273", appId: "1:409596394273:web:b930012ce0a845ddb45c60" };
+        const app = initializeApp(firebaseConfig);
+        const db = initializeFirestore(app, { experimentalForceLongPolling: true });
+        const docPath = (coll, id) => doc(db, coll, id);
+
+        window.AppState = {
+            user: null, allQuestions: [], dailyQuestions: [], currentQIndex: 0, timerInterval: null, timeLeft: 30, totalTimeLimit: 30, currentDay: 1, isLocked: false, todayEarned: 0, todayLost: 0,
+            settings: { questionMode: 'fixed', instructions: '', scoringEnabled: false, pointsCorrect: 10, pointsNegative: 0, resultsPublished: false, dynamicTimers: [], logoBase64: '' },
+            ads: { masterEnabled: false, zone1: {}, zone2: {} }, z2SlideInterval: null, z2SlideIdx: 0, targetAdLink: '', publicUsers: []
+        };
+
+        window.showModal = function(t, m, ic, cb=null) { const mo=document.getElementById('sys-modal'), mc=document.getElementById('sys-modal-card'); document.getElementById('sys-modal-title').innerText=t; document.getElementById('sys-modal-msg').innerText=m; document.getElementById('sys-modal-icon').innerHTML=`<i class="${ic} text-5xl"></i>`; if(cb){document.getElementById('sys-modal-btns').innerHTML=cb;}else{document.getElementById('sys-modal-btns').innerHTML=`<button onclick="window.closeModal()" class="w-full bg-slate-900 text-white font-black py-4 rounded-xl text-sm transition-transform active:scale-95 shadow-lg">OK</button>`;} mo.classList.remove('hidden-safe'); setTimeout(()=>{mo.classList.remove('opacity-0'); mc.classList.remove('scale-95');},10); };
+        window.closeModal = function() { const mo=document.getElementById('sys-modal'), mc=document.getElementById('sys-modal-card'); mo.classList.add('opacity-0'); mc.classList.add('scale-95'); setTimeout(()=>mo.classList.add('hidden-safe'),300); };
+        window.showLoader = function() { document.getElementById('loader').classList.remove('hidden-safe'); };
+        window.hideLoader = function() { document.getElementById('loader').classList.add('hidden-safe'); };
+
+        function calcDay(startStr) { if(!startStr) return 1; const s=new Date(startStr); s.setHours(0,0,0,0); const n=new Date(); n.setHours(0,0,0,0); const d=Math.floor(Math.abs(n-s)/(1000*60*60*24))+1; return d>0?d:1; }
+
+        async function initApp() {
+            onSnapshot(docPath('settings', 'global'), (snap) => {
+                if(snap.exists()) {
+                    const data = snap.data(); window.AppState.settings = { ...window.AppState.settings, ...data };
+                    const lgi=document.getElementById('custom-logo-login'), dli=document.getElementById('default-logo-login'), lqi=document.getElementById('custom-logo-quiz'), dqi=document.getElementById('default-logo-quiz'), lri=document.getElementById('custom-logo-result'), dri=document.getElementById('default-logo-result');
+                    if(data.logoBase64) { lgi.src=data.logoBase64; lgi.classList.remove('hidden-safe'); dli.classList.add('hidden-safe'); lqi.src=data.logoBase64; lqi.classList.remove('hidden-safe'); dqi.classList.add('hidden-safe'); lri.src=data.logoBase64; lri.classList.remove('hidden-safe'); dri.classList.add('hidden-safe'); }
+                    if(data.startDate) window.AppState.currentDay = calcDay(data.startDate); renderInstructions();
+                    checkPublicMode();
+                }
+            });
+
+            onSnapshot(docPath('settings', 'ads'), (snap) => { if(snap.exists()) { window.AppState.ads = snap.data(); renderZone1Ad(); } });
+            onSnapshot(collection(db, "questions"), (snap) => { window.AppState.allQuestions = []; snap.forEach(doc => { window.AppState.allQuestions.push({ id: doc.id, ...doc.data() }); }); });
+            document.getElementById('instructions-modal').classList.remove('hidden-safe'); setupBackButtonTrap();
+        }
+
+        async function checkPublicMode() {
+            if(window.AppState.settings.resultsPublished) {
+                document.getElementById('auth-section').classList.add('hidden-safe'); document.getElementById('login-ad-banner').classList.add('hidden-safe');
+                document.getElementById('instructions-modal').classList.add('hidden-safe'); document.getElementById('public-leaderboard-section').classList.remove('hidden-safe'); document.getElementById('public-leaderboard-section').classList.add('flex');
+                showLoader(); await buildPublicLeaderboard(); hideLoader();
+            }
+        }
+        function maskPhone(phone) { return '******' + phone.slice(-4); }
+        async function buildPublicLeaderboard() {
+            try {
+                const snap = await getDocs(collection(db, "users")); let u = []; snap.forEach(doc => u.push({ id: doc.id, ...doc.data() }));
+                u.sort((a,b) => b.totalScore - a.totalScore); let r=1, p=null; u.forEach((x,i)=>{ if(x.totalScore!==p && i!==0) r=i+1; x.rank=r; p=x.totalScore; });
+                window.AppState.publicUsers = u; const pod = document.getElementById('podium-container'); const list = document.getElementById('public-list-container'); pod.innerHTML=''; list.innerHTML='';
+                
+                const top3 = u.filter(x => x.rank <= 3); const others = u.filter(x => x.rank > 3);
+                
+                if(top3.find(x=>x.rank===2)) pod.innerHTML += createPodiumCard(top3.find(x=>x.rank===2), 'silver', '140px');
+                if(top3.find(x=>x.rank===1)) pod.innerHTML += createPodiumCard(top3.find(x=>x.rank===1), 'gold', '180px');
+                if(top3.find(x=>x.rank===3)) pod.innerHTML += createPodiumCard(top3.find(x=>x.rank===3), 'bronze', '120px');
+                
+                others.forEach(x => { list.innerHTML += `<div class="bg-white/80 border border-slate-100 p-4 rounded-2xl flex items-center justify-between shadow-sm"><div class="flex items-center"><div class="w-8 h-8 rounded-full bg-slate-200 text-slate-700 font-black text-xs flex items-center justify-center mr-3">${x.rank}</div><div><div class="font-bold text-sm text-slate-800">${x.name}</div><div class="text-[10px] font-bold text-slate-500">${maskPhone(x.id)}</div></div></div><div class="font-black text-indigo-600 text-sm">${x.totalScore} pts</div></div>`; });
+            } catch(e){}
+        }
+        function createPodiumCard(u, type, height) {
+            let colors = ''; let icon = ''; if(type==='gold') { colors='rank-gold'; icon='fa-crown text-yellow-600'; } else if(type==='silver') { colors='rank-silver'; icon='fa-medal text-gray-500'; } else { colors='rank-bronze'; icon='fa-award text-orange-700'; }
+            let postBtn = `<button onclick="window.triggerPoster('${u.id}')" class="mt-2 w-full bg-slate-900 text-white text-[9px] font-bold py-1.5 rounded-lg active:scale-95"><i class="fa-solid fa-download mr-1"></i> Poster</button>`;
+            return `<div class="flex flex-col items-center w-1/3"><div class="w-full ${colors} rounded-t-2xl rounded-b-lg shadow-lg flex flex-col items-center p-2 relative" style="height: ${height};"><div class="absolute -top-4 w-8 h-8 bg-white rounded-full flex items-center justify-center shadow-md border-2 border-slate-100"><i class="fa-solid ${icon} text-sm"></i></div><div class="mt-4 font-black text-2xl text-slate-900 opacity-20">#${u.rank}</div><div class="mt-auto text-center w-full"><div class="font-bold text-xs text-slate-800 truncate w-full px-1">${u.name}</div><div class="text-[9px] font-bold text-slate-600 mt-0.5">${maskPhone(u.id)}</div><div class="font-black text-slate-900 text-sm mt-1">${u.totalScore}</div></div></div>${postBtn}</div>`;
+        }
+
+        window.posterUserId = null;
+        window.triggerPoster = function(uid) { window.posterUserId = uid; document.getElementById('poster-upload').click(); };
+        window.generatePoster = function(e) {
+            const f = e.target.files[0]; if(!f) return; showLoader();
+            const u = window.AppState.publicUsers.find(x=>x.id===window.posterUserId); if(!u) { hideLoader(); return; }
+            const r = new FileReader();
+            r.onload = function(ev) {
+                const img = new Image(); img.onload = function() {
+                    const canvas = document.getElementById('poster-canvas'); const ctx = canvas.getContext('2d');
+                    // Draw Background
+                    const grad = ctx.createLinearGradient(0, 0, 1080, 1080); grad.addColorStop(0, "#4f46e5"); grad.addColorStop(1, "#ec4899");
+                    ctx.fillStyle = grad; ctx.fillRect(0, 0, 1080, 1080);
+                    // Add some pattern/shapes
+                    ctx.fillStyle = "rgba(255,255,255,0.1)"; ctx.beginPath(); ctx.arc(200, 200, 300, 0, Math.PI*2); ctx.fill();
+                    ctx.beginPath(); ctx.arc(900, 900, 400, 0, Math.PI*2); ctx.fill();
+                    // Draw White Card
+                    ctx.shadowColor="rgba(0,0,0,0.3)"; ctx.shadowBlur=30; ctx.shadowOffsetY=10; ctx.fillStyle="#ffffff"; ctx.beginPath(); ctx.roundRect(100, 250, 880, 700, 40); ctx.fill(); ctx.shadowColor="transparent";
+                    // Draw Title & Logo
+                    ctx.fillStyle="#ffffff"; ctx.font="900 60px Arial"; ctx.textAlign="center"; ctx.fillText("CHAMPION", 540, 150);
+                    if(window.AppState.settings.logoBase64) {
+                        const lImg = new Image(); lImg.onload = function() {
+                            ctx.drawImage(lImg, 460, 20, 160, 160); finalizePoster(ctx, canvas, img, u);
+                        }; lImg.src = window.AppState.settings.logoBase64;
+                    } else { finalizePoster(ctx, canvas, img, u); }
+                }; img.src = ev.target.result;
+            }; r.readAsDataURL(f);
+        };
+        function finalizePoster(ctx, canvas, uImg, u) {
+            // Draw Circular User Image
+            ctx.save(); ctx.beginPath(); ctx.arc(540, 450, 180, 0, Math.PI*2); ctx.closePath(); ctx.clip(); ctx.drawImage(uImg, 360, 270, 360, 360); ctx.restore();
+            // Draw Rank
+            let rCol="#f59e0b"; if(u.rank===2) rCol="#9ca3af"; if(u.rank===3) rCol="#b45309";
+            ctx.fillStyle=rCol; ctx.font="900 80px Arial"; ctx.textAlign="center"; ctx.fillText(`RANK #${u.rank}`, 540, 700);
+            // Draw Name
+            ctx.fillStyle="#1e293b"; ctx.font="900 70px Arial"; ctx.fillText(u.name.toUpperCase(), 540, 800);
+            ctx.fillStyle="#64748b"; ctx.font="bold 40px Arial"; ctx.fillText(`Total Points: ${u.totalScore}`, 540, 880);
+            
+            const link = document.createElement('a'); link.download = `Rank_${u.rank}_${u.name}.jpg`; link.href = canvas.toDataURL("image/jpeg", 0.9); link.click(); hideLoader(); e.target.value='';
+        }
+
+        function renderZone1Ad() {
+            const z1 = window.AppState.ads.zone1; const banner = document.getElementById('login-ad-banner');
+            if(window.AppState.ads.masterEnabled && z1 && z1.enabled && document.getElementById('auth-section').classList.contains('hidden-safe') === false) {
+                document.getElementById('z1-img').src = z1.imageUrl || z1.imageBase64 || ''; document.getElementById('z1-text').innerText = z1.text || 'Sponsored Partner'; window.AppState.z1Link = z1.link || '#'; banner.classList.remove('hidden-safe');
+            } else { banner.classList.add('hidden-safe'); }
+        }
+        window.openZ1Link = function() { if(window.AppState.z1Link && window.AppState.z1Link !== '#') window.open(window.AppState.z1Link, '_blank'); };
+        
+        window.handlePostResultAction = function() {
+            const z2 = window.AppState.ads.zone2;
+            if(window.AppState.ads.masterEnabled && z2 && z2.enabled) {
+                const modal = document.getElementById('interstitial-ad-modal'); const contentBox = document.getElementById('ad-content-box'); const ctaBox = document.getElementById('ad-cta-box');
+                window.AppState.targetAdLink = z2.link || '#'; contentBox.innerHTML = ''; clearInterval(window.AppState.z2SlideInterval);
+                if(z2.type === 'youtube' && z2.youtubeUrl) {
+                    let yid = ''; let url = z2.youtubeUrl; if (url.includes('youtu.be/')) yid = url.split('youtu.be/')[1].split('?')[0]; else if (url.includes('shorts/')) yid = url.split('shorts/')[1].split('?')[0]; else if (url.includes('watch?v=')) yid = url.split('watch?v=')[1].split('&')[0];
+                    if(yid) { contentBox.innerHTML = `<iframe class="w-full h-full object-cover" src="https://www.youtube.com/embed/${yid}?autoplay=1&mute=0&controls=0&loop=1&playlist=${yid}" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>`; contentBox.onclick = null; if(window.AppState.targetAdLink !== '#') ctaBox.classList.remove('hidden-safe'); }
+                } else if(z2.images && z2.images.length > 0) {
+                    contentBox.innerHTML = `<img id="z2-slider-img" src="${z2.images[0]}" class="w-full h-full object-contain bg-black">`; ctaBox.classList.add('hidden-safe');
+                    if(z2.images.length > 1) { const sec = parseInt(z2.interval) || 3; window.AppState.z2SlideIdx = 0; window.AppState.z2SlideInterval = setInterval(() => { window.AppState.z2SlideIdx = (window.AppState.z2SlideIdx + 1) % z2.images.length; document.getElementById('z2-slider-img').src = z2.images[window.AppState.z2SlideIdx]; }, sec * 1000); }
+                }
+                modal.classList.remove('hidden-safe'); setTimeout(() => { modal.classList.remove('opacity-0'); }, 10);
+            } else { window.resetToHome(); }
+        };
+        window.closeInterstitialAd = function() { clearInterval(window.AppState.z2SlideInterval); const modal = document.getElementById('interstitial-ad-modal'); modal.classList.add('opacity-0'); setTimeout(() => { modal.classList.add('hidden-safe'); document.getElementById('ad-content-box').innerHTML=''; window.resetToHome(); }, 300); };
+        window.openAdLink = function() { if(window.AppState.targetAdLink && window.AppState.targetAdLink !== '#') window.open(window.AppState.targetAdLink, '_blank'); };
+
+        function renderInstructions() { const ul = document.getElementById('instructions-content'); const txt = window.AppState.settings.instructions; if(!txt.trim()) { ul.innerHTML = `<li class="flex items-start"><i class="fa-solid fa-circle-check text-emerald-500 mt-1 mr-3"></i> <span>Ready to play! No specific rules set.</span></li>`; return; } ul.innerHTML = txt.split('\n').filter(l => l.trim() !== '').map(l => `<li class="flex items-start"><i class="fa-solid fa-star text-pink-400 mt-1 mr-3 text-[10px]"></i> <span class="pt-0.5">${l}</span></li>`).join(''); }
+        window.closeInstructions = function() { document.getElementById('instructions-modal').classList.add('hidden-safe'); }
+        window.updateResultColors = function(net) { const netBox=document.getElementById('res-net-box'), netIcon=document.getElementById('res-net-icon'), netLabel=document.getElementById('res-net-label'), netVal=document.getElementById('res-net-score'); netBox.className = 'border-2 p-5 rounded-[2rem] relative overflow-hidden mb-5 shadow-inner flex flex-col items-center justify-center transition-colors'; if (net >= 0) { netBox.classList.add('bg-emerald-50', 'border-emerald-200'); netIcon.className='fa-solid fa-ranking-star text-7xl text-emerald-500'; netLabel.className='text-[11px] text-emerald-600 font-black uppercase tracking-widest mb-1.5 relative z-10'; netVal.className='text-6xl font-black text-emerald-700 relative z-10 font-["Quicksand"] tracking-tighter'; } else { netBox.classList.add('bg-rose-50', 'border-rose-200'); netIcon.className='fa-solid fa-ranking-star text-7xl text-rose-500'; netLabel.className='text-[11px] text-rose-600 font-black uppercase tracking-widest mb-1.5 relative z-10'; netVal.className='text-6xl font-black text-rose-700 relative z-10 font-["Quicksand"] tracking-tighter'; } };
+        
+        window.handlePhoneInput = async function(val) { const clean = val.replace(/\D/g,'').slice(0,10); document.getElementById('login-phone').value = clean; if(clean.length === 10) { try { const snap = await getDoc(docPath('users', clean)); if(snap.exists()) { const d = snap.data(); document.getElementById('login-name').value = d.name; document.getElementById('login-gender').value = d.gender; document.getElementById('login-name').classList.add('bg-emerald-50', 'border-emerald-300', 'text-emerald-800'); } } catch(e){} } else { document.getElementById('login-name').classList.remove('bg-emerald-50', 'border-emerald-300', 'text-emerald-800'); } };
+        window.handleLogin = async function() {
+            const phone=document.getElementById('login-phone').value.trim(), name=document.getElementById('login-name').value.trim(), gender=document.getElementById('login-gender').value, pass=document.getElementById('login-password').value;
+            if(phone.length!==10) return window.showModal("Error", "Please enter exactly 10 digits.", "fa-solid fa-mobile-screen text-rose-500");
+            if(!name||!gender) return window.showModal("Error", "Please fill all fields.", "fa-solid fa-circle-exclamation text-rose-500");
+            if(pass.length<4) return window.showModal("Error", "Password minimum 4 characters.", "fa-solid fa-lock text-rose-500");
+            showLoader();
+            try {
+                const uRef=docPath('users', phone); const snap=await getDoc(uRef); let uData={ phone, name, gender, password: pass, totalScore: 0, history: {}, lastDayPlayed: 0 };
+                if(snap.exists()) {
+                    const d=snap.data(); if(d.password!==pass) { hideLoader(); return window.showModal("Error", "Incorrect password.", "fa-solid fa-lock text-rose-500"); } uData=d;
+                    if(uData.lastDayPlayed===window.AppState.currentDay) { hideLoader(); let earned=0, lost=0; if(uData.history) { const tdIds=window.AppState.allQuestions.filter(q=>q.mode!=='random'&&parseInt(q.day)===window.AppState.currentDay).map(q=>q.id); Object.keys(uData.history).forEach(qId=>{ const r=uData.history[qId]; if(tdIds.includes(qId)||(r.timeAt&&new Date(r.timeAt).toDateString()===new Date().toDateString())) { if(r.correct) earned+=window.AppState.settings.scoringEnabled?window.AppState.settings.pointsCorrect:10; else if(r.answer) lost+=window.AppState.settings.scoringEnabled?window.AppState.settings.pointsNegative:0; } }); } const btns=`<button onclick="window.closeModal(); window.showAlreadyPlayedResult(${earned}, ${lost})" class="w-full bg-emerald-500 text-white font-black py-4 rounded-xl shadow-lg transition-transform active:scale-95 text-lg">VIEW RESULT <i class="fa-solid fa-arrow-right ml-2"></i></button>`; return window.showModal("Already Played", "You have already participated today. Only one attempt is allowed per day.", "fa-solid fa-calendar-check text-emerald-500", btns); }
+                } else { await setDoc(uRef, uData); }
+                window.AppState.user=uData; window.AppState.todayEarned=0; window.AppState.todayLost=0; prepareQuestions();
+            } catch(e) { hideLoader(); window.showModal("System Error", e.message, "fa-solid fa-triangle-exclamation text-rose-500"); }
+        };
+
+        function getDynamicTimeForToday() {
+            if(!window.AppState.settings.dynamicTimers || window.AppState.settings.dynamicTimers.length===0) return 30;
+            const t = window.AppState.settings.dynamicTimers.find(x => window.AppState.currentDay >= x.s && window.AppState.currentDay <= x.e);
+            return t ? t.t : 30;
+        }
+
+        function prepareQuestions() {
+            const mode = window.AppState.settings.questionMode; let selQ = [];
+            if(mode==='random') {
+                const hIds=window.AppState.user.history?Object.keys(window.AppState.user.history):[]; let pool=window.AppState.allQuestions.filter(q=>q.mode==='random'&&!hIds.includes(q.id));
+                for(let i=pool.length-1; i>0; i--) { const j=Math.floor(Math.random()*(i+1)); [pool[i],pool[j]]=[pool[j],pool[i]]; } selQ=pool.slice(0, window.AppState.settings.questionsPerDay||3);
+                const dTime = getDynamicTimeForToday(); selQ.forEach(q => q.timeLimit = dTime); // Apply dynamic timer
+            } else { selQ=window.AppState.allQuestions.filter(q=>q.mode!=='random'&&parseInt(q.day)===window.AppState.currentDay); selQ.sort((a,b)=>a.slotIndex-b.slotIndex); }
+
+            if(selQ.length===0) { hideLoader(); return window.showModal("Wait!", "Questions for today are not ready yet.", "fa-solid fa-clock text-amber-500"); }
+            window.AppState.dailyQuestions = selQ; window.AppState.currentQIndex = 0; window.history.pushState({page:'quiz'},"",window.location.href);
+            document.getElementById('auth-section').classList.add('hidden-safe'); document.getElementById('login-ad-banner').classList.add('hidden-safe'); document.getElementById('quiz-section').classList.remove('hidden-safe'); document.getElementById('quiz-section').classList.add('flex'); hideLoader(); loadQuestion();
+        }
+
+        function loadQuestion() {
+            window.AppState.isLocked=false; document.getElementById('btn-skip').classList.remove('hidden-safe'); document.getElementById('btn-submit').classList.remove('hidden-safe'); document.getElementById('btn-next').classList.add('hidden-safe'); document.getElementById('btn-next').classList.remove('flex');
+            const q = window.AppState.dailyQuestions[window.AppState.currentQIndex]; document.getElementById('q-counter').innerText = `${window.AppState.currentQIndex+1}/${window.AppState.dailyQuestions.length}`; document.getElementById('quiz-question-text').innerText = q.text;
+            const cont = document.getElementById('quiz-options-container'); cont.innerHTML = '';
+            if(q.type==='mcq') { const letters=['A','B','C','D']; q.options.forEach((opt, idx) => { cont.innerHTML += `<div class="relative mb-3"><input type="radio" name="quiz_option" id="opt_${idx}" value="${opt}" class="option-radio sr-only"><label for="opt_${idx}" class="flex items-center p-4 border-2 border-slate-100 bg-white rounded-2xl cursor-pointer transition-all text-slate-700 font-bold relative overflow-hidden group"><div class="opt-letter w-8 h-8 rounded-full bg-slate-100 text-slate-400 flex items-center justify-center mr-4 text-sm transition-colors shrink-0 font-black">${letters[idx]}</div><span class="pr-8 text-sm">${opt}</span><i class="opt-check fa-solid fa-circle-check absolute right-4 text-2xl text-emerald-500 opacity-0 transform scale-50"></i></label></div>`; }); } else { cont.innerHTML = `<textarea id="quiz-text-answer" rows="3" class="w-full p-4 border-2 border-slate-200 rounded-2xl font-bold text-sm outline-none focus:border-pink-400 bg-white" placeholder="Type your answer here..."></textarea>`; }
+            startTimer(q.timeLimit||30);
+        }
+
+        function startTimer(sec) { clearInterval(window.AppState.timerInterval); window.AppState.totalTimeLimit=sec; window.AppState.timeLeft=sec; const wBg=document.getElementById('wave-bg'), wFg=document.getElementById('wave-fg'), txt=document.getElementById('timer-text'), lbl=document.getElementById('timer-label'); updateWaveUI(sec, wBg, wFg, txt, lbl); window.AppState.timerInterval = setInterval(() => { if(window.AppState.isLocked) return; window.AppState.timeLeft--; updateWaveUI(window.AppState.timeLeft, wBg, wFg, txt, lbl); if(window.AppState.timeLeft<=0) { clearInterval(window.AppState.timerInterval); window.processAnswer(true); } }, 1000); }
+        function updateWaveUI(timeLeft, wBg, wFg, txt, lbl) { const pct=(timeLeft/window.AppState.totalTimeLimit)*100; const drop=100-pct; wBg.style.top=`${drop}%`; wFg.style.top=`${drop}%`; txt.innerText=timeLeft; let col='rgba(52,211,153,', tCol='#10b981'; if(pct<=60&&pct>30){ col='rgba(245,158,11,'; tCol='#f59e0b'; } else if(pct<=30){ col='rgba(244,63,94,'; tCol='#f43f5e'; } wBg.style.backgroundColor=`${col}0.2)`; wFg.style.backgroundColor=`${col}0.5)`; txt.style.color=tCol; lbl.style.color=tCol; }
+
+        window.handleAction = function(type) {
+            if(window.AppState.isLocked&&type!=='next') return;
+            if(type==='skip') { const btns=`<button onclick="window.closeModal()" class="flex-1 bg-slate-200 text-slate-800 font-bold py-3.5 rounded-xl text-sm transition-transform active:scale-95">Cancel</button><button onclick="window.closeModal(); window.processAnswer(false, true)" class="flex-1 bg-rose-500 text-white font-black py-3.5 rounded-xl text-sm shadow-md transition-transform active:scale-95">Yes, Skip</button>`; window.showModal("Skip Question?", "You won't get points. Sure?", "fa-solid fa-forward text-amber-500", btns); }
+            else if(type==='submit') { const q=window.AppState.dailyQuestions[window.AppState.currentQIndex]; let hasAns=false; if(q.type==='mcq') { hasAns=document.querySelector('input[name="quiz_option"]:checked')!==null; } else { hasAns=document.getElementById('quiz-text-answer').value.trim()!==''; } if(!hasAns) return window.showModal("No Answer", "Please select/type an answer.", "fa-solid fa-hand text-rose-500"); const btns=`<button onclick="window.closeModal()" class="flex-1 bg-slate-200 text-slate-800 font-bold py-3.5 rounded-xl text-sm transition-transform active:scale-95">Cancel</button><button onclick="window.closeModal(); window.processAnswer(false, false)" class="flex-1 bg-emerald-500 text-white font-black py-3.5 rounded-xl text-sm shadow-md transition-transform active:scale-95">Lock Answer</button>`; window.showModal("Submit Answer?", "Cannot be changed later.", "fa-solid fa-lock text-emerald-500", btns); }
+            else if(type==='next') { if(window.AppState.currentQIndex===window.AppState.dailyQuestions.length-1) window.finishQuiz(); else { window.AppState.currentQIndex++; loadQuestion(); } }
+        };
+
+        window.processAnswer = function(isTimeout=false, isSkip=false) {
+            window.AppState.isLocked=true; clearInterval(window.AppState.timerInterval); const q=window.AppState.dailyQuestions[window.AppState.currentQIndex]; let ans=null;
+            if(q.type==='mcq') { document.querySelectorAll('input[name="quiz_option"]').forEach(el=>el.disabled=true); const sel=document.querySelector('input[name="quiz_option"]:checked'); if(sel) ans=sel.value; } else { const txt=document.getElementById('quiz-text-answer'); if(txt){ txt.disabled=true; ans=txt.value.trim(); } }
+            if(!isSkip&&!isTimeout) { let isC = (ans&&ans.toLowerCase()===q.answer.trim().toLowerCase()); if(window.AppState.settings.scoringEnabled) { if(isC) window.AppState.todayEarned+=window.AppState.settings.pointsCorrect; else if(ans) window.AppState.todayLost+=window.AppState.settings.pointsNegative; } else { if(isC) window.AppState.todayEarned+=10; } if(!window.AppState.user.history) window.AppState.user.history={}; window.AppState.user.history[q.id] = { answer:ans, correct:isC, timeAt:new Date().toISOString() }; }
+            document.getElementById('btn-skip').classList.add('hidden-safe'); document.getElementById('btn-submit').classList.add('hidden-safe'); document.getElementById('btn-next').classList.remove('hidden-safe'); document.getElementById('btn-next').classList.add('flex');
+            if(isTimeout) { document.getElementById('btn-next').innerHTML=`TIME UP - NEXT <i class="fa-solid fa-arrow-right ml-2"></i>`; document.getElementById('btn-next').className="flex w-full bg-rose-600 text-white font-black py-4 rounded-2xl shadow-xl transition-transform active:scale-95 justify-center items-center tracking-wide"; } else { document.getElementById('btn-next').innerHTML=(window.AppState.currentQIndex===window.AppState.dailyQuestions.length-1)?`FINISH QUIZ <i class="fa-solid fa-flag-checkered ml-2"></i>`:`NEXT QUESTION <i class="fa-solid fa-arrow-right ml-2"></i>`; document.getElementById('btn-next').className="flex w-full bg-slate-900 text-white font-black py-4 rounded-2xl shadow-xl transition-transform active:scale-95 justify-center items-center tracking-wide text-lg"; }
+        };
+
+        window.finishQuiz = async function() {
+            showLoader(); const netToday=window.AppState.todayEarned-window.AppState.todayLost; window.AppState.user.totalScore+=netToday; window.AppState.user.lastDayPlayed=window.AppState.currentDay;
+            try { await updateDoc(docPath('users', window.AppState.user.phone), { totalScore:window.AppState.user.totalScore, lastDayPlayed:window.AppState.user.lastDayPlayed, history:window.AppState.user.history }); hideLoader(); document.getElementById('quiz-section').classList.add('hidden-safe'); document.getElementById('quiz-section').classList.remove('flex'); const rsec=document.getElementById('result-section'); rsec.classList.remove('hidden-safe'); document.getElementById('res-day-title').innerText=`Day ${window.AppState.currentDay} Result`; document.getElementById('res-earned').innerText=`+${window.AppState.todayEarned}`; document.getElementById('res-lost').innerText=`-${window.AppState.todayLost}`; document.getElementById('res-net-score').innerText=netToday>0?`+${netToday}`:netToday; window.updateResultColors(netToday); setTimeout(()=>rsec.classList.remove('scale-95','opacity-0'),50); } catch(e) { hideLoader(); window.showModal("Error", e.message, "fa-solid fa-triangle-exclamation text-rose-500"); }
+        };
+
+        function setupBackButtonTrap() { window.addEventListener('popstate', (e) => { const qSec=document.getElementById('quiz-section'); if(!qSec.classList.contains('hidden-safe')) { window.history.pushState({page:'quiz'},"",window.location.href); const btns=`<button onclick="window.closeModal()" class="flex-1 bg-slate-200 text-slate-800 font-bold py-3.5 rounded-xl text-sm transition-transform active:scale-95">Cancel</button><button onclick="window.closeModal(); window.finishQuiz()" class="flex-1 bg-rose-600 text-white font-bold py-3.5 rounded-xl text-sm shadow-md transition-transform active:scale-95">Exit Quiz</button>`; window.showModal("Exit Alert!", "Leaving now ends today's attempt. Proceed?", "fa-solid fa-right-from-bracket text-rose-500", btns); } }); }
+        window.showAlreadyPlayedResult = function(earned, lost) { document.getElementById('auth-section').classList.add('hidden-safe'); document.getElementById('login-ad-banner').classList.add('hidden-safe'); const rsec=document.getElementById('result-section'); rsec.classList.remove('hidden-safe'); const net=earned-lost; document.getElementById('res-day-title').innerText=`Day ${window.AppState.currentDay} Result`; document.getElementById('res-earned').innerText=`+${earned}`; document.getElementById('res-lost').innerText=`-${lost}`; document.getElementById('res-net-score').innerText=net>0?`+${net}`:net; window.updateResultColors(net); setTimeout(()=>rsec.classList.remove('scale-95','opacity-0'),50); };
+        window.resetToHome = function() { const rsec=document.getElementById('result-section'); rsec.classList.add('scale-95','opacity-0'); setTimeout(() => { rsec.classList.add('hidden-safe'); document.getElementById('auth-section').classList.remove('hidden-safe'); renderZone1Ad(); document.getElementById('login-phone').value=''; document.getElementById('login-name').value=''; document.getElementById('login-gender').value=''; document.getElementById('login-password').value=''; document.getElementById('login-name').classList.remove('bg-emerald-50','border-emerald-300','text-emerald-800'); }, 300); };
+
+        window.onload = initApp;
+    </script>
+</body>
+</html>
