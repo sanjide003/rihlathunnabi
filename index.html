@@ -33,13 +33,13 @@
 <body class="text-slate-800 antialiased selection:bg-pink-200">
     <div class="festive-art-bg"></div>
 
-    <!-- Slide-down Top Alert Bar for validation & offline mode -->
+    <!-- Slide-down Top Alert Bar -->
     <div id="top-alert-bar" class="fixed top-0 left-0 right-0 z-[400] transform -translate-y-full transition-transform duration-300 shadow-lg text-white text-xs font-bold text-center py-2.5 flex justify-center items-center">
         <i id="top-alert-icon" class="mr-2 fa-solid fa-triangle-exclamation"></i> <span id="top-alert-text">Message</span>
     </div>
 
-    <!-- Bilingual Language Toggle -->
-    <div class="fixed top-4 left-4 right-4 z-[50] flex justify-between items-center pointer-events-none">
+    <!-- Bilingual Language Toggle (Fixed Positioning Top Right) -->
+    <div class="fixed top-4 right-4 z-[50] flex justify-end pointer-events-none">
         <button onclick="window.toggleLang()" class="pointer-events-auto bg-white/90 backdrop-blur-md px-3.5 py-1.5 rounded-full shadow-md font-bold text-[10px] text-pink-600 flex items-center border border-pink-100 uppercase tracking-widest active:scale-95 transition-transform">
             <i class="fa-solid fa-language text-sm mr-1.5"></i> <span id="lang-text">EN</span>
         </button>
@@ -75,22 +75,21 @@
         <div class="flex-1 overflow-y-auto w-full max-w-[440px] mx-auto px-4 py-8 flex flex-col justify-center min-h-full pb-20">
             
             <!-- Auth Section -->
-            <div id="auth-section" class="w-full glass-card p-8 transition-all duration-500 transform relative z-10 mb-16">
-                <button onclick="document.getElementById('instructions-modal').classList.remove('hidden-safe')" class="absolute top-5 right-5 flex flex-col items-center justify-center text-pink-500 hover:text-pink-600 group z-20">
-                    <div class="w-10 h-10 bg-pink-100/90 rounded-full flex items-center justify-center shadow-md animate-bounce border border-pink-200"><i class="fa-solid fa-scroll text-base text-pink-600"></i></div>
-                    <span class="text-[9px] font-black tracking-widest text-pink-600 animate-pulse mt-0.5">README</span>
+            <div id="auth-section" class="w-full glass-card p-8 transition-all duration-500 transform relative z-10 mb-16 mt-6">
+                <button onclick="document.getElementById('instructions-modal').classList.remove('hidden-safe')" class="absolute -top-6 right-5 flex flex-col items-center justify-center text-pink-500 hover:text-pink-600 group z-20">
+                    <div class="w-12 h-12 bg-pink-100/90 rounded-full flex items-center justify-center shadow-md animate-bounce border-2 border-pink-200"><i class="fa-solid fa-scroll text-xl text-pink-600"></i></div>
+                    <span class="text-[10px] font-black tracking-widest text-pink-600 animate-pulse mt-1 bg-white/80 px-2 rounded-md">README</span>
                 </button>
                 <div class="text-center mb-8 relative">
-                    <!-- Default Gamepad icon as requested for the login page -->
                     <div class="w-24 h-24 bg-white rounded-full flex items-center justify-center mx-auto mb-4 shadow-[0_10px_25px_rgba(236,72,153,0.25)] overflow-hidden border-2 border-white"><i class="fa-solid fa-gamepad text-5xl text-pink-500" id="default-logo-login"></i><img id="custom-logo-login" src="" class="hidden-safe w-full h-full object-cover"></div>
                     <h2 class="text-3xl font-black text-slate-800 font-['Quicksand'] tracking-tight" id="login-title" data-i18n="login_title">Join Fest Quiz</h2>
                     <p class="text-sm text-slate-500 font-bold mt-1" id="login-sub" data-i18n="login_sub">Enter details to start</p>
                 </div>
                 <div class="space-y-4">
-                    <div class="relative input-group"><i class="fa-solid fa-phone absolute left-4 top-4 text-slate-400"></i><input type="tel" id="login-phone" maxlength="10" class="w-full pl-12 pr-4 py-3.5 bg-slate-50/80 border-2 border-slate-100 rounded-2xl font-bold text-slate-700 outline-none focus:border-pink-300" placeholder="10 Digit Phone Number" data-i18n-ph="ph_phone" oninput="window.handlePhoneInput(this.value)"></div>
-                    <div class="relative input-group"><i class="fa-solid fa-venus-mars absolute left-4 top-4 text-slate-400"></i><select id="login-gender" class="w-full pl-12 pr-4 py-3.5 bg-slate-50/80 border-2 border-slate-100 rounded-2xl font-bold text-slate-700 outline-none appearance-none focus:border-pink-300"><option value="" disabled selected data-i18n="ph_gender">Select Gender</option><option value="Male" data-i18n="gen_m">Male</option><option value="Female" data-i18n="gen_f">Female</option></select></div>
-                    <div class="relative input-group"><i class="fa-solid fa-user absolute left-4 top-4 text-slate-400"></i><input type="text" id="login-name" class="w-full pl-12 pr-4 py-3.5 bg-slate-50/80 border-2 border-slate-100 rounded-2xl font-bold text-slate-700 outline-none focus:border-pink-300" placeholder="Full Name" data-i18n-ph="ph_name"></div>
-                    <div class="relative input-group"><i class="fa-solid fa-lock absolute left-4 top-4 text-slate-400"></i><input type="password" id="login-password" class="w-full pl-12 pr-4 py-3.5 bg-slate-50/80 border-2 border-slate-100 rounded-2xl font-bold text-slate-700 outline-none focus:border-pink-300" placeholder="Password (Min 4 chars)" data-i18n-ph="ph_pass"></div>
+                    <div class="relative input-group"><i class="fa-solid fa-phone absolute left-4 top-4 text-slate-400"></i><input type="tel" id="login-phone" maxlength="10" class="w-full pl-12 pr-4 py-3.5 bg-slate-50/80 border-2 border-slate-100 rounded-2xl font-bold text-slate-700 outline-none focus:border-pink-300 transition-colors" placeholder="10 Digit Phone Number" data-i18n-ph="ph_phone" oninput="window.handlePhoneInput(this.value)"></div>
+                    <div class="relative input-group"><i class="fa-solid fa-venus-mars absolute left-4 top-4 text-slate-400"></i><select id="login-gender" class="w-full pl-12 pr-4 py-3.5 bg-slate-50/80 border-2 border-slate-100 rounded-2xl font-bold text-slate-700 outline-none appearance-none focus:border-pink-300 transition-colors"><option value="" disabled selected data-i18n="ph_gender">Select Gender</option><option value="Male" data-i18n="gen_m">Male</option><option value="Female" data-i18n="gen_f">Female</option></select></div>
+                    <div class="relative input-group"><i class="fa-solid fa-user absolute left-4 top-4 text-slate-400"></i><input type="text" id="login-name" class="w-full pl-12 pr-4 py-3.5 bg-slate-50/80 border-2 border-slate-100 rounded-2xl font-bold text-slate-700 outline-none focus:border-pink-300 transition-colors" placeholder="Full Name" data-i18n-ph="ph_name"></div>
+                    <div class="relative input-group"><i class="fa-solid fa-lock absolute left-4 top-4 text-slate-400"></i><input type="password" id="login-password" class="w-full pl-12 pr-4 py-3.5 bg-slate-50/80 border-2 border-slate-100 rounded-2xl font-bold text-slate-700 outline-none focus:border-pink-300 transition-colors" placeholder="Password (Min 4 chars)" data-i18n-ph="ph_pass"></div>
                     <button onclick="window.initiateLogin()" class="w-full bg-gradient-to-r from-pink-500 to-rose-500 text-white font-black py-4 rounded-2xl shadow-xl transition-transform active:scale-95 flex justify-center items-center mt-6 text-lg"><span data-i18n="btn_start">START QUIZ</span> <i class="fa-solid fa-play ml-2"></i></button>
                 </div>
             </div>
@@ -102,8 +101,10 @@
             </div>
 
             <!-- Quiz Section -->
-            <div id="quiz-section" class="w-full hidden-safe flex-col items-center relative z-10">
-                <div class="bg-white/95 backdrop-blur-md px-6 py-2 rounded-full shadow-lg text-pink-600 font-black tracking-widest text-sm mb-6 border border-white flex items-center"><i class="fa-solid fa-layer-group mr-2 opacity-70"></i> <span data-i18n="q_prefix">Q</span> <span id="q-counter" class="ml-1 text-slate-800">1/3</span></div>
+            <div id="quiz-section" class="w-full hidden-safe flex-col items-center relative z-10 pt-4">
+                <div class="w-full flex justify-between items-center mb-6">
+                    <div class="bg-white/95 backdrop-blur-md px-6 py-2 rounded-full shadow-lg text-pink-600 font-black tracking-widest text-sm border border-white flex items-center"><i class="fa-solid fa-layer-group mr-2 opacity-70"></i> <span data-i18n="q_prefix">Q</span> <span id="q-counter" class="ml-1 text-slate-800">1/3</span></div>
+                </div>
                 <div class="timer-circle mx-auto mb-8"><div class="timer-border"></div><div id="wave-bg" class="wave" style="top: 100%;"></div><div id="wave-fg" class="wave-fill" style="top: 100%;"></div><div class="timer-content"><div id="timer-text" class="text-6xl font-black text-rose-500 tracking-tighter">30</div><div id="timer-label" class="text-[11px] font-black text-rose-400 uppercase tracking-widest mt-1">SEC LEFT</div></div></div>
                 <div class="glass-card w-full p-6 sm:p-8 flex flex-col relative overflow-hidden">
                     <div class="flex items-start mb-6 border-b border-slate-100 pb-5">
@@ -120,8 +121,8 @@
             </div>
 
             <!-- Result Section -->
-            <div id="result-section" class="w-full glass-card p-8 hidden-safe text-center transform transition-all duration-500 scale-95 opacity-0 relative z-10">
-                <div class="w-24 h-24 bg-white rounded-full flex items-center justify-center mx-auto mb-5 shadow-[0_10px_25px_rgba(0,0,0,0.1)] overflow-hidden border-4 border-white"><i class="fa-solid fa-trophy text-5xl text-emerald-500" id="default-logo-result"></i><img id="custom-logo-result" src="" class="hidden-safe w-full h-full object-cover"></div>
+            <div id="result-section" class="w-full glass-card p-8 hidden-safe text-center transform transition-all duration-500 scale-95 opacity-0 relative z-10 mt-10">
+                <div class="w-24 h-24 bg-white rounded-full flex items-center justify-center mx-auto mb-5 shadow-[0_10px_25px_rgba(0,0,0,0.1)] overflow-hidden border-4 border-white -mt-16"><i class="fa-solid fa-trophy text-5xl text-emerald-500" id="default-logo-result"></i><img id="custom-logo-result" src="" class="hidden-safe w-full h-full object-cover"></div>
                 <h2 class="text-3xl font-black text-slate-800 font-['Quicksand'] mb-1" id="res-day-title">Result</h2><p class="text-sm text-slate-500 font-bold mb-6" data-i18n="res_sub">Completed successfully!</p>
                 
                 <div id="res-net-box" class="bg-indigo-50 border-2 border-indigo-100 p-5 rounded-[2rem] relative overflow-hidden mb-5 shadow-inner flex flex-col items-center justify-center"><div class="absolute -right-2 -bottom-2 opacity-10"><i id="res-net-icon" class="fa-solid fa-ranking-star text-7xl text-indigo-500"></i></div><div id="res-net-label" class="text-[11px] text-indigo-600 font-black uppercase tracking-widest mb-1.5 relative z-10" data-i18n="res_total">Total Points Today</div><div class="text-6xl font-black text-indigo-700 relative z-10 font-['Quicksand'] tracking-tighter" id="res-net-score">0</div></div>
@@ -155,13 +156,12 @@
 
         const firebaseConfig = { apiKey: "AIzaSyAfJSonmGHnf0t92B71ycuAZbc-CV3k7LE", authDomain: "fest-dsd-003.firebaseapp.com", projectId: "fest-dsd-003", storageBucket: "fest-dsd-003.firebasestorage.app", messagingSenderId: "409596394273", appId: "1:409596394273:web:b930012ce0a845ddb45c60" };
         const app = initializeApp(firebaseConfig);
-        // Experimental Long Polling fix applied
         const db = initializeFirestore(app, { experimentalForceLongPolling: true });
         const docPath = (coll, id) => doc(db, coll, id);
 
         window.AppState = {
             lang: 'en', user: null, allQuestions: [], dailyQuestions: [], currentQIndex: 0, timerInterval: null, timeLeft: 30, totalTimeLimit: 30, currentDay: 1, isLocked: false, todayEarned: 0, todayLost: 0,
-            settings: { questionMode: 'fixed', instructions: '', scoringEnabled: false, pointsCorrect: 10, pointsNegative: 0, resultsPublished: false, dynamicTimers: [], logoBase64: '', isMockTestActive: false },
+            settings: { questionMode: 'fixed', instructions: '', scoringEnabled: false, pointsCorrect: 10, pointsNegative: 0, resultsPublished: false, dynamicTimers: [], logoBase64: '', isMockTestActive: false, startDate: '' },
             ads: { masterEnabled: false, zone1: {}, zone2: {} }, publicUsers: []
         };
 
@@ -170,13 +170,19 @@
                 login_title: "Join Fest Quiz", login_sub: "Enter details to start", ph_phone: "10 Digit Phone Number", ph_gender: "Select Gender", gen_m: "Male", gen_f: "Female", ph_name: "Full Name", ph_pass: "Password (Min 4 chars)",
                 btn_start: "START QUIZ", q_prefix: "Q", btn_skip: "SKIP", btn_submit: "SUBMIT", btn_next: "NEXT",
                 res_sub: "Completed successfully!", res_total: "Total Points Today", res_earned: "Earned", res_lost: "Lost", btn_ok: "OK",
-                pub_title: "Final Champions", pub_sub: "Top 10 winners of the fest quiz!", rules: "Quiz Rules", agree: "I Agree & Continue", mock_mode: "Mock Test Mode", mock_sub: "Practice mode (Scores won't affect finals)"
+                pub_title: "Final Champions", pub_sub: "Top 10 winners of the fest quiz!", rules: "Quiz Rules", agree: "I Agree & Continue", mock_mode: "Mock Test Mode", mock_sub: "Practice mode (Scores won't affect finals)",
+                skip_q: "Skip Question?", skip_sure: "Are you sure you want to skip this question?", yes_skip: "Yes, Skip", cancel: "Cancel",
+                sub_q: "Submit Answer?", sub_sure: "Are you sure you want to submit this answer?", yes_sub: "Yes, Submit", please_sel: "Please select an answer!",
+                alr_played: "Already Played", alr_desc: "You have already completed today's quiz."
             },
             ml: {
-                login_title: "ഫെസ്റ്റ് ക്വിസിലേക്ക് സ്വാഗതം", login_sub: "വിവരങ്ങൾ നൽകി തുടങ്ങുക", ph_phone: "10 അക്ക മൊബൈൽ നമ്പർ", ph_gender: "ലിംഗം തിരഞ്ഞെടുക്കുക", gen_m: "പുരുഷൻ", gen_f: "സ്ത്രീ", ph_name: "പൂർണ്ണ നാമം", ph_pass: "പാസ്‌വേഡ് (കുറഞ്ഞത് 4 അക്ഷരം)",
+                login_title: "ഫെസ്റ്റ് ക്വിസിലേക്ക് സ്വാഗതം", login_sub: "വിവരങ്ങൾ നൽകി തുടങ്ങുക", ph_phone: "10 അക്ക മൊബൈൽ നമ്പർ", ph_gender: "ജൻഡർ തിരഞ്ഞെടുക്കുക", gen_m: "പുരുഷൻ", gen_f: "സ്ത്രീ", ph_name: "പൂർണ്ണ നാമം", ph_pass: "പാസ്‌വേഡ് (കുറഞ്ഞത് 4 അക്ഷരം)",
                 btn_start: "തുടങ്ങാം", q_prefix: "ചോദ്യം", btn_skip: "ഒഴിവാക്കുക", btn_submit: "സമർപ്പിക്കുക", btn_next: "അടുത്തത്",
                 res_sub: "വിജയകരമായി പൂർത്തിയാക്കി!", res_total: "ഇന്നത്തെ ആകെ പോയിന്റ്", res_earned: "ലഭിച്ചത്", res_lost: "നഷ്ടപ്പെട്ടത്", btn_ok: "ശരി",
-                pub_title: "വിജയികൾ", pub_sub: "ആദ്യത്തെ 10 സ്ഥാനക്കാർ", rules: "നിയമങ്ങൾ", agree: "വായിച്ചു മനസ്സിലാക്കി", mock_mode: "പരിശീലന ക്വിസ്", mock_sub: "ഇത് മെയിൻ സ്കോറിനെ ബാധിക്കില്ല"
+                pub_title: "വിജയികൾ", pub_sub: "ആദ്യത്തെ 10 സ്ഥാനക്കാർ", rules: "നിയമങ്ങൾ", agree: "വായിച്ചു മനസ്സിലാക്കി", mock_mode: "പരിശീലന ക്വിസ്", mock_sub: "ഇത് മെയിൻ സ്കോറിനെ ബാധിക്കില്ല",
+                skip_q: "സ്കിപ്പ് ചെയ്യണോ?", skip_sure: "ഈ ചോദ്യം ഒഴിവാക്കാൻ ഉറപ്പാണോ?", yes_skip: "അതെ, ഒഴിവാക്കുക", cancel: "ക്യാൻസൽ",
+                sub_q: "സമർപ്പിക്കണോ?", sub_sure: "ഈ ഉത്തരം സമർപ്പിക്കാൻ ഉറപ്പാണോ?", yes_sub: "അതെ, സമർപ്പിക്കുക", please_sel: "ദയവായി ഉത്തരം തിരഞ്ഞെടുക്കുക!",
+                alr_played: "പങ്കെടുത്തു കഴിഞ്ഞു", alr_desc: "നിങ്ങൾ ഇന്നത്തെ ക്വിസിൽ പങ്കെടുത്തു കഴിഞ്ഞു."
             }
         };
 
@@ -201,19 +207,17 @@
             renderInstructions();
         }
 
-        // Add soft back prevention
         function enableSoftBackPrevention() {
             history.pushState({page: 'quiz'}, null, location.href);
             window.onpopstate = function (e) {
                 if(document.getElementById('quiz-section').classList.contains('hidden-safe') === false) {
-                    history.go(1); // Push state forward again
+                    history.go(1); 
                     const btns = `<button onclick="window.closeModal()" class="flex-1 bg-slate-200 text-slate-800 font-bold py-3.5 rounded-xl text-sm">Cancel</button><button onclick="location.reload()" class="flex-1 bg-rose-600 text-white font-black py-3.5 rounded-xl text-sm shadow-md">Exit Quiz</button>`;
                     window.showModal("Exit Quiz?", "Your progress will be lost if you exit now.", "fa-solid fa-triangle-exclamation text-amber-500", btns);
                 }
             };
         }
 
-        // Top Alert UI for Validation & Offline Modes
         let alertTimeout;
         window.showTopAlert = function(msg, type='error', sticky=false) {
             const bar = document.getElementById('top-alert-bar'); const icon = document.getElementById('top-alert-icon'); const txt = document.getElementById('top-alert-text');
@@ -229,7 +233,6 @@
         window.addEventListener('offline', () => window.showTopAlert('No internet connection - Offline mode', 'error', true));
         window.addEventListener('online', () => { window.showTopAlert('Back online!', 'success', false); });
 
-        // Normal Modal Logic
         window.showModal = function(t, m, ic, cb=null) { const mo=document.getElementById('sys-modal'), mc=document.getElementById('sys-modal-card'); document.getElementById('sys-modal-title').innerText=t; document.getElementById('sys-modal-msg').innerText=m; document.getElementById('sys-modal-icon').innerHTML=`<i class="${ic} text-5xl"></i>`; if(cb){document.getElementById('sys-modal-btns').innerHTML=cb;}else{document.getElementById('sys-modal-btns').innerHTML=`<button onclick="window.closeModal()" class="w-full bg-slate-900 text-white font-black py-4 rounded-xl text-sm transition-transform active:scale-95 shadow-lg">OK</button>`;} mo.classList.remove('hidden-safe'); setTimeout(()=>{mo.classList.remove('opacity-0'); mc.classList.remove('scale-95');},10); };
         window.closeModal = function() { const mo=document.getElementById('sys-modal'), mc=document.getElementById('sys-modal-card'); mo.classList.add('opacity-0'); mc.classList.add('scale-95'); setTimeout(()=>mo.classList.add('hidden-safe'),300); };
         window.showLoader = function() { document.getElementById('loader').classList.remove('hidden-safe'); };
@@ -245,7 +248,7 @@
                         ['login', 'quiz', 'result'].forEach(x => { const ci=document.getElementById(`custom-logo-${x}`), di=document.getElementById(`default-logo-${x}`); if(ci&&di){ ci.src=data.logoBase64; ci.classList.remove('hidden-safe'); di.classList.add('hidden-safe'); } });
                     }
                     if(data.startDate) window.AppState.currentDay = calcDay(data.startDate);
-                    applyLanguage(); // Calls renderInstructions & checks mock
+                    applyLanguage();
                     checkPublicMode();
                 }
             });
@@ -331,10 +334,29 @@
             });
         };
 
-        window.handlePhoneInput = async function(val) { const clean = val.replace(/\D/g,'').slice(0,10); document.getElementById('login-phone').value = clean; if(clean.length === 10) { try { const snap = await getDoc(docPath('users', clean)); if(snap.exists() && snap.data().isRegistered!==false) { const d = snap.data(); document.getElementById('login-name').value = d.name; document.getElementById('login-gender').value = d.gender; } } catch(e){} } };
+        window.handlePhoneInput = async function(val) { 
+            const clean = val.replace(/\D/g,'').slice(0,10); 
+            document.getElementById('login-phone').value = clean; 
+            if(clean.length === 10) { 
+                try { 
+                    const snap = await getDoc(docPath('users', clean)); 
+                    if(snap.exists() && snap.data().isRegistered!==false) { 
+                        const d = snap.data(); 
+                        document.getElementById('login-name').value = d.name; 
+                        document.getElementById('login-gender').value = d.gender; 
+                        document.getElementById('login-name').classList.add('bg-emerald-50', 'border-emerald-300');
+                        document.getElementById('login-gender').classList.add('bg-emerald-50', 'border-emerald-300');
+                    } 
+                } catch(e){} 
+            } else {
+                document.getElementById('login-name').classList.remove('bg-emerald-50', 'border-emerald-300');
+                document.getElementById('login-gender').classList.remove('bg-emerald-50', 'border-emerald-300');
+            }
+        };
         
         window.initiateLogin = async function() {
             const phone=document.getElementById('login-phone').value.trim(), name=document.getElementById('login-name').value.trim(), gender=document.getElementById('login-gender').value, pass=document.getElementById('login-password').value;
+            const dict = i18n[window.AppState.lang];
             if(phone.length!==10) return window.showTopAlert("Enter 10 digit phone number", "error");
             if(!name || !gender) return window.showTopAlert("Please fill all details", "error");
             if(pass.length<4) return window.showTopAlert("Password minimum 4 chars", "error");
@@ -354,22 +376,87 @@
 
         window.processLogin = async function(saveToDb) {
             showLoader();
+            const dict = i18n[window.AppState.lang];
             const phone=document.getElementById('login-phone').value.trim(), name=document.getElementById('login-name').value.trim(), gender=document.getElementById('login-gender').value, pass=document.getElementById('login-password').value;
             let uData = { phone, name, gender, password: pass, totalScore: 0, mockScore: 0, history: {}, lastDayPlayed: 0, isRegistered: saveToDb };
             
             if(saveToDb) {
                 const snap = await getDoc(docPath('users', phone));
                 if(snap.exists()) {
-                    const d = snap.data(); if(d.password !== pass) { hideLoader(); return window.showTopAlert("Incorrect password.", "error"); }
+                    const d = snap.data(); if(d.password !== pass) { hideLoader(); return window.showTopAlert(window.AppState.lang==='ml'?"പാസ്‌വേഡ് തെറ്റാണ്.":"Incorrect password.", "error"); }
                     uData = d; uData.isRegistered = true;
-                    if(!window.AppState.settings.isMockTestActive && uData.lastDayPlayed === window.AppState.currentDay) {
+                    
+                    // ROBUST ANTI-CHEAT CHECK (Block multiple plays & refreshing)
+                    let hasPlayedToday = false;
+                    if(uData.lastDayPlayed === window.AppState.currentDay) {
+                        hasPlayedToday = true;
+                    } else if(uData.history) {
+                        const sDate = window.AppState.settings.startDate;
+                        let sT = new Date(sDate||Date.now()); sT.setHours(0,0,0,0);
+                        for(let qid of Object.keys(uData.history)) {
+                            let rec = uData.history[qid];
+                            if(rec && rec.timeAt) {
+                                let rT = new Date(rec.timeAt);
+                                let dN = Math.floor(Math.abs(rT - sT) / (1000 * 60 * 60 * 24)) + 1;
+                                if(dN === window.AppState.currentDay) { hasPlayedToday = true; break; }
+                            }
+                        }
+                    }
+
+                    if(!window.AppState.settings.isMockTestActive && hasPlayedToday) {
                         hideLoader(); 
-                        const btns = `<button onclick="window.closeModal(); window.finishQuiz()" class="w-full bg-slate-900 text-white font-black py-3.5 rounded-xl text-sm shadow-md">Show Result</button>`;
-                        return window.showModal("Already Played", "You have already completed today's quiz.", "fa-solid fa-check text-emerald-500", btns);
+                        window.AppState.user = uData; 
+                        const btnTxt = window.AppState.lang === 'ml' ? 'ശരി' : 'OK';
+                        const btns = `<button onclick="window.closeModal(); window.showTodayResultFromLogin()" class="w-full bg-slate-900 text-white font-black py-3.5 rounded-xl text-sm shadow-md">${btnTxt}</button>`;
+                        return window.showModal(dict.alr_played, dict.alr_desc, "fa-solid fa-check-circle text-emerald-500", btns);
                     }
                 } else { await setDoc(docPath('users', phone), uData); }
             }
             window.AppState.user = uData; window.AppState.todayEarned = 0; window.AppState.todayLost = 0; prepareQuestions();
+        };
+
+        window.showTodayResultFromLogin = function() {
+            showLoader();
+            let earned = 0; let lost = 0;
+            const sDate = window.AppState.settings.startDate;
+            const isMock = window.AppState.settings.isMockTestActive;
+
+            if(window.AppState.user.history) {
+                Object.keys(window.AppState.user.history).forEach(qid => {
+                    let rec = window.AppState.user.history[qid];
+                    if(rec && rec.timeAt) {
+                        let rT = new Date(rec.timeAt);
+                        let sT = new Date(sDate||Date.now()); sT.setHours(0,0,0,0);
+                        let dN = Math.floor(Math.abs(rT - sT) / (1000 * 60 * 60 * 24)) + 1;
+                        if(dN === window.AppState.currentDay) {
+                            if(rec.correct) earned += (window.AppState.settings.pointsCorrect||10);
+                            else if(rec.answer) lost += (window.AppState.settings.pointsNegative||0);
+                        }
+                    }
+                });
+            }
+            window.AppState.todayEarned = earned;
+            window.AppState.todayLost = lost;
+
+            hideLoader();
+            document.getElementById('auth-section').classList.add('hidden-safe');
+            document.getElementById('login-ad-banner').classList.add('hidden-safe');
+            const rsec=document.getElementById('result-section');
+            rsec.classList.remove('hidden-safe');
+
+            let dayStr = isMock?"Mock Result":`Day ${window.AppState.currentDay} Result`; 
+            if(window.AppState.lang==='ml') dayStr = isMock?"പരിശീലന ഫലം":`Day ${window.AppState.currentDay} റിസൾട്ട്`;
+            document.getElementById('res-day-title').innerText=dayStr; 
+
+            let netToday = earned - lost;
+            document.getElementById('res-earned').innerText=`+${earned}`; 
+            document.getElementById('res-lost').innerText=`-${lost}`; 
+            document.getElementById('res-net-score').innerText=netToday>0?`+${netToday}`:netToday;
+            
+            const netBox=document.getElementById('res-net-box'), netIcon=document.getElementById('res-net-icon'); 
+            netBox.className = 'border-2 p-5 rounded-[2rem] relative overflow-hidden mb-5 shadow-inner flex flex-col items-center justify-center'; 
+            if(netToday>=0){netBox.classList.add('bg-emerald-50','border-emerald-200'); netIcon.className='fa-solid fa-ranking-star text-7xl text-emerald-500'; document.getElementById('res-net-score').classList.replace('text-rose-700', 'text-emerald-700'); document.getElementById('res-net-label').classList.replace('text-rose-600', 'text-emerald-600'); }else{netBox.classList.add('bg-rose-50','border-rose-200'); netIcon.className='fa-solid fa-ranking-star text-7xl text-rose-500'; document.getElementById('res-net-score').classList.replace('text-emerald-700', 'text-rose-700'); document.getElementById('res-net-label').classList.replace('text-emerald-600', 'text-rose-600'); }
+            setTimeout(()=>rsec.classList.remove('scale-95','opacity-0'),50);
         };
 
         function getDynamicTimeForToday() {
@@ -395,6 +482,13 @@
 
             if(selQ.length===0) { hideLoader(); return window.showModal("Wait!", "Questions are not ready.", "fa-solid fa-clock text-amber-500"); }
             window.AppState.dailyQuestions = selQ; window.AppState.currentQIndex = 0;
+            
+            // ANTI-CHEAT: Lock user entry for today IMMEDIATELY upon starting quiz
+            if(!isMock && window.AppState.user.isRegistered) {
+                window.AppState.user.lastDayPlayed = window.AppState.currentDay;
+                try { updateDoc(docPath('users', window.AppState.user.phone), { lastDayPlayed: window.AppState.currentDay }); } catch(e){}
+            }
+
             enableSoftBackPrevention();
             document.getElementById('auth-section').classList.add('hidden-safe'); document.getElementById('login-ad-banner').classList.add('hidden-safe'); document.getElementById('quiz-section').classList.remove('hidden-safe'); document.getElementById('quiz-section').classList.add('flex'); hideLoader(); loadQuestion();
         }
@@ -407,20 +501,60 @@
             startTimer(q.timeLimit||30);
         }
 
-        function startTimer(sec) { clearInterval(window.AppState.timerInterval); window.AppState.totalTimeLimit=sec; window.AppState.timeLeft=sec; const wBg=document.getElementById('wave-bg'), wFg=document.getElementById('wave-fg'), txt=document.getElementById('timer-text'), lbl=document.getElementById('timer-label'); updateWaveUI(sec, wBg, wFg, txt, lbl); window.AppState.timerInterval = setInterval(() => { if(window.AppState.isLocked) return; window.AppState.timeLeft--; updateWaveUI(window.AppState.timeLeft, wBg, wFg, txt, lbl); if(window.AppState.timeLeft<=0) { clearInterval(window.AppState.timerInterval); window.processAnswer(true); } }, 1000); }
+        function startTimer(sec) { 
+            clearInterval(window.AppState.timerInterval); window.AppState.totalTimeLimit=sec; window.AppState.timeLeft=sec; 
+            const wBg=document.getElementById('wave-bg'), wFg=document.getElementById('wave-fg'), txt=document.getElementById('timer-text'), lbl=document.getElementById('timer-label'); 
+            updateWaveUI(sec, wBg, wFg, txt, lbl); 
+            window.AppState.timerInterval = setInterval(() => { 
+                if(window.AppState.isLocked) return; 
+                window.AppState.timeLeft--; updateWaveUI(window.AppState.timeLeft, wBg, wFg, txt, lbl); 
+                if(window.AppState.timeLeft<=0) { 
+                    clearInterval(window.AppState.timerInterval); 
+                    window.closeModal(); // Ensure modals are closed
+                    window.processAnswer(true); 
+                } 
+            }, 1000); 
+        }
         function updateWaveUI(timeLeft, wBg, wFg, txt, lbl) { const pct=(timeLeft/window.AppState.totalTimeLimit)*100; const drop=100-pct; wBg.style.top=`${drop}%`; wFg.style.top=`${drop}%`; txt.innerText=timeLeft; let col='rgba(52,211,153,', tCol='#10b981'; if(pct<=60&&pct>30){ col='rgba(245,158,11,'; tCol='#f59e0b'; } else if(pct<=30){ col='rgba(244,63,94,'; tCol='#f43f5e'; } wBg.style.backgroundColor=`${col}0.2)`; wFg.style.backgroundColor=`${col}0.5)`; txt.style.color=tCol; lbl.style.color=tCol; }
 
         window.handleAction = function(type) {
             if(window.AppState.isLocked&&type!=='next') return;
-            if(type==='skip') { window.processAnswer(false, true); }
-            else if(type==='submit') { const q=window.AppState.dailyQuestions[window.AppState.currentQIndex]; let hasAns=false; if(q.type==='mcq') hasAns=document.querySelector('input[name="quiz_option"]:checked')!==null; else hasAns=document.getElementById('quiz-text-answer').value.trim()!==''; if(!hasAns) return; window.processAnswer(false, false); }
-            else if(type==='next') { if(window.AppState.currentQIndex===window.AppState.dailyQuestions.length-1) window.finishQuiz(); else { window.AppState.currentQIndex++; loadQuestion(); } }
+            const dict = i18n[window.AppState.lang];
+            
+            if(type==='skip') { 
+                const btns = `<button onclick="window.closeModal()" class="flex-1 bg-slate-200 text-slate-800 font-bold py-3.5 rounded-xl text-sm">${dict.cancel}</button><button onclick="window.closeModal(); window.processAnswer(false, true)" class="flex-1 bg-rose-500 text-white font-black py-3.5 rounded-xl text-sm shadow-md">${dict.yes_skip}</button>`;
+                window.showModal(dict.skip_q, dict.skip_sure, "fa-solid fa-forward-step text-rose-500", btns);
+            }
+            else if(type==='submit') { 
+                const q=window.AppState.dailyQuestions[window.AppState.currentQIndex]; let hasAns=false; 
+                if(q.type==='mcq') hasAns=document.querySelector('input[name="quiz_option"]:checked')!==null; else hasAns=document.getElementById('quiz-text-answer').value.trim()!==''; 
+                if(!hasAns) return window.showTopAlert(dict.please_sel, "error"); 
+                
+                const btns = `<button onclick="window.closeModal()" class="flex-1 bg-slate-200 text-slate-800 font-bold py-3.5 rounded-xl text-sm">${dict.cancel}</button><button onclick="window.closeModal(); window.processAnswer(false, false)" class="flex-1 bg-emerald-500 text-white font-black py-3.5 rounded-xl text-sm shadow-md">${dict.yes_sub}</button>`;
+                window.showModal(dict.sub_q, dict.sub_sure, "fa-solid fa-check-circle text-emerald-500", btns);
+            }
+            else if(type==='next') { 
+                if(window.AppState.currentQIndex===window.AppState.dailyQuestions.length-1) window.finishQuiz(); else { window.AppState.currentQIndex++; loadQuestion(); } 
+            }
         };
 
         window.processAnswer = function(isTimeout=false, isSkip=false) {
             window.AppState.isLocked=true; clearInterval(window.AppState.timerInterval); const q=window.AppState.dailyQuestions[window.AppState.currentQIndex]; let ans=null;
             if(q.type==='mcq') { document.querySelectorAll('input[name="quiz_option"]').forEach(el=>el.disabled=true); const sel=document.querySelector('input[name="quiz_option"]:checked'); if(sel) ans=sel.value; } else { const txt=document.getElementById('quiz-text-answer'); if(txt){ txt.disabled=true; ans=txt.value.trim(); } }
-            if(!isSkip&&!isTimeout) { let isC = (ans&&ans.toLowerCase()===q.answer.trim().toLowerCase()); if(window.AppState.settings.scoringEnabled) { if(isC) window.AppState.todayEarned+=window.AppState.settings.pointsCorrect; else if(ans) window.AppState.todayLost+=window.AppState.settings.pointsNegative; } else { if(isC) window.AppState.todayEarned+=10; } if(!window.AppState.user.history) window.AppState.user.history={}; window.AppState.user.history[q.id] = { answer:ans, correct:isC, timeAt:new Date().toISOString() }; }
+            
+            if(!isSkip&&!isTimeout) { 
+                let isC = (ans&&ans.toLowerCase()===q.answer.trim().toLowerCase()); 
+                if(window.AppState.settings.scoringEnabled) { if(isC) window.AppState.todayEarned+=window.AppState.settings.pointsCorrect; else if(ans) window.AppState.todayLost+=window.AppState.settings.pointsNegative; } else { if(isC) window.AppState.todayEarned+=10; } 
+                if(!window.AppState.user.history) window.AppState.user.history={}; window.AppState.user.history[q.id] = { answer:ans, correct:isC, timeAt:new Date().toISOString() }; 
+            } else {
+                if(!window.AppState.user.history) window.AppState.user.history={}; window.AppState.user.history[q.id] = { answer:null, correct:false, timeAt:new Date().toISOString(), skipped: isSkip, timeout: isTimeout };
+            }
+
+            // ANTI-CHEAT: Incremental Save - Save each answer to DB immediately so refresh doesn't wipe history
+            if(window.AppState.user.isRegistered && !window.AppState.settings.isMockTestActive) {
+                try { updateDoc(docPath('users', window.AppState.user.phone), { history: window.AppState.user.history }); } catch(e){}
+            }
+
             document.getElementById('btn-skip').classList.add('hidden-safe'); document.getElementById('btn-submit').classList.add('hidden-safe'); document.getElementById('btn-next').classList.remove('hidden-safe'); document.getElementById('btn-next').classList.add('flex');
             let isLast = window.AppState.currentQIndex===window.AppState.dailyQuestions.length-1;
             let nxtTxt = isLast ? "FINISH QUIZ" : "NEXT"; if(window.AppState.lang==='ml') nxtTxt = isLast ? "പൂർത്തിയാക്കുക" : "അടുത്തത്";
@@ -463,7 +597,17 @@
         };
         window.closeInterstitialAd = function() { clearInterval(window.AppState.z2SlideInterval); const modal = document.getElementById('interstitial-ad-modal'); modal.classList.add('opacity-0'); setTimeout(() => { modal.classList.add('hidden-safe'); window.resetToHome(); }, 300); };
         window.openAdLink = function() { if(window.AppState.targetAdLink && window.AppState.targetAdLink !== '#') window.open(window.AppState.targetAdLink, '_blank'); };
-        window.resetToHome = function() { const rsec=document.getElementById('result-section'); rsec.classList.add('scale-95','opacity-0'); setTimeout(() => { rsec.classList.add('hidden-safe'); document.getElementById('auth-section').classList.remove('hidden-safe'); renderZone1Ad(); document.getElementById('login-password').value=''; }, 300); };
+        window.resetToHome = function() { 
+            const rsec=document.getElementById('result-section'); rsec.classList.add('scale-95','opacity-0'); 
+            setTimeout(() => { 
+                rsec.classList.add('hidden-safe'); 
+                document.getElementById('auth-section').classList.remove('hidden-safe'); 
+                renderZone1Ad(); 
+                document.getElementById('login-password').value=''; 
+                document.getElementById('login-name').classList.remove('bg-emerald-50', 'border-emerald-300');
+                document.getElementById('login-gender').classList.remove('bg-emerald-50', 'border-emerald-300');
+            }, 300); 
+        };
 
         window.onload = initApp;
     </script>
