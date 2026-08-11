@@ -3,18 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Fest Quiz - Admin Panel</title>
+    <title>Fest Quiz - Admin Hub</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&display=swap');
         body { font-family: 'Inter', sans-serif; background-color: #f8fafc; margin: 0; padding: 0; overflow: hidden; height: 100svh; width: 100vw; }
         .hidden-safe { display: none !important; }
         ::-webkit-scrollbar { width: 4px; height: 4px; }
         ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
         .hide-scrollbar::-webkit-scrollbar { display: none; }
-        
         .view-section { display: none; }
         .view-section.active { display: flex; }
         .danger-stripes { background: repeating-linear-gradient(45deg, #fef2f2, #fef2f2 10px, #fff5f5 10px, #fff5f5 20px); }
@@ -25,7 +23,7 @@
     <div class="bg-gradient-to-r from-slate-900 to-indigo-950 text-white p-4 shadow-lg flex justify-between items-center z-30 shrink-0">
         <h1 class="font-black text-lg flex items-center tracking-wide">
             <div class="w-8 h-8 bg-indigo-500 rounded-lg flex items-center justify-center mr-3 shadow-inner"><i class="fa-solid fa-shield-halved text-white text-sm"></i></div>
-            Admin Panel
+            Admin Hub
         </h1>
         <button onclick="window.toggleAdminMenu()" class="w-10 h-10 bg-white/10 rounded-xl flex items-center justify-center hover:bg-white/20 transition-all border border-white/10 shadow-sm"><i class="fa-solid fa-bars text-lg"></i></button>
     </div>
@@ -34,7 +32,7 @@
         <button onclick="window.switchAdminTab('dashboard')" class="text-left px-5 py-3.5 font-bold text-sm text-slate-700 hover:bg-indigo-50 hover:text-indigo-700 flex items-center"><i class="fa-solid fa-chart-pie w-6 text-indigo-400"></i> Dashboard</button>
         <button onclick="window.switchAdminTab('setup')" class="text-left px-5 py-3.5 font-bold text-sm text-slate-700 hover:bg-indigo-50 hover:text-indigo-700 flex items-center border-t border-slate-50"><i class="fa-solid fa-gears w-6 text-indigo-400"></i> Core Settings</button>
         <button onclick="window.switchAdminTab('questions')" class="text-left px-5 py-3.5 font-bold text-sm text-slate-700 hover:bg-indigo-50 hover:text-indigo-700 flex items-center border-t border-slate-50"><i class="fa-solid fa-clipboard-list w-6 text-indigo-400"></i> Questions</button>
-        <button onclick="window.switchAdminTab('ads')" class="text-left px-5 py-3.5 font-bold text-sm text-slate-700 hover:bg-indigo-50 hover:text-indigo-700 flex items-center border-t border-slate-50"><i class="fa-solid fa-bullhorn w-6 text-amber-500"></i> Ads Management</button>
+        <button onclick="window.switchAdminTab('ads')" class="text-left px-5 py-3.5 font-bold text-sm text-slate-700 hover:bg-indigo-50 hover:text-indigo-700 flex items-center border-t border-slate-50"><i class="fa-solid fa-bullhorn w-6 text-amber-500"></i> Ad Management</button>
         <button onclick="window.switchAdminTab('users')" class="text-left px-5 py-3.5 font-bold text-sm text-slate-700 hover:bg-indigo-50 hover:text-indigo-700 flex items-center border-t border-slate-50"><i class="fa-solid fa-ranking-star w-6 text-emerald-500"></i> Leaderboard</button>
     </div>
 
@@ -44,16 +42,17 @@
             <div class="bg-white p-5 sm:p-6 rounded-3xl border border-slate-100 shadow-sm">
                 <h2 class="text-xl font-black text-slate-800 mb-1">System Overview</h2>
                 <p class="text-xs font-bold text-slate-400 mb-6 uppercase tracking-wider">Real-time Platform Statistics</p>
+                
                 <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
                     <div class="bg-indigo-50 border border-indigo-100 rounded-2xl p-4 flex flex-col relative overflow-hidden group">
                         <i class="fa-solid fa-users absolute -right-3 -bottom-3 text-5xl text-indigo-500/10 group-hover:scale-110 transition-transform"></i>
-                        <span class="text-[10px] font-black text-indigo-600 uppercase tracking-widest mb-1 relative z-10">Total Users</span>
+                        <span class="text-[10px] font-black text-indigo-600 uppercase tracking-widest mb-1 relative z-10">Total Participants</span>
                         <span id="dash-users-count" class="text-3xl font-black text-indigo-700 relative z-10">0</span>
                     </div>
-                    <div class="bg-emerald-50 border border-emerald-100 rounded-2xl p-4 flex flex-col relative overflow-hidden group">
-                        <i class="fa-solid fa-calendar-day absolute -right-3 -bottom-3 text-5xl text-emerald-500/10 group-hover:scale-110 transition-transform"></i>
-                        <span class="text-[10px] font-black text-emerald-600 uppercase tracking-widest mb-1 relative z-10">Current Day</span>
-                        <span id="dash-day" class="text-3xl font-black text-emerald-700 relative z-10">Day 1</span>
+                    <div onclick="window.showDaywiseStats()" class="bg-emerald-50 border border-emerald-100 rounded-2xl p-4 flex flex-col relative overflow-hidden group cursor-pointer hover:bg-emerald-100 transition-colors">
+                        <i class="fa-solid fa-chart-line absolute -right-3 -bottom-3 text-5xl text-emerald-500/10 group-hover:scale-110 transition-transform"></i>
+                        <span class="text-[10px] font-black text-emerald-600 uppercase tracking-widest mb-1 relative z-10">Today's Participants</span>
+                        <div class="flex items-end space-x-2 relative z-10"><span id="dash-today-count" class="text-3xl font-black text-emerald-700">0</span><span class="text-[10px] font-bold text-emerald-600 mb-1.5 underline decoration-emerald-300">View All</span></div>
                     </div>
                     <div class="bg-blue-50 border border-blue-100 rounded-2xl p-4 flex flex-col relative overflow-hidden group">
                         <i class="fa-solid fa-clipboard-question absolute -right-3 -bottom-3 text-5xl text-blue-500/10 group-hover:scale-110 transition-transform"></i>
@@ -79,13 +78,13 @@
                         <div class="w-10 h-10 rounded-full bg-white shadow-sm flex items-center justify-center mr-4 text-emerald-500 group-hover:scale-110 transition-transform"><i class="fa-solid fa-ranking-star"></i></div>
                         <div><div class="font-bold text-sm text-slate-800">View Leaderboard</div><div class="text-[10px] font-semibold text-slate-500">Check user rankings</div></div>
                     </button>
+                    <button onclick="window.switchAdminTab('setup')" class="flex items-center p-4 bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-2xl transition-colors text-left group">
+                        <div class="w-10 h-10 rounded-full bg-white shadow-sm flex items-center justify-center mr-4 text-purple-500 group-hover:scale-110 transition-transform"><i class="fa-solid fa-flask"></i></div>
+                        <div><div class="font-bold text-sm text-slate-800">Mock Test Control</div><div class="text-[10px] font-semibold text-slate-500">Enable practice mode</div></div>
+                    </button>
                     <button onclick="window.switchAdminTab('ads')" class="flex items-center p-4 bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-2xl transition-colors text-left group">
                         <div class="w-10 h-10 rounded-full bg-white shadow-sm flex items-center justify-center mr-4 text-amber-500 group-hover:scale-110 transition-transform"><i class="fa-solid fa-bullhorn"></i></div>
                         <div><div class="font-bold text-sm text-slate-800">Control Ads</div><div class="text-[10px] font-semibold text-slate-500">Update sponsors & banners</div></div>
-                    </button>
-                    <button onclick="window.switchAdminTab('setup')" class="flex items-center p-4 bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-2xl transition-colors text-left group">
-                        <div class="w-10 h-10 rounded-full bg-white shadow-sm flex items-center justify-center mr-4 text-blue-500 group-hover:scale-110 transition-transform"><i class="fa-solid fa-gears"></i></div>
-                        <div><div class="font-bold text-sm text-slate-800">Platform Settings</div><div class="text-[10px] font-semibold text-slate-500">Change dates & rules</div></div>
                     </button>
                 </div>
             </div>
@@ -93,17 +92,21 @@
 
         <div id="admin-setup" class="view-section hidden-safe flex-col h-full overflow-y-auto max-w-3xl mx-auto w-full">
             <div class="bg-white p-5 rounded-3xl border border-slate-100 shadow-sm space-y-5 mb-6">
+                
                 <div class="flex justify-between items-center border-b border-slate-50 pb-3">
                     <h3 class="font-black text-slate-800 text-sm flex items-center"><i class="fa-solid fa-gears text-indigo-500 mr-2"></i> Core Configuration</h3>
-                    
-                    <!-- NEW: Publish Results Switch -->
                     <div class="flex items-center bg-indigo-50 px-3 py-1.5 rounded-lg border border-indigo-100">
                         <span class="text-[10px] font-black text-indigo-700 mr-3 uppercase tracking-wider">Publish Final Results</span>
-                        <label class="relative inline-flex items-center cursor-pointer">
-                            <input type="checkbox" id="setup-publish-toggle" class="sr-only peer">
-                            <div class="w-9 h-5 bg-slate-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-indigo-600"></div>
-                        </label>
+                        <label class="relative inline-flex items-center cursor-pointer"><input type="checkbox" id="setup-publish-toggle" class="sr-only peer"><div class="w-9 h-5 bg-slate-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-indigo-600"></div></label>
                     </div>
+                </div>
+
+                <div class="flex items-center justify-between bg-purple-50 p-4 rounded-2xl border border-purple-100">
+                    <div>
+                        <h4 class="font-black text-sm text-purple-800 flex items-center"><i class="fa-solid fa-flask mr-2"></i> Mock Test Mode</h4>
+                        <p class="text-[10px] text-purple-600 font-bold mt-1">Users can play practice questions. No effect on main scores.</p>
+                    </div>
+                    <label class="relative inline-flex items-center cursor-pointer"><input type="checkbox" id="setup-mock-toggle" class="sr-only peer"><div class="w-11 h-6 bg-slate-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-purple-600"></div></label>
                 </div>
                 
                 <div class="grid grid-cols-2 gap-4">
@@ -123,203 +126,113 @@
                 
                 <div class="grid grid-cols-2 gap-3">
                     <div class="flex items-center justify-between bg-blue-50/50 p-2.5 rounded-xl border border-blue-100"><span class="text-[10px] font-bold text-blue-800">Days:</span><span id="setup-total-days" class="text-xs font-black text-blue-700 bg-white px-2 rounded shadow-sm">0</span></div>
-                    <div class="flex items-center justify-between bg-emerald-50/50 p-2.5 rounded-xl border border-emerald-100"><span class="text-[10px] font-bold text-emerald-800">Total Qs Needed:</span><span id="setup-total-q" class="text-xs font-black text-emerald-700 bg-white px-2 rounded shadow-sm">0</span></div>
+                    <div class="flex items-center justify-between bg-emerald-50/50 p-2.5 rounded-xl border border-emerald-100"><span class="text-[10px] font-bold text-emerald-800">Qs Needed:</span><span id="setup-total-q" class="text-xs font-black text-emerald-700 bg-white px-2 rounded shadow-sm">0</span></div>
                 </div>
 
-                <!-- NEW: Dynamic Timer Rules for Random Mode -->
                 <div id="dynamic-timer-section" class="hidden pt-3 border-t border-slate-100">
-                    <h4 class="font-bold text-xs text-slate-700 flex items-center mb-2"><i class="fa-solid fa-stopwatch text-indigo-500 mr-2"></i> Dynamic Timer Rules (Day-wise)</h4>
-                    <p class="text-[10px] text-slate-500 font-semibold mb-3">Set different time limits for different days. E.g. Day 1 to 5 = 40s.</p>
+                    <h4 class="font-bold text-xs text-slate-700 flex items-center mb-2"><i class="fa-solid fa-stopwatch text-indigo-500 mr-2"></i> Dynamic Timer Rules (Pool)</h4>
                     <div class="space-y-2">
                         <div class="grid grid-cols-3 gap-2 bg-slate-50 p-2 rounded-lg border border-slate-200">
-                            <div><label class="block text-[9px] font-bold text-slate-400 uppercase">Start Day</label><input type="number" id="tr1-start" class="w-full px-2 py-1.5 bg-white border border-slate-200 rounded text-xs font-bold" placeholder="1"></div>
-                            <div><label class="block text-[9px] font-bold text-slate-400 uppercase">End Day</label><input type="number" id="tr1-end" class="w-full px-2 py-1.5 bg-white border border-slate-200 rounded text-xs font-bold" placeholder="5"></div>
-                            <div><label class="block text-[9px] font-bold text-slate-400 uppercase">Seconds</label><input type="number" id="tr1-time" class="w-full px-2 py-1.5 bg-white border border-slate-200 rounded text-xs font-bold text-indigo-600" placeholder="40"></div>
+                            <div><label class="block text-[9px] font-bold text-slate-400 uppercase">Start Day</label><input type="number" id="tr1-start" class="w-full px-2 py-1.5 border border-slate-200 rounded text-xs font-bold" placeholder="1"></div>
+                            <div><label class="block text-[9px] font-bold text-slate-400 uppercase">End Day</label><input type="number" id="tr1-end" class="w-full px-2 py-1.5 border border-slate-200 rounded text-xs font-bold" placeholder="5"></div>
+                            <div><label class="block text-[9px] font-bold text-slate-400 uppercase">Seconds</label><input type="number" id="tr1-time" class="w-full px-2 py-1.5 border border-slate-200 rounded text-xs font-bold text-indigo-600" placeholder="40"></div>
                         </div>
                         <div class="grid grid-cols-3 gap-2 bg-slate-50 p-2 rounded-lg border border-slate-200">
-                            <div><label class="block text-[9px] font-bold text-slate-400 uppercase">Start Day</label><input type="number" id="tr2-start" class="w-full px-2 py-1.5 bg-white border border-slate-200 rounded text-xs font-bold" placeholder="6"></div>
-                            <div><label class="block text-[9px] font-bold text-slate-400 uppercase">End Day</label><input type="number" id="tr2-end" class="w-full px-2 py-1.5 bg-white border border-slate-200 rounded text-xs font-bold" placeholder="10"></div>
-                            <div><label class="block text-[9px] font-bold text-slate-400 uppercase">Seconds</label><input type="number" id="tr2-time" class="w-full px-2 py-1.5 bg-white border border-slate-200 rounded text-xs font-bold text-indigo-600" placeholder="30"></div>
-                        </div>
-                        <div class="grid grid-cols-3 gap-2 bg-slate-50 p-2 rounded-lg border border-slate-200">
-                            <div><label class="block text-[9px] font-bold text-slate-400 uppercase">Start Day</label><input type="number" id="tr3-start" class="w-full px-2 py-1.5 bg-white border border-slate-200 rounded text-xs font-bold" placeholder="11"></div>
-                            <div><label class="block text-[9px] font-bold text-slate-400 uppercase">End Day</label><input type="number" id="tr3-end" class="w-full px-2 py-1.5 bg-white border border-slate-200 rounded text-xs font-bold" placeholder="15"></div>
-                            <div><label class="block text-[9px] font-bold text-slate-400 uppercase">Seconds</label><input type="number" id="tr3-time" class="w-full px-2 py-1.5 bg-white border border-slate-200 rounded text-xs font-bold text-indigo-600" placeholder="20"></div>
+                            <div><label class="block text-[9px] font-bold text-slate-400 uppercase">Start Day</label><input type="number" id="tr2-start" class="w-full px-2 py-1.5 border border-slate-200 rounded text-xs font-bold" placeholder="6"></div>
+                            <div><label class="block text-[9px] font-bold text-slate-400 uppercase">End Day</label><input type="number" id="tr2-end" class="w-full px-2 py-1.5 border border-slate-200 rounded text-xs font-bold" placeholder="10"></div>
+                            <div><label class="block text-[9px] font-bold text-slate-400 uppercase">Seconds</label><input type="number" id="tr2-time" class="w-full px-2 py-1.5 border border-slate-200 rounded text-xs font-bold text-indigo-600" placeholder="30"></div>
                         </div>
                     </div>
                 </div>
 
                 <div class="pt-3 border-t border-slate-100">
-                    <label class="block text-[10px] font-bold text-slate-500 mb-1.5 uppercase">Fest Logo (For User App)</label>
+                    <label class="block text-[10px] font-bold text-slate-500 mb-1.5 uppercase">Fest Logo (Base64)</label>
                     <div class="flex items-center space-x-3">
                         <div class="w-12 h-12 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-center overflow-hidden shrink-0 shadow-inner">
-                            <i class="fa-solid fa-image text-slate-300" id="admin-logo-icon"></i>
-                            <img id="admin-logo-preview" src="" class="hidden-safe w-full h-full object-cover">
+                            <i class="fa-solid fa-image text-slate-300" id="admin-logo-icon"></i><img id="admin-logo-preview" src="" class="hidden-safe w-full h-full object-cover">
                         </div>
-                        <div class="flex-1">
-                            <input type="file" id="setup-logo-input" accept="image/*" class="w-full text-xs text-slate-500 file:mr-2 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-[10px] file:font-bold file:bg-indigo-50 file:text-indigo-700 cursor-pointer" onchange="window.handleLogoUpload(event)">
-                            <p class="text-[9px] text-slate-400 mt-1">Max 1MB. Auto-updates.</p>
-                        </div>
+                        <input type="file" id="setup-logo-input" accept="image/*" class="w-full text-xs text-slate-500 file:mr-2 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:bg-indigo-50 file:text-indigo-700 cursor-pointer" onchange="window.handleLogoUpload(event)">
                     </div>
-                </div>
-
-                <div class="pt-2 border-t border-slate-100">
-                    <label class="block text-[10px] font-bold text-slate-500 mb-1 uppercase">Instructions (Bullet points)</label>
-                    <textarea id="admin-inst-input" rows="2" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl font-semibold text-xs outline-none focus:border-indigo-500"></textarea>
                 </div>
 
                 <div class="pt-2 border-t border-slate-100">
                     <div class="flex items-center justify-between mb-2">
                         <h4 class="font-bold text-xs text-slate-700 flex items-center"><i class="fa-solid fa-star-half-stroke text-amber-500 mr-2"></i> Custom Scoring</h4>
-                        <label class="relative inline-flex items-center cursor-pointer">
-                            <input type="checkbox" id="setup-scoring-toggle" class="sr-only peer" onchange="window.toggleScoringUI()">
-                            <div class="w-9 h-5 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-indigo-500"></div>
-                        </label>
+                        <label class="relative inline-flex items-center cursor-pointer"><input type="checkbox" id="setup-scoring-toggle" class="sr-only peer" onchange="window.toggleScoringUI()"><div class="w-9 h-5 bg-slate-200 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-indigo-500"></div></label>
                     </div>
                     <div id="scoring-rules-box" class="hidden grid-cols-2 gap-3 bg-slate-50 p-3 rounded-xl border border-slate-100 shadow-inner">
-                        <div><label class="block text-[9px] font-bold text-emerald-600 mb-1 uppercase">Correct Points</label><input type="number" id="setup-pts-correct" value="10" class="w-full px-3 py-1.5 bg-white border border-emerald-200 rounded-lg font-black text-emerald-700 text-xs outline-none"></div>
-                        <div><label class="block text-[9px] font-bold text-rose-600 mb-1 uppercase">Negative Penalty</label><input type="number" id="setup-pts-negative" value="0" class="w-full px-3 py-1.5 bg-white border border-rose-200 rounded-lg font-black text-rose-700 text-xs outline-none"></div>
+                        <div><label class="block text-[9px] font-bold text-emerald-600 mb-1 uppercase">Correct Points</label><input type="number" id="setup-pts-correct" value="10" class="w-full px-3 py-1.5 border border-emerald-200 rounded-lg font-black text-emerald-700 text-xs outline-none"></div>
+                        <div><label class="block text-[9px] font-bold text-rose-600 mb-1 uppercase">Negative Penalty</label><input type="number" id="setup-pts-negative" value="0" class="w-full px-3 py-1.5 border border-rose-200 rounded-lg font-black text-rose-700 text-xs outline-none"></div>
                     </div>
                 </div>
 
-                <button onclick="window.saveAdminSetup()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-black py-3.5 rounded-xl shadow-lg shadow-indigo-200 transition-transform active:scale-95 text-sm flex items-center justify-center sticky bottom-0 z-10 mt-2">
+                <button onclick="window.saveAdminSetup()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-black py-3.5 rounded-xl shadow-lg transition-transform active:scale-95 text-sm flex items-center justify-center sticky bottom-0 z-10 mt-2">
                     <i class="fa-solid fa-floppy-disk mr-2"></i> SAVE SETTINGS
                 </button>
             </div>
 
+            <!-- Danger Zone -->
             <div class="danger-stripes p-5 rounded-3xl border-2 border-rose-200 shadow-sm mt-4">
                 <h3 class="font-black text-rose-700 text-sm flex items-center mb-3"><i class="fa-solid fa-triangle-exclamation mr-2"></i> DANGER ZONE</h3>
-                <p class="text-xs text-rose-600 font-semibold mb-4">Actions here are irreversible. Data will be permanently deleted.</p>
                 <div class="space-y-3">
-                    <button onclick="window.triggerDangerAction('users')" class="w-full bg-white border border-rose-300 text-rose-700 hover:bg-rose-50 font-bold py-3 rounded-xl transition-colors text-xs flex justify-center items-center shadow-sm">
-                        <i class="fa-solid fa-users-slash mr-2"></i> Clear All Users & Scores
-                    </button>
-                    <button onclick="window.triggerDangerAction('questions')" class="w-full bg-white border border-rose-300 text-rose-700 hover:bg-rose-50 font-bold py-3 rounded-xl transition-colors text-xs flex justify-center items-center shadow-sm">
-                        <i class="fa-solid fa-trash-can mr-2"></i> Clear All Questions
-                    </button>
+                    <button onclick="window.triggerDangerAction('users')" class="w-full bg-white border border-rose-300 text-rose-700 hover:bg-rose-50 font-bold py-3 rounded-xl transition-colors text-xs shadow-sm flex items-center justify-center"><i class="fa-solid fa-users-slash mr-2"></i> Clear All Users & Scores</button>
+                    <button onclick="window.triggerDangerAction('questions')" class="w-full bg-white border border-rose-300 text-rose-700 hover:bg-rose-50 font-bold py-3 rounded-xl transition-colors text-xs shadow-sm flex items-center justify-center"><i class="fa-solid fa-trash-can mr-2"></i> Clear All Questions</button>
                 </div>
-            </div>
-        </div>
-
-        <div id="admin-ads" class="view-section hidden-safe flex-col h-full overflow-y-auto max-w-2xl mx-auto w-full">
-            <div class="bg-white p-5 rounded-3xl border border-slate-100 shadow-sm space-y-5">
-                <div class="flex items-center justify-between border-b border-slate-100 pb-3">
-                    <h3 class="font-black text-slate-800 text-sm flex items-center"><i class="fa-solid fa-bullhorn text-amber-500 mr-2 text-lg"></i> Ad Management</h3>
-                    <div class="flex items-center">
-                        <span class="text-[10px] font-bold text-slate-500 mr-2 uppercase tracking-wider">Master Switch</span>
-                        <label class="relative inline-flex items-center cursor-pointer">
-                            <input type="checkbox" id="ad-master-toggle" class="sr-only peer">
-                            <div class="w-11 h-6 bg-slate-200 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-500"></div>
-                        </label>
-                    </div>
-                </div>
-
-                <!-- Zone 1 -->
-                <div class="bg-slate-50 border border-slate-200 rounded-2xl p-4">
-                    <div class="flex items-center justify-between mb-3">
-                        <h4 class="font-bold text-sm text-indigo-700 flex items-center"><i class="fa-solid fa-mobile-screen mr-2"></i> Zone 1: Login Banner</h4>
-                        <label class="relative inline-flex items-center cursor-pointer"><input type="checkbox" id="ad-z1-toggle" class="sr-only peer"><div class="w-9 h-5 bg-slate-300 rounded-full peer peer-checked:after:translate-x-full after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-indigo-500"></div></label>
-                    </div>
-                    <div class="space-y-3">
-                        <div><label class="block text-[10px] font-bold text-slate-500 mb-1 uppercase">Sponsor Text</label><input type="text" id="ad-z1-text" class="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-xs font-semibold outline-none"></div>
-                        <div>
-                            <label class="block text-[10px] font-bold text-slate-500 mb-1 uppercase">Banner Image</label>
-                            <input type="file" id="ad-z1-img" accept="image/*" class="w-full text-xs text-slate-500 file:mr-2 file:py-1 file:px-2 file:rounded file:border-0 file:text-[10px] file:font-bold file:bg-indigo-50 file:text-indigo-700 mb-2" onchange="window.handleAdZ1Upload(event)">
-                            <div class="text-[10px] font-bold text-slate-400 mb-1 text-center border-t border-b border-slate-200 py-1">OR</div>
-                            <input type="text" id="ad-z1-url" placeholder="Paste Image URL here (Overrides upload)" class="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-xs font-semibold outline-none text-indigo-600">
-                            <img id="ad-z1-preview" src="" class="hidden-safe h-12 mt-2 rounded-lg object-contain border border-slate-200 bg-white">
-                        </div>
-                        <div><label class="block text-[10px] font-bold text-slate-500 mb-1 uppercase">Target Link (Click URL)</label><input type="text" id="ad-z1-link" class="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-xs font-semibold outline-none"></div>
-                    </div>
-                </div>
-
-                <!-- Zone 2 -->
-                <div class="bg-slate-50 border border-slate-200 rounded-2xl p-4">
-                    <div class="flex items-center justify-between mb-3">
-                        <h4 class="font-bold text-sm text-indigo-700 flex items-center"><i class="fa-solid fa-ticket mr-2"></i> Zone 2: Post-Result Ad</h4>
-                        <label class="relative inline-flex items-center cursor-pointer"><input type="checkbox" id="ad-z2-toggle" class="sr-only peer"><div class="w-9 h-5 bg-slate-300 rounded-full peer peer-checked:after:translate-x-full after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-indigo-500"></div></label>
-                    </div>
-                    <div class="space-y-3">
-                        <div><label class="block text-[10px] font-bold text-slate-500 mb-1 uppercase">Ad Format</label><select id="ad-z2-type" onchange="window.toggleAdZ2Type()" class="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-xs font-bold outline-none"><option value="image">Image Slider</option><option value="youtube">YouTube / Shorts</option></select></div>
-                        
-                        <div id="ad-z2-img-sec" class="space-y-3 p-3 bg-white border border-slate-100 rounded-xl shadow-sm">
-                            <div>
-                                <label class="block text-[10px] font-bold text-slate-500 mb-1 uppercase">Add Image</label>
-                                <input type="file" id="ad-z2-imgs" accept="image/*" class="w-full text-xs text-slate-500 file:mr-2 file:py-1 file:px-2 file:rounded file:border-0 file:text-[10px] file:font-bold file:bg-emerald-50 file:text-emerald-700 mb-2" onchange="window.handleAdZ2Upload(event)">
-                                <div class="text-[10px] font-bold text-slate-400 mb-1 text-center border-t border-b border-slate-200 py-1">OR</div>
-                                <div class="flex space-x-2">
-                                    <input type="text" id="ad-z2-url-input" placeholder="Paste Image URL" class="flex-1 px-3 py-1.5 bg-slate-50 border border-slate-200 rounded text-xs font-semibold outline-none text-emerald-600">
-                                    <button onclick="window.addAdZ2Url()" class="px-3 bg-emerald-500 text-white rounded text-xs font-bold shadow-sm">Add URL</button>
-                                </div>
-                                <div id="ad-z2-gallery" class="flex flex-wrap gap-2 mt-3"></div>
-                                <button onclick="window.clearZ2Images()" class="mt-2 text-[10px] text-rose-500 font-bold bg-rose-50 px-2 py-1 rounded">Clear Images</button>
-                            </div>
-                            <div><label class="block text-[10px] font-bold text-slate-500 mb-1 uppercase">Slide Interval (Secs)</label><input type="number" id="ad-z2-interval" value="3" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-xs font-semibold outline-none"></div>
-                        </div>
-
-                        <div id="ad-z2-yt-sec" class="hidden-safe space-y-3 p-3 bg-white border border-slate-100 rounded-xl shadow-sm">
-                            <div><label class="block text-[10px] font-bold text-slate-500 mb-1 uppercase">YouTube URL</label><input type="text" id="ad-z2-yturl" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-xs font-semibold outline-none"></div>
-                        </div>
-
-                        <div><label class="block text-[10px] font-bold text-slate-500 mb-1 uppercase">Target Link (Click URL)</label><input type="text" id="ad-z2-link" class="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-xs font-semibold outline-none"></div>
-                    </div>
-                </div>
-
-                <button onclick="window.saveAdSettings()" class="w-full bg-amber-500 hover:bg-amber-600 text-white font-black py-3.5 rounded-xl shadow-lg shadow-amber-200 transition-transform active:scale-95 text-sm sticky bottom-0 mt-2 flex items-center justify-center">
-                    <i class="fa-solid fa-cloud-arrow-up mr-2"></i> SAVE AD SETTINGS
-                </button>
             </div>
         </div>
 
         <div id="admin-questions" class="view-section hidden-safe flex-col h-full overflow-hidden flex w-full max-w-4xl mx-auto">
             <div class="bg-white p-3 rounded-2xl border border-slate-100 shadow-sm shrink-0 mb-3 z-10">
                 <div class="flex space-x-2 mb-3">
-                    <button onclick="window.downloadCSVTemplate()" class="flex-1 bg-slate-50 hover:bg-slate-100 text-slate-700 text-xs font-bold py-2.5 rounded-xl transition-colors border border-slate-200 flex justify-center items-center shadow-sm">
-                        <i class="fa-solid fa-download mr-1.5 text-indigo-500"></i> Template
-                    </button>
-                    <!-- Used direct file upload logic below -->
+                    <button onclick="window.downloadCSVTemplate()" class="flex-1 bg-slate-50 text-slate-700 text-xs font-bold py-2.5 rounded-xl border border-slate-200 shadow-sm"><i class="fa-solid fa-download mr-1.5 text-indigo-500"></i> CSV Template</button>
                 </div>
 
                 <div id="pool-capacity-indicator" class="hidden text-xs font-bold text-center p-2 bg-indigo-50 text-indigo-700 rounded-lg border border-indigo-100 mb-2">
-                    <i class="fa-solid fa-database mr-1"></i> Pool Capacity: <span id="pool-count" class="text-indigo-900 font-black">0</span> available
+                    <i class="fa-solid fa-database mr-1"></i> Pool Capacity: <span id="pool-count" class="font-black">0</span> available
                 </div>
 
                 <div id="day-select-container" class="flex items-center justify-between mb-2 pt-2 border-t border-slate-100">
-                    <button onclick="window.changeAdminDay(-1)" class="w-9 h-9 rounded-xl bg-slate-50 border border-slate-200 hover:bg-slate-100 text-slate-600 flex justify-center items-center"><i class="fa-solid fa-chevron-left"></i></button>
-                    <div class="font-black text-sm text-indigo-700 px-4 py-1.5 bg-indigo-50 rounded-xl border border-indigo-100 shadow-inner">DAY <span id="admin-day-disp">1</span></div>
-                    <button onclick="window.changeAdminDay(1)" class="w-9 h-9 rounded-xl bg-slate-50 border border-slate-200 hover:bg-slate-100 text-slate-600 flex justify-center items-center"><i class="fa-solid fa-chevron-right"></i></button>
+                    <button onclick="window.changeAdminDay(-1)" class="w-9 h-9 rounded-xl bg-slate-50 border border-slate-200 hover:bg-slate-100"><i class="fa-solid fa-chevron-left"></i></button>
+                    <div class="font-black text-sm text-indigo-700 px-4 py-1.5 bg-indigo-50 rounded-xl border border-indigo-100">DAY <span id="admin-day-disp">1</span></div>
+                    <button onclick="window.changeAdminDay(1)" class="w-9 h-9 rounded-xl bg-slate-50 border border-slate-200 hover:bg-slate-100"><i class="fa-solid fa-chevron-right"></i></button>
                 </div>
                 
-                <div class="text-[9px] font-bold text-slate-400 mb-1.5 uppercase tracking-widest">Status:</div>
                 <div class="flex overflow-x-auto pb-2 space-x-2 hide-scrollbar" id="admin-slot-pills"></div>
             </div>
 
             <div class="bg-white p-4 rounded-3xl border border-slate-100 shadow-sm flex-1 overflow-y-auto relative flex flex-col">
                 <div class="flex justify-between items-center mb-4 shrink-0 border-b border-slate-50 pb-3">
-                    <h4 class="font-black text-xs text-indigo-700 uppercase tracking-widest" id="admin-q-editor-title">EDIT QUESTION</h4>
-                    <span id="admin-q-status" class="px-2 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider bg-rose-100 text-rose-600">Unsaved</span>
+                    <h4 class="font-black text-xs text-indigo-700 uppercase" id="admin-q-editor-title">EDIT QUESTION</h4>
+                    <span id="admin-q-status" class="px-2 py-1 rounded-md text-[10px] font-bold uppercase bg-rose-100 text-rose-600">Unsaved</span>
                 </div>
 
                 <div class="space-y-4 flex-1">
-                    <div><label class="block text-[10px] font-bold text-slate-500 mb-1 uppercase">Type</label><select id="admin-q-type" onchange="window.toggleAdminQType()" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl font-bold text-xs outline-none focus:border-indigo-500"><option value="mcq">MCQ</option><option value="text">Text</option></select></div>
-                    <div><label class="block text-[10px] font-bold text-slate-500 mb-1 uppercase">Question</label><textarea id="admin-q-text" rows="2" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl font-semibold text-sm outline-none focus:border-indigo-500"></textarea></div>
+                    <div>
+                        <label class="block text-[10px] font-bold text-slate-500 mb-1 uppercase">Target Group</label>
+                        <select id="admin-q-target" onchange="window.renderAdminQuestionPills()" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl font-bold text-xs outline-none">
+                            <option value="main">Main Quiz</option>
+                            <option value="mock">Mock Test (Practice)</option>
+                        </select>
+                    </div>
+                    <div><label class="block text-[10px] font-bold text-slate-500 mb-1 uppercase">Type</label><select id="admin-q-type" onchange="window.toggleAdminQType()" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl font-bold text-xs outline-none"><option value="mcq">MCQ</option><option value="text">Text</option></select></div>
+                    <div><label class="block text-[10px] font-bold text-slate-500 mb-1 uppercase">Question</label><textarea id="admin-q-text" rows="2" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl font-semibold text-sm outline-none"></textarea></div>
 
                     <div id="admin-mcq-area" class="space-y-3 pt-2 border-t border-slate-50">
                         <div class="grid grid-cols-2 gap-2">
-                            <input type="text" id="admin-opt-a" placeholder="Opt A" class="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl font-semibold text-xs outline-none">
-                            <input type="text" id="admin-opt-b" placeholder="Opt B" class="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl font-semibold text-xs outline-none">
-                            <input type="text" id="admin-opt-c" placeholder="Opt C" class="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl font-semibold text-xs outline-none">
-                            <input type="text" id="admin-opt-d" placeholder="Opt D" class="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl font-semibold text-xs outline-none">
+                            <input type="text" id="admin-opt-a" placeholder="Opt A" class="w-full px-3 py-2 border border-slate-200 rounded-xl font-semibold text-xs outline-none">
+                            <input type="text" id="admin-opt-b" placeholder="Opt B" class="w-full px-3 py-2 border border-slate-200 rounded-xl font-semibold text-xs outline-none">
+                            <input type="text" id="admin-opt-c" placeholder="Opt C" class="w-full px-3 py-2 border border-slate-200 rounded-xl font-semibold text-xs outline-none">
+                            <input type="text" id="admin-opt-d" placeholder="Opt D" class="w-full px-3 py-2 border border-slate-200 rounded-xl font-semibold text-xs outline-none">
                         </div>
-                        <div><label class="block text-[10px] font-bold text-emerald-600 mb-1 uppercase">Correct</label><select id="admin-mcq-correct" class="w-full px-3 py-2 bg-emerald-50 border border-emerald-200 text-emerald-700 rounded-xl font-black text-sm outline-none shadow-sm"><option value="A">A</option><option value="B">B</option><option value="C">C</option><option value="D">D</option></select></div>
+                        <div><label class="block text-[10px] font-bold text-emerald-600 mb-1 uppercase">Correct</label><select id="admin-mcq-correct" class="w-full px-3 py-2 bg-emerald-50 border border-emerald-200 text-emerald-700 rounded-xl font-black text-sm outline-none"><option value="A">A</option><option value="B">B</option><option value="C">C</option><option value="D">D</option></select></div>
                     </div>
                     
                     <div id="admin-text-area" class="hidden-safe pt-2 border-t border-slate-50">
-                        <label class="block text-[10px] font-bold text-emerald-600 mb-1 uppercase">Answer</label><input type="text" id="admin-text-correct" class="w-full px-3 py-2 bg-emerald-50 border border-emerald-200 text-emerald-700 rounded-xl font-black text-sm outline-none shadow-sm">
+                        <label class="block text-[10px] font-bold text-emerald-600 mb-1 uppercase">Answer</label><input type="text" id="admin-text-correct" class="w-full px-3 py-2 bg-emerald-50 border border-emerald-200 text-emerald-700 rounded-xl font-black text-sm outline-none">
                     </div>
 
                     <div id="fixed-time-input" class="pt-2 border-t border-slate-50">
-                        <label class="block text-[10px] font-bold text-slate-500 mb-1 uppercase">Time (Secs) [Fixed Mode Only]</label>
+                        <label class="block text-[10px] font-bold text-slate-500 mb-1 uppercase">Time (Secs)</label>
                         <input type="number" id="admin-q-time" value="30" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl font-bold text-xs outline-none">
                     </div>
                 </div>
@@ -330,63 +243,111 @@
             </div>
         </div>
 
+        <div id="admin-ads" class="view-section hidden-safe flex-col h-full overflow-y-auto max-w-3xl mx-auto w-full">
+            <div class="bg-white p-5 rounded-3xl border border-slate-100 shadow-sm space-y-5">
+                <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+                    <h3 class="font-black text-slate-800 text-sm flex items-center"><i class="fa-solid fa-bullhorn text-amber-500 mr-2"></i> Ad Management</h3>
+                    <div class="flex items-center"><span class="text-[10px] font-bold text-slate-500 mr-2 uppercase">Master Switch</span><label class="relative inline-flex items-center cursor-pointer"><input type="checkbox" id="ad-master-toggle" class="sr-only peer"><div class="w-11 h-6 bg-slate-200 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-500"></div></label></div>
+                </div>
+
+                <!-- Zone 1 -->
+                <div class="bg-slate-50 border border-slate-200 rounded-2xl p-4">
+                    <div class="flex items-center justify-between mb-3"><h4 class="font-bold text-sm text-indigo-700 flex items-center"><i class="fa-solid fa-mobile-screen mr-2"></i> Zone 1: Login Banner</h4><label class="relative inline-flex items-center cursor-pointer"><input type="checkbox" id="ad-z1-toggle" class="sr-only peer"><div class="w-9 h-5 bg-slate-300 rounded-full peer peer-checked:after:translate-x-full after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-indigo-500"></div></label></div>
+                    <div class="space-y-3">
+                        <div><label class="block text-[10px] font-bold text-slate-500 mb-1 uppercase">Target Link</label><input type="text" id="ad-z1-link" class="w-full px-3 py-2 border border-slate-200 rounded-lg text-xs outline-none"></div>
+                        <div><label class="block text-[10px] font-bold text-slate-500 mb-1 uppercase">Image URL (Overrides Upload)</label><input type="text" id="ad-z1-url" class="w-full px-3 py-2 border border-slate-200 rounded-lg text-xs outline-none text-indigo-600"></div>
+                        <div><label class="block text-[10px] font-bold text-slate-500 mb-1 uppercase">Upload Image Base64</label><input type="file" accept="image/*" class="w-full text-xs" onchange="window.handleAdZ1Upload(event)"></div>
+                    </div>
+                </div>
+
+                <!-- Zone 2 -->
+                <div class="bg-slate-50 border border-slate-200 rounded-2xl p-4">
+                    <div class="flex items-center justify-between mb-3"><h4 class="font-bold text-sm text-indigo-700 flex items-center"><i class="fa-solid fa-ticket mr-2"></i> Zone 2: Post-Result Ad</h4><label class="relative inline-flex items-center cursor-pointer"><input type="checkbox" id="ad-z2-toggle" class="sr-only peer"><div class="w-9 h-5 bg-slate-300 rounded-full peer peer-checked:after:translate-x-full after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-indigo-500"></div></label></div>
+                    <div class="space-y-3">
+                        <div><label class="block text-[10px] font-bold text-slate-500 mb-1 uppercase">Target Link</label><input type="text" id="ad-z2-link" class="w-full px-3 py-2 border border-slate-200 rounded-lg text-xs outline-none"></div>
+                        <div><label class="block text-[10px] font-bold text-slate-500 mb-1 uppercase">Format</label><select id="ad-z2-type" onchange="window.toggleAdZ2Type()" class="w-full px-3 py-2 border border-slate-200 rounded-lg text-xs font-bold outline-none"><option value="image">Image Slider</option><option value="youtube">YouTube</option></select></div>
+                        <div id="ad-z2-img-sec" class="space-y-2 p-3 bg-white border border-slate-100 rounded-xl shadow-sm">
+                            <div class="flex space-x-2"><input type="text" id="ad-z2-url-input" placeholder="Paste Image URL" class="flex-1 px-3 py-1.5 border rounded text-xs outline-none"><button onclick="window.addAdZ2Url()" class="px-3 bg-emerald-500 text-white rounded text-xs font-bold">Add URL</button></div>
+                            <input type="file" accept="image/*" class="w-full text-xs" onchange="window.handleAdZ2Upload(event)">
+                            <div id="ad-z2-gallery" class="flex flex-wrap gap-2 mt-2"></div>
+                            <button onclick="window.clearZ2Images()" class="text-[10px] text-rose-500 font-bold bg-rose-50 px-2 py-1 rounded mt-1">Clear</button>
+                        </div>
+                        <div id="ad-z2-yt-sec" class="hidden-safe space-y-2 p-3 bg-white border border-slate-100 rounded-xl shadow-sm">
+                            <input type="text" id="ad-z2-yturl" placeholder="YouTube URL" class="w-full px-3 py-2 border rounded-lg text-xs outline-none">
+                        </div>
+                    </div>
+                </div>
+                
+                <button onclick="window.saveAdSettings()" class="w-full bg-amber-500 text-white font-black py-3.5 rounded-xl shadow-lg active:scale-95 text-sm flex items-center justify-center sticky bottom-0 mt-2">
+                    <i class="fa-solid fa-cloud-arrow-up mr-2"></i> SAVE AD SETTINGS
+                </button>
+            </div>
+        </div>
+
         <div id="admin-users" class="view-section hidden-safe flex-col h-full overflow-hidden w-full max-w-4xl mx-auto">
             <div class="bg-white p-4 rounded-3xl border border-slate-100 shadow-sm h-full flex flex-col">
-                <h3 class="font-black text-slate-800 text-lg flex items-center mb-4"><i class="fa-solid fa-ranking-star text-emerald-500 mr-2"></i> Leaderboard</h3>
+                <div class="flex justify-between items-center mb-4 shrink-0">
+                    <h3 class="font-black text-slate-800 text-lg flex items-center"><i class="fa-solid fa-ranking-star text-emerald-500 mr-2"></i> Leaderboard</h3>
+                </div>
                 <div class="flex-1 overflow-y-auto"><div class="space-y-2" id="admin-user-list"></div></div>
             </div>
         </div>
         
+        <!-- User Detail Screen -->
         <div id="admin-user-detail" class="view-section hidden-safe flex-col h-full overflow-hidden w-full bg-slate-50 z-20 absolute inset-0">
             <div class="bg-white border-b border-slate-200 p-4 flex items-center justify-between shrink-0 shadow-sm">
-                <button onclick="window.closeUserHistoryFull()" class="text-xs font-bold text-slate-600 hover:text-indigo-600 bg-slate-50 px-4 py-2 rounded-xl border border-slate-200 flex items-center shadow-sm"><i class="fa-solid fa-arrow-left mr-2"></i> Back</button>
-                <div class="text-right">
-                    <h3 class="text-base font-black text-slate-800" id="hist-name">Name</h3>
-                    <p class="text-indigo-500 text-[11px] font-bold" id="hist-phone">Phone</p>
-                </div>
+                <button onclick="window.closeUserHistoryFull()" class="text-xs font-bold text-slate-600 bg-slate-50 px-4 py-2 rounded-xl border border-slate-200 flex items-center shadow-sm"><i class="fa-solid fa-arrow-left mr-2"></i> Back</button>
+                <div class="text-right"><h3 class="text-base font-black text-slate-800" id="hist-name">Name</h3><p class="text-indigo-500 text-[11px] font-bold" id="hist-phone">Phone</p></div>
             </div>
             <div class="p-4 overflow-y-auto flex-1 max-w-3xl mx-auto w-full space-y-3" id="hist-body"></div>
         </div>
     </div>
 
+    <!-- Modals -->
     <div id="sys-modal" class="fixed inset-0 z-[200] hidden-safe bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 opacity-0 transition-opacity">
         <div class="bg-white rounded-3xl p-6 w-full max-w-sm shadow-2xl transform scale-95 transition-transform" id="sys-modal-card">
             <div class="text-center mb-3" id="sys-modal-icon"></div>
             <h3 class="text-lg font-black text-slate-800 text-center mb-2" id="sys-modal-title">Title</h3>
             <p class="text-sm text-slate-500 font-semibold text-center mb-5" id="sys-modal-msg">Message</p>
-            <div id="sys-modal-input-area" class="mb-4 hidden-safe"><input type="text" id="sys-modal-input" class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-center font-black outline-none focus:border-rose-500" placeholder="Type here..."></div>
-            <div class="flex space-x-3" id="sys-modal-btns">
-                <button onclick="window.closeModal()" class="w-full bg-slate-900 text-white font-bold py-3.5 rounded-xl text-sm">OK</button>
+            <div id="sys-modal-input-area" class="mb-4 hidden-safe"><input type="text" id="sys-modal-input" class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-center font-black outline-none" placeholder="Type CONFIRM..."></div>
+            <div class="flex space-x-3" id="sys-modal-btns"><button onclick="window.closeModal()" class="w-full bg-slate-900 text-white font-bold py-3.5 rounded-xl text-sm">OK</button></div>
+        </div>
+    </div>
+
+    <div id="day-stats-modal" class="fixed inset-0 z-[250] hidden-safe bg-slate-900/80 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl w-full max-w-sm shadow-2xl overflow-hidden flex flex-col max-h-[80vh]">
+            <div class="bg-emerald-500 p-4 text-white flex justify-between items-center shrink-0">
+                <h3 class="font-black"><i class="fa-solid fa-chart-line mr-2"></i> Day-wise Analytics</h3>
+                <button onclick="document.getElementById('day-stats-modal').classList.add('hidden-safe')" class="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center"><i class="fa-solid fa-xmark"></i></button>
             </div>
+            <div class="p-4 overflow-y-auto flex-1 bg-slate-50 space-y-2" id="day-stats-list"></div>
         </div>
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { initializeFirestore, collection, doc, setDoc, getDoc, getDocs, onSnapshot, deleteDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { getFirestore, collection, doc, setDoc, getDoc, getDocs, onSnapshot, deleteDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
+        // IMPORTANT: In production, do not expose keys here. Use environment variables or rely on Security Rules.
         const firebaseConfig = { apiKey: "AIzaSyAfJSonmGHnf0t92B71ycuAZbc-CV3k7LE", authDomain: "fest-dsd-003.firebaseapp.com", projectId: "fest-dsd-003", storageBucket: "fest-dsd-003.firebasestorage.app", messagingSenderId: "409596394273", appId: "1:409596394273:web:b930012ce0a845ddb45c60" };
         const app = initializeApp(firebaseConfig);
-        const db = initializeFirestore(app, { experimentalForceLongPolling: true });
+        const db = getFirestore(app);
 
         window.AppState = {
             allQuestions: [], allUsers: [], totalDays: 1, questionsPerDay: 3, currentDay: 1, adminSelectedSlot: 0, adminSelectedDay: 1, adminPoolSelectedId: null,
-            settings: { startDate: '', questionMode: 'fixed', instructions: '', scoringEnabled: false, pointsCorrect: 10, pointsNegative: 0, logoBase64: '', resultsPublished: false, dynamicTimers: [] },
+            settings: { startDate: '', questionMode: 'fixed', scoringEnabled: false, pointsCorrect: 10, pointsNegative: 0, logoBase64: '', resultsPublished: false, dynamicTimers: [], isMockTestActive: false },
             ads: { masterEnabled: false, zone1: {}, zone2: { images: [] } }
         };
-
         const docPath = (coll, id) => doc(db, coll, id);
 
         window.showModal = function(title, msg, iconClass, customBtns = null, requireInput = false) {
             const m = document.getElementById('sys-modal'), mc = document.getElementById('sys-modal-card'), ia = document.getElementById('sys-modal-input-area');
             document.getElementById('sys-modal-title').innerText = title; document.getElementById('sys-modal-msg').innerText = msg; document.getElementById('sys-modal-icon').innerHTML = `<i class="${iconClass} text-5xl"></i>`;
             if(requireInput) { ia.classList.remove('hidden-safe'); document.getElementById('sys-modal-input').value=''; } else { ia.classList.add('hidden-safe'); }
-            if(customBtns) { document.getElementById('sys-modal-btns').innerHTML = customBtns; } else { document.getElementById('sys-modal-btns').innerHTML = `<button onclick="window.closeModal()" class="w-full bg-slate-900 text-white font-bold py-3.5 rounded-xl text-sm">OK</button>`; }
+            if(customBtns) document.getElementById('sys-modal-btns').innerHTML = customBtns; else document.getElementById('sys-modal-btns').innerHTML = `<button onclick="window.closeModal()" class="w-full bg-slate-900 text-white font-bold py-3.5 rounded-xl text-sm">OK</button>`;
             m.classList.remove('hidden-safe'); setTimeout(() => { m.classList.remove('opacity-0'); mc.classList.remove('scale-95'); }, 10);
         };
-        window.closeModal = function() {
-            const m = document.getElementById('sys-modal'), mc = document.getElementById('sys-modal-card'); m.classList.add('opacity-0'); mc.classList.add('scale-95'); setTimeout(() => m.classList.add('hidden-safe'), 300);
-        };
+        window.closeModal = function() { const m = document.getElementById('sys-modal'), mc = document.getElementById('sys-modal-card'); m.classList.add('opacity-0'); mc.classList.add('scale-95'); setTimeout(() => m.classList.add('hidden-safe'), 300); };
 
         async function initAdmin() {
             onSnapshot(docPath('settings', 'global'), (snap) => {
@@ -394,15 +355,13 @@
                     const data = snap.data(); window.AppState.totalDays = data.totalDays || 1; window.AppState.questionsPerDay = data.questionsPerDay || 3; window.AppState.settings = data;
                     document.getElementById('setup-start').value = data.startDate || ''; document.getElementById('setup-end').value = data.endDate || '';
                     document.getElementById('setup-q-per-day').value = window.AppState.questionsPerDay; document.getElementById('setup-q-mode').value = data.questionMode || 'fixed';
-                    document.getElementById('admin-inst-input').value = data.instructions || ''; document.getElementById('setup-scoring-toggle').checked = data.scoringEnabled || false;
+                    document.getElementById('setup-scoring-toggle').checked = data.scoringEnabled || false; document.getElementById('setup-publish-toggle').checked = data.resultsPublished || false;
                     document.getElementById('setup-pts-correct').value = data.pointsCorrect || 10; document.getElementById('setup-pts-negative').value = data.pointsNegative || 0;
-                    document.getElementById('setup-publish-toggle').checked = data.resultsPublished || false;
+                    document.getElementById('setup-mock-toggle').checked = data.isMockTestActive || false;
                     if(data.logoBase64) { document.getElementById('admin-logo-icon').classList.add('hidden-safe'); document.getElementById('admin-logo-preview').src = data.logoBase64; document.getElementById('admin-logo-preview').classList.remove('hidden-safe'); }
-                    
-                    if(data.dynamicTimers && data.dynamicTimers.length === 3) {
+                    if(data.dynamicTimers && data.dynamicTimers.length >= 2) {
                         document.getElementById('tr1-start').value = data.dynamicTimers[0].s; document.getElementById('tr1-end').value = data.dynamicTimers[0].e; document.getElementById('tr1-time').value = data.dynamicTimers[0].t;
                         document.getElementById('tr2-start').value = data.dynamicTimers[1].s; document.getElementById('tr2-end').value = data.dynamicTimers[1].e; document.getElementById('tr2-time').value = data.dynamicTimers[1].t;
-                        document.getElementById('tr3-start').value = data.dynamicTimers[2].s; document.getElementById('tr3-end').value = data.dynamicTimers[2].e; document.getElementById('tr3-time').value = data.dynamicTimers[2].t;
                     }
                     window.toggleScoringUI(); window.calculateSetupDays(); window.toggleTimerRulesUI(); window.updateDashboardStats();
                 }
@@ -412,9 +371,8 @@
                 if (snap.exists()) {
                     const data = snap.data(); window.AppState.ads = { ...window.AppState.ads, ...data }; if(!window.AppState.ads.zone2.images) window.AppState.ads.zone2.images = [];
                     document.getElementById('ad-master-toggle').checked = data.masterEnabled || false;
-                    if(data.zone1) { document.getElementById('ad-z1-toggle').checked = data.zone1.enabled || false; document.getElementById('ad-z1-text').value = data.zone1.text || ''; document.getElementById('ad-z1-link').value = data.zone1.link || ''; document.getElementById('ad-z1-url').value = data.zone1.imageUrl || '';
-                        if(data.zone1.imageUrl || data.zone1.imageBase64) { document.getElementById('ad-z1-preview').src = data.zone1.imageUrl || data.zone1.imageBase64; document.getElementById('ad-z1-preview').classList.remove('hidden-safe'); } }
-                    if(data.zone2) { document.getElementById('ad-z2-toggle').checked = data.zone2.enabled || false; document.getElementById('ad-z2-type').value = data.zone2.type || 'image'; document.getElementById('ad-z2-interval').value = data.zone2.interval || 3; document.getElementById('ad-z2-yturl').value = data.zone2.youtubeUrl || ''; document.getElementById('ad-z2-link').value = data.zone2.link || ''; window.renderZ2Images(); window.toggleAdZ2Type(); }
+                    if(data.zone1) { document.getElementById('ad-z1-toggle').checked = data.zone1.enabled || false; document.getElementById('ad-z1-url').value = data.zone1.imageUrl || ''; document.getElementById('ad-z1-link').value = data.zone1.link || ''; }
+                    if(data.zone2) { document.getElementById('ad-z2-toggle').checked = data.zone2.enabled || false; document.getElementById('ad-z2-type').value = data.zone2.type || 'image'; document.getElementById('ad-z2-yturl').value = data.zone2.youtubeUrl || ''; document.getElementById('ad-z2-link').value = data.zone2.link || ''; window.renderZ2Images(); window.toggleAdZ2Type(); }
                     window.updateDashboardStats();
                 }
             });
@@ -424,78 +382,82 @@
                 window.renderAdminQuestionPills(); window.updateDashboardStats();
             });
 
-            loadUsersForLeaderboard();
+            onSnapshot(collection(db, "users"), (snap) => {
+                let u = []; snap.forEach(doc => u.push({ id: doc.id, ...doc.data() }));
+                window.AppState.allUsers = u; loadUsersForLeaderboard(); window.updateDashboardStats();
+            });
         }
 
-        window.toggleAdminMenu = function() { const m = document.getElementById('admin-menu'); if(m.classList.contains('scale-0')) { m.classList.remove('scale-0', 'opacity-0'); } else { m.classList.add('scale-0', 'opacity-0'); } };
+        window.toggleAdminMenu = function() { const m = document.getElementById('admin-menu'); if(m.classList.contains('scale-0')) m.classList.remove('scale-0', 'opacity-0'); else m.classList.add('scale-0', 'opacity-0'); };
         window.switchAdminTab = function(tabId) { document.querySelectorAll('.view-section:not(#admin-user-detail)').forEach(el => { el.classList.remove('active'); el.classList.add('hidden-safe'); }); const t = document.getElementById(`admin-${tabId}`); if(t) { t.classList.remove('hidden-safe'); t.classList.add('active'); } document.getElementById('admin-user-detail').classList.add('hidden-safe'); document.getElementById('admin-user-detail').classList.remove('active'); const m = document.getElementById('admin-menu'); if(!m.classList.contains('scale-0')) m.classList.add('scale-0', 'opacity-0'); if(tabId==='questions') window.renderAdminQuestionPills(); };
-        window.updateDashboardStats = function() { document.getElementById('dash-users-count').innerText = window.AppState.allUsers ? window.AppState.allUsers.length : 0; document.getElementById('dash-q-count').innerText = window.AppState.allQuestions ? window.AppState.allQuestions.length : 0; const sDate = window.AppState.settings.startDate; let dNum = 1; if(sDate) { const s = new Date(sDate); s.setHours(0,0,0,0); const n = new Date(); n.setHours(0,0,0,0); dNum = Math.floor(Math.abs(n - s) / (1000 * 60 * 60 * 24)) + 1; } document.getElementById('dash-day').innerText = `Day ${dNum > 0 ? dNum : 1}`; const adStatus = window.AppState.ads.masterEnabled; document.getElementById('dash-ads-status').innerText = adStatus ? 'Active' : 'Offline'; document.getElementById('dash-ads-status').className = adStatus ? 'text-2xl font-black text-emerald-500 relative z-10 mt-1' : 'text-2xl font-black text-rose-500 relative z-10 mt-1'; };
-        window.calculateSetupDays = function() { const s = document.getElementById('setup-start').value; const e = document.getElementById('setup-end').value; const q = parseInt(document.getElementById('setup-q-per-day').value) || 0; let days = 0; if(s && e) { days = Math.floor(Math.abs(new Date(e) - new Date(s)) / (1000 * 60 * 60 * 24)) + 1; if(days < 0) days = 0; } document.getElementById('setup-total-days').innerText = days; document.getElementById('setup-total-q').innerText = days * q; };
+        window.calculateSetupDays = function() { const s = document.getElementById('setup-start').value, e = document.getElementById('setup-end').value, q = parseInt(document.getElementById('setup-q-per-day').value) || 0; let days = 0; if(s && e) { days = Math.floor(Math.abs(new Date(e) - new Date(s)) / (1000 * 60 * 60 * 24)) + 1; if(days < 0) days = 0; } document.getElementById('setup-total-days').innerText = days; document.getElementById('setup-total-q').innerText = days * q; };
         window.toggleScoringUI = function() { const box = document.getElementById('scoring-rules-box'); if(document.getElementById('setup-scoring-toggle').checked) { box.classList.remove('hidden'); box.classList.add('grid'); } else { box.classList.add('hidden'); box.classList.remove('grid'); } };
         window.toggleTimerRulesUI = function() { const m = document.getElementById('setup-q-mode').value; const sec = document.getElementById('dynamic-timer-section'); if(m === 'random') { sec.classList.remove('hidden'); document.getElementById('fixed-time-input').classList.add('hidden-safe'); } else { sec.classList.add('hidden'); document.getElementById('fixed-time-input').classList.remove('hidden-safe'); } window.renderAdminQuestionPills(); };
         window.handleLogoUpload = function(e) { const f = e.target.files[0]; if(!f) return; if(f.size > 1024*1024) return window.showModal("Error", "Logo must be under 1MB", "fa-solid fa-triangle-exclamation text-rose-500"); const r = new FileReader(); r.onload = function(ev) { window.AppState.settings.logoBase64 = ev.target.result; document.getElementById('admin-logo-icon').classList.add('hidden-safe'); document.getElementById('admin-logo-preview').src = ev.target.result; document.getElementById('admin-logo-preview').classList.remove('hidden-safe'); }; r.readAsDataURL(f); };
         
+        window.updateDashboardStats = function() {
+            // Count registered users (excluding temporary mock users not saved)
+            const registeredUsers = window.AppState.allUsers.filter(u => u.isRegistered !== false);
+            document.getElementById('dash-users-count').innerText = registeredUsers.length;
+            document.getElementById('dash-q-count').innerText = window.AppState.allQuestions.length;
+            const adStatus = window.AppState.ads.masterEnabled; document.getElementById('dash-ads-status').innerText = adStatus ? 'Active' : 'Offline'; document.getElementById('dash-ads-status').className = adStatus ? 'text-2xl font-black text-emerald-500 relative z-10 mt-1' : 'text-2xl font-black text-rose-500 relative z-10 mt-1';
+            
+            // Calculate Day-wise stats
+            let dayCounts = {}; let todayNum = 1;
+            const sDate = window.AppState.settings.startDate; if(sDate) { const s = new Date(sDate); s.setHours(0,0,0,0); const n = new Date(); n.setHours(0,0,0,0); todayNum = Math.floor(Math.abs(n - s) / (1000 * 60 * 60 * 24)) + 1; }
+            
+            registeredUsers.forEach(u => {
+                let daysPlayed = new Set();
+                if(u.history) {
+                    Object.keys(u.history).forEach(qid => {
+                        let q = window.AppState.allQuestions.find(x => x.id === qid);
+                        if(q && q.mode !== 'mock') {
+                            if(q.day) daysPlayed.add(parseInt(q.day));
+                            else { let rT = new Date(u.history[qid].timeAt); let dN = Math.floor(Math.abs(rT - new Date(sDate||Date.now())) / (1000 * 60 * 60 * 24)) + 1; daysPlayed.add(dN>0?dN:1); }
+                        }
+                    });
+                }
+                daysPlayed.forEach(d => { dayCounts[d] = (dayCounts[d] || 0) + 1; });
+            });
+            window.AppState.dayCounts = dayCounts;
+            document.getElementById('dash-today-count').innerText = dayCounts[todayNum] || 0;
+        };
+
+        window.showDaywiseStats = function() {
+            const list = document.getElementById('day-stats-list'); list.innerHTML = '';
+            const counts = window.AppState.dayCounts || {};
+            if(Object.keys(counts).length === 0) list.innerHTML = '<div class="text-center p-4 text-xs font-bold text-slate-400">No participation data yet.</div>';
+            else {
+                Object.keys(counts).sort((a,b)=>a-b).forEach(d => {
+                    list.innerHTML += `<div class="bg-white border border-slate-200 p-3 rounded-xl flex justify-between items-center shadow-sm"><span class="font-bold text-sm text-slate-700">Day ${d}</span><span class="bg-emerald-100 text-emerald-700 px-3 py-1 rounded-lg text-xs font-black">${counts[d]} Users</span></div>`;
+                });
+            }
+            document.getElementById('day-stats-modal').classList.remove('hidden-safe');
+        };
+
         window.saveAdminSetup = async function() {
-            const data = { startDate: document.getElementById('setup-start').value, endDate: document.getElementById('setup-end').value, totalDays: parseInt(document.getElementById('setup-total-days').innerText) || 1, questionsPerDay: parseInt(document.getElementById('setup-q-per-day').value) || 3, questionMode: document.getElementById('setup-q-mode').value, instructions: document.getElementById('admin-inst-input').value, scoringEnabled: document.getElementById('setup-scoring-toggle').checked, pointsCorrect: parseInt(document.getElementById('setup-pts-correct').value) || 10, pointsNegative: parseInt(document.getElementById('setup-pts-negative').value) || 0, logoBase64: window.AppState.settings.logoBase64 || '', resultsPublished: document.getElementById('setup-publish-toggle').checked,
-                dynamicTimers: [
-                    { s: parseInt(document.getElementById('tr1-start').value)||1, e: parseInt(document.getElementById('tr1-end').value)||5, t: parseInt(document.getElementById('tr1-time').value)||40 },
-                    { s: parseInt(document.getElementById('tr2-start').value)||6, e: parseInt(document.getElementById('tr2-end').value)||10, t: parseInt(document.getElementById('tr2-time').value)||30 },
-                    { s: parseInt(document.getElementById('tr3-start').value)||11, e: parseInt(document.getElementById('tr3-end').value)||15, t: parseInt(document.getElementById('tr3-time').value)||15 }
-                ]
+            const data = { startDate: document.getElementById('setup-start').value, endDate: document.getElementById('setup-end').value, totalDays: parseInt(document.getElementById('setup-total-days').innerText) || 1, questionsPerDay: parseInt(document.getElementById('setup-q-per-day').value) || 3, questionMode: document.getElementById('setup-q-mode').value, scoringEnabled: document.getElementById('setup-scoring-toggle').checked, pointsCorrect: parseInt(document.getElementById('setup-pts-correct').value) || 10, pointsNegative: parseInt(document.getElementById('setup-pts-negative').value) || 0, logoBase64: window.AppState.settings.logoBase64 || '', resultsPublished: document.getElementById('setup-publish-toggle').checked, isMockTestActive: document.getElementById('setup-mock-toggle').checked,
+                dynamicTimers: [ { s: parseInt(document.getElementById('tr1-start').value)||1, e: parseInt(document.getElementById('tr1-end').value)||5, t: parseInt(document.getElementById('tr1-time').value)||40 }, { s: parseInt(document.getElementById('tr2-start').value)||6, e: parseInt(document.getElementById('tr2-end').value)||10, t: parseInt(document.getElementById('tr2-time').value)||30 } ]
             };
             try { await setDoc(docPath('settings', 'global'), data, {merge:true}); window.showModal("Saved", "Core configuration saved.", "fa-solid fa-check text-emerald-500"); } catch(e) {}
         };
 
-        window.triggerDangerAction = function(type) {
-            const btns = `<button onclick="window.closeModal()" class="flex-1 bg-slate-200 text-slate-800 font-bold py-3.5 rounded-xl text-sm">Cancel</button><button onclick="window.executeDangerAction('${type}')" class="flex-1 bg-rose-600 text-white font-black py-3.5 rounded-xl text-sm shadow-md">DELETE</button>`;
-            window.showModal("Are you absolutely sure?", `Type CONFIRM below to clear all ${type}. This cannot be undone.`, "fa-solid fa-skull-crossbones text-rose-500", btns, true);
-        };
-        window.executeDangerAction = async function(type) {
-            const val = document.getElementById('sys-modal-input').value; if(val !== 'CONFIRM') { return window.showModal("Aborted", "You did not type CONFIRM correctly.", "fa-solid fa-ban text-slate-500"); }
-            window.closeModal(); document.body.style.opacity = '0.5';
-            try {
-                const snap = await getDocs(collection(db, type)); const promises = [];
-                snap.forEach(d => promises.push(deleteDoc(doc(db, type, d.id)))); await Promise.all(promises);
-                document.body.style.opacity = '1'; window.showModal("Success", `All ${type} cleared successfully.`, "fa-solid fa-check-double text-emerald-500");
-            } catch(e) { document.body.style.opacity = '1'; window.showModal("Error", e.message, "fa-solid fa-triangle-exclamation text-rose-500"); }
-        };
-
-        window.toggleAdZ2Type = function() { const v = document.getElementById('ad-z2-type').value; if(v === 'image') { document.getElementById('ad-z2-img-sec').classList.remove('hidden-safe'); document.getElementById('ad-z2-yt-sec').classList.add('hidden-safe'); } else { document.getElementById('ad-z2-img-sec').classList.add('hidden-safe'); document.getElementById('ad-z2-yt-sec').classList.remove('hidden-safe'); } };
-        window.handleAdZ1Upload = function(e) { const f = e.target.files[0]; if(!f) return; const r = new FileReader(); r.onload = function(ev) { window.AppState.ads.zone1.imageBase64 = ev.target.result; document.getElementById('ad-z1-preview').src = ev.target.result; document.getElementById('ad-z1-preview').classList.remove('hidden-safe'); document.getElementById('ad-z1-url').value = ''; }; r.readAsDataURL(f); };
-        window.handleAdZ2Upload = function(e) { const f = e.target.files[0]; if(!f) return; const r = new FileReader(); r.onload = function(ev) { window.AppState.ads.zone2.images.push(ev.target.result); window.renderZ2Images(); }; r.readAsDataURL(f); };
-        window.addAdZ2Url = function() { const u = document.getElementById('ad-z2-url-input').value.trim(); if(u) { window.AppState.ads.zone2.images.push(u); window.renderZ2Images(); document.getElementById('ad-z2-url-input').value=''; } };
-        window.renderZ2Images = function() { const g = document.getElementById('ad-z2-gallery'); g.innerHTML = ''; window.AppState.ads.zone2.images.forEach(i => { g.innerHTML += `<div class="w-16 h-16 rounded-lg bg-slate-100 border border-slate-200 overflow-hidden"><img src="${i}" class="w-full h-full object-cover"></div>`; }); };
-        window.clearZ2Images = function() { window.AppState.ads.zone2.images = []; window.renderZ2Images(); };
-        window.saveAdSettings = async function() {
-            const data = { masterEnabled: document.getElementById('ad-master-toggle').checked,
-                zone1: { enabled: document.getElementById('ad-z1-toggle').checked, text: document.getElementById('ad-z1-text').value.trim(), imageBase64: window.AppState.ads.zone1.imageBase64 || '', imageUrl: document.getElementById('ad-z1-url').value.trim(), link: document.getElementById('ad-z1-link').value.trim() },
-                zone2: { enabled: document.getElementById('ad-z2-toggle').checked, type: document.getElementById('ad-z2-type').value, images: window.AppState.ads.zone2.images || [], interval: parseInt(document.getElementById('ad-z2-interval').value) || 3, youtubeUrl: document.getElementById('ad-z2-yturl').value.trim(), link: document.getElementById('ad-z2-link').value.trim() }
-            };
-            try { await setDoc(docPath('settings', 'ads'), data); window.showModal("Saved", "Ad settings updated.", "fa-solid fa-check text-emerald-500"); } catch(e) {}
-        };
-
-        window.downloadCSVTemplate = function() {
-            const csv = "Type (mcq/text),Question Text,Option A,Option B,Option C,Option D,Correct (A/B/C/D) or Text Ans,Time Limit (sec)\nmcq,Which planet is known as the Red Planet?,Earth,Mars,Jupiter,Venus,B,30\ntext,What is the capital of France?,,,,,Paris,45";
-            let a = document.createElement('a'); a.href = 'data:text/csv;charset=utf-8,' + encodeURI(csv); a.download = 'FestQuiz_Template.csv'; a.click();
-        };
-
         window.changeAdminDay = function(dir) { let n = window.AppState.adminSelectedDay + dir; if(n<1) n=1; if(n>window.AppState.totalDays) n=window.AppState.totalDays; window.AppState.adminSelectedDay = n; document.getElementById('admin-day-disp').innerText = n; window.renderAdminQuestionPills(); };
         window.renderAdminQuestionPills = function() {
-            const m = window.AppState.settings.questionMode; const c = document.getElementById('admin-slot-pills'); c.innerHTML = '';
-            if(m === 'random') {
+            const mode = document.getElementById('admin-q-target').value === 'mock' ? 'mock' : window.AppState.settings.questionMode;
+            const c = document.getElementById('admin-slot-pills'); c.innerHTML = '';
+            
+            if(mode === 'random' || mode === 'mock') {
                 document.getElementById('day-select-container').classList.add('hidden-safe'); document.getElementById('pool-capacity-indicator').classList.remove('hidden');
-                const pool = window.AppState.allQuestions.filter(q => q.mode === 'random');
-                const needed = (window.AppState.totalDays * window.AppState.questionsPerDay);
+                const pool = window.AppState.allQuestions.filter(q => q.mode === mode);
                 document.getElementById('pool-count').innerText = `${pool.length}`;
-                if(pool.length < needed) document.getElementById('pool-capacity-indicator').className = 'text-xs font-bold text-center p-2 bg-amber-50 text-amber-700 rounded-lg border border-amber-200 mb-2'; else document.getElementById('pool-capacity-indicator').className = 'text-xs font-bold text-center p-2 bg-emerald-50 text-emerald-700 rounded-lg border border-emerald-200 mb-2';
-
-                pool.forEach((q, idx) => { c.innerHTML += `<button onclick="window.loadAdminQuestion('random', null, '${q.id}')" class="w-10 h-10 rounded-full flex-shrink-0 text-white font-bold text-xs bg-emerald-500 hover:scale-105">Q${idx+1}</button>`; });
-                c.innerHTML += `<button onclick="window.loadAdminQuestion('random', null, 'new')" class="w-10 h-10 rounded-full flex-shrink-0 text-indigo-500 border-2 border-dashed border-indigo-300 font-bold text-lg hover:bg-indigo-50"><i class="fa-solid fa-plus"></i></button>`;
-                if(window.AppState.adminPoolSelectedId === null) window.loadAdminQuestion('random', null, pool.length>0?pool[0].id:'new');
+                pool.forEach((q, idx) => { c.innerHTML += `<button onclick="window.loadAdminQuestion('${mode}', null, '${q.id}')" class="w-10 h-10 rounded-full flex-shrink-0 text-white font-bold text-xs bg-emerald-500 hover:scale-105">Q${idx+1}</button>`; });
+                c.innerHTML += `<button onclick="window.loadAdminQuestion('${mode}', null, 'new')" class="w-10 h-10 rounded-full flex-shrink-0 text-indigo-500 border-2 border-dashed border-indigo-300 font-bold text-lg hover:bg-indigo-50"><i class="fa-solid fa-plus"></i></button>`;
+                if(window.AppState.adminPoolSelectedId === null) window.loadAdminQuestion(mode, null, pool.length>0?pool[0].id:'new');
             } else {
                 document.getElementById('day-select-container').classList.remove('hidden-safe'); document.getElementById('pool-capacity-indicator').classList.add('hidden');
                 for(let i=1; i<=window.AppState.questionsPerDay; i++) {
-                    const ex = window.AppState.allQuestions.find(q => q.mode !== 'random' && parseInt(q.day) === window.AppState.adminSelectedDay && parseInt(q.slotIndex) === i);
+                    const ex = window.AppState.allQuestions.find(q => q.mode !== 'random' && q.mode !== 'mock' && parseInt(q.day) === window.AppState.adminSelectedDay && parseInt(q.slotIndex) === i);
                     const col = ex ? 'bg-emerald-500 text-white shadow-sm border-0' : 'bg-slate-50 text-slate-400 border border-slate-200';
                     c.innerHTML += `<button onclick="window.loadAdminQuestion('fixed', ${i}, null)" class="w-10 h-10 rounded-full flex-shrink-0 font-bold text-xs ${col} hover:scale-105">${i}</button>`;
                 }
@@ -505,15 +467,14 @@
         
         window.loadAdminQuestion = function(mode, slot, poolId) {
             window.AppState.adminSelectedSlot = slot; window.AppState.adminPoolSelectedId = poolId; let q = null;
-            if(mode === 'random') { document.getElementById('admin-q-editor-title').innerText = (poolId==='new')?"ADD POOL QUESTION":"EDIT POOL QUESTION"; if(poolId!=='new') q = window.AppState.allQuestions.find(x=>x.id===poolId); }
-            else { document.getElementById('admin-q-editor-title').innerText = `DAY ${window.AppState.adminSelectedDay} - SLOT ${slot}`; q = window.AppState.allQuestions.find(x=>x.mode!=='random' && parseInt(x.day)===window.AppState.adminSelectedDay && parseInt(x.slotIndex)===slot); }
+            if(mode === 'random' || mode === 'mock') { document.getElementById('admin-q-editor-title').innerText = (poolId==='new')?`ADD ${mode.toUpperCase()} QUESTION`:`EDIT ${mode.toUpperCase()} QUESTION`; if(poolId!=='new') q = window.AppState.allQuestions.find(x=>x.id===poolId); }
+            else { document.getElementById('admin-q-editor-title').innerText = `DAY ${window.AppState.adminSelectedDay} - SLOT ${slot}`; q = window.AppState.allQuestions.find(x=>x.mode!=='random' && x.mode!=='mock' && parseInt(x.day)===window.AppState.adminSelectedDay && parseInt(x.slotIndex)===slot); }
             
             const stat = document.getElementById('admin-q-status');
             if(q) {
-                stat.innerText = 'Saved'; stat.className = 'px-2.5 py-1 rounded-md text-[10px] font-bold uppercase bg-emerald-100 text-emerald-700';
-                document.getElementById('admin-q-type').value = q.type; document.getElementById('admin-q-text').value = q.text; document.getElementById('admin-q-time').value = q.timeLimit || 30;
+                stat.innerText = 'Saved'; stat.className = 'px-2.5 py-1 rounded-md text-[10px] font-bold uppercase bg-emerald-100 text-emerald-700'; document.getElementById('admin-q-type').value = q.type; document.getElementById('admin-q-text').value = q.text; document.getElementById('admin-q-time').value = q.timeLimit || 30;
                 if(q.type==='mcq') { document.getElementById('admin-opt-a').value=q.options[0]; document.getElementById('admin-opt-b').value=q.options[1]; document.getElementById('admin-opt-c').value=q.options[2]; document.getElementById('admin-opt-d').value=q.options[3]; document.getElementById('admin-mcq-correct').value=q.correctOptionKey||'A'; }
-                else { document.getElementById('admin-text-correct').value = q.answer; }
+                else document.getElementById('admin-text-correct').value = q.answer;
             } else {
                 stat.innerText = 'Unsaved'; stat.className = 'px-2.5 py-1 rounded-md text-[10px] font-bold uppercase bg-rose-100 text-rose-600'; document.getElementById('admin-q-text').value=''; document.getElementById('admin-opt-a').value=''; document.getElementById('admin-opt-b').value=''; document.getElementById('admin-opt-c').value=''; document.getElementById('admin-opt-d').value=''; document.getElementById('admin-text-correct').value='';
             }
@@ -521,26 +482,41 @@
         };
         window.toggleAdminQType = function() { if(document.getElementById('admin-q-type').value === 'mcq') { document.getElementById('admin-mcq-area').classList.remove('hidden-safe'); document.getElementById('admin-text-area').classList.add('hidden-safe'); } else { document.getElementById('admin-mcq-area').classList.add('hidden-safe'); document.getElementById('admin-text-area').classList.remove('hidden-safe'); } };
         window.saveAdminQuestion = async function() {
-            const m = window.AppState.settings.questionMode, t = document.getElementById('admin-q-type').value, txt = document.getElementById('admin-q-text').value.trim(), tm = parseInt(document.getElementById('admin-q-time').value)||30;
+            const target = document.getElementById('admin-q-target').value;
+            const m = target === 'mock' ? 'mock' : window.AppState.settings.questionMode;
+            const t = document.getElementById('admin-q-type').value, txt = document.getElementById('admin-q-text').value.trim(), tm = parseInt(document.getElementById('admin-q-time').value)||30;
             if(!txt) return window.showModal("Error", "Question text required.", "fa-solid fa-triangle-exclamation text-rose-500");
-            let data = { type:t, text:txt, timeLimit: tm, updatedAt: new Date().toISOString() };
-            if(t==='mcq') { const a=document.getElementById('admin-opt-a').value.trim(), b=document.getElementById('admin-opt-b').value.trim(), c=document.getElementById('admin-opt-c').value.trim(), d=document.getElementById('admin-opt-d').value.trim(); if(!a||!b) return; data.options=[a,b,c,d]; data.correctOptionKey=document.getElementById('admin-mcq-correct').value; data.answer = data.correctOptionKey==='A'?a:(data.correctOptionKey==='B'?b:(data.correctOptionKey==='C'?c:d)); } else { data.answer=document.getElementById('admin-text-correct').value.trim(); }
-            let dId = m==='random' ? (window.AppState.adminPoolSelectedId==='new' ? `pool_${Date.now()}` : window.AppState.adminPoolSelectedId) : `q_day${window.AppState.adminSelectedDay}_slot${window.AppState.adminSelectedSlot}`;
-            data.mode = m; if(m==='fixed') { data.day=window.AppState.adminSelectedDay; data.slotIndex=window.AppState.adminSelectedSlot; }
-            try { await setDoc(docPath('questions', dId), data); if(m==='random' && window.AppState.adminPoolSelectedId==='new') window.AppState.adminPoolSelectedId=dId; window.showModal("Saved", "Question updated.", "fa-solid fa-check text-emerald-500"); } catch(e){}
+            let data = { type:t, text:txt, timeLimit: tm, updatedAt: new Date().toISOString(), mode: m };
+            if(t==='mcq') { const a=document.getElementById('admin-opt-a').value.trim(), b=document.getElementById('admin-opt-b').value.trim(), c=document.getElementById('admin-opt-c').value.trim(), d=document.getElementById('admin-opt-d').value.trim(); if(!a||!b) return; data.options=[a,b,c,d]; data.correctOptionKey=document.getElementById('admin-mcq-correct').value; data.answer = data.correctOptionKey==='A'?a:(data.correctOptionKey==='B'?b:(data.correctOptionKey==='C'?c:d)); } else data.answer=document.getElementById('admin-text-correct').value.trim();
+            
+            let dId = (m==='random' || m==='mock') ? (window.AppState.adminPoolSelectedId==='new' ? `${m}_${Date.now()}` : window.AppState.adminPoolSelectedId) : `q_day${window.AppState.adminSelectedDay}_slot${window.AppState.adminSelectedSlot}`;
+            if(m==='fixed') { data.day=window.AppState.adminSelectedDay; data.slotIndex=window.AppState.adminSelectedSlot; }
+            try { await setDoc(docPath('questions', dId), data); if((m==='random'||m==='mock') && window.AppState.adminPoolSelectedId==='new') window.AppState.adminPoolSelectedId=dId; window.showModal("Saved", "Question updated.", "fa-solid fa-check text-emerald-500"); } catch(e){}
         };
 
-        async function loadUsersForLeaderboard() {
+        window.toggleAdZ2Type = function() { const v = document.getElementById('ad-z2-type').value; if(v === 'image') { document.getElementById('ad-z2-img-sec').classList.remove('hidden-safe'); document.getElementById('ad-z2-yt-sec').classList.add('hidden-safe'); } else { document.getElementById('ad-z2-img-sec').classList.add('hidden-safe'); document.getElementById('ad-z2-yt-sec').classList.remove('hidden-safe'); } };
+        window.handleAdZ1Upload = function(e) { const f = e.target.files[0]; if(!f) return; const r = new FileReader(); r.onload = function(ev) { window.AppState.ads.zone1.imageBase64 = ev.target.result; document.getElementById('ad-z1-url').value = ''; }; r.readAsDataURL(f); };
+        window.handleAdZ2Upload = function(e) { const f = e.target.files[0]; if(!f) return; const r = new FileReader(); r.onload = function(ev) { window.AppState.ads.zone2.images.push(ev.target.result); window.renderZ2Images(); }; r.readAsDataURL(f); };
+        window.addAdZ2Url = function() { const u = document.getElementById('ad-z2-url-input').value.trim(); if(u) { window.AppState.ads.zone2.images.push(u); window.renderZ2Images(); document.getElementById('ad-z2-url-input').value=''; } };
+        window.renderZ2Images = function() { const g = document.getElementById('ad-z2-gallery'); g.innerHTML = ''; window.AppState.ads.zone2.images.forEach(i => { g.innerHTML += `<div class="w-12 h-12 rounded bg-slate-100 border border-slate-200 overflow-hidden"><img src="${i}" class="w-full h-full object-cover"></div>`; }); };
+        window.clearZ2Images = function() { window.AppState.ads.zone2.images = []; window.renderZ2Images(); };
+        window.saveAdSettings = async function() {
+            const data = { masterEnabled: document.getElementById('ad-master-toggle').checked,
+                zone1: { enabled: document.getElementById('ad-z1-toggle').checked, imageBase64: window.AppState.ads.zone1.imageBase64 || '', imageUrl: document.getElementById('ad-z1-url').value.trim(), link: document.getElementById('ad-z1-link').value.trim() },
+                zone2: { enabled: document.getElementById('ad-z2-toggle').checked, type: document.getElementById('ad-z2-type').value, images: window.AppState.ads.zone2.images || [], youtubeUrl: document.getElementById('ad-z2-yturl').value.trim(), link: document.getElementById('ad-z2-link').value.trim() }
+            };
+            try { await setDoc(docPath('settings', 'ads'), data); window.showModal("Saved", "Ad settings updated.", "fa-solid fa-check text-emerald-500"); } catch(e) {}
+        };
+
+        function loadUsersForLeaderboard() {
             const list = document.getElementById('admin-user-list');
-            try {
-                const snap = await getDocs(collection(db, "users")); let u = []; snap.forEach(doc => u.push({ id: doc.id, ...doc.data() }));
-                u.sort((a,b) => b.totalScore - a.totalScore); let r = 1, p = null; u.forEach((x, i) => { if(x.totalScore !== p && i !== 0) r = i+1; x.rank = r; p = x.totalScore; });
-                window.AppState.allUsers = u; list.innerHTML = '';
-                u.forEach(x => {
-                    const c = x.totalScore >= 0 ? "text-emerald-700 bg-emerald-50" : "text-rose-700 bg-rose-50";
-                    list.innerHTML += `<div onclick="window.openUserHistoryFull('${x.id}')" class="flex items-center justify-between p-3 bg-slate-50 hover:bg-indigo-50 rounded-2xl border border-slate-100 cursor-pointer transition-colors mb-2"><div class="flex items-center"><div class="w-10 h-10 rounded-full bg-white border border-slate-200 text-slate-700 flex items-center justify-center font-black text-xs mr-3">${x.rank}</div><div><div class="font-bold text-sm text-slate-800">${x.name}</div><div class="text-[10px] font-bold text-slate-500 mt-0.5"><i class="fa-solid fa-phone mr-1"></i>${x.id} <span class="mx-1 text-slate-300">|</span> <i class="fa-solid fa-lock text-indigo-400 mr-1"></i><span class="text-indigo-500">${x.password||'N/A'}</span></div></div></div><div class="px-3 py-1.5 rounded-lg font-black text-xs ${c}">${Math.abs(x.totalScore)} pts</div></div>`;
-                });
-            } catch(e) {}
+            const regUsers = window.AppState.allUsers.filter(u => u.isRegistered !== false);
+            regUsers.sort((a,b) => (b.totalScore||0) - (a.totalScore||0));
+            list.innerHTML = '';
+            regUsers.forEach((x, i) => {
+                const c = x.totalScore >= 0 ? "text-emerald-700 bg-emerald-50" : "text-rose-700 bg-rose-50";
+                list.innerHTML += `<div onclick="window.openUserHistoryFull('${x.id}')" class="flex items-center justify-between p-3 bg-slate-50 hover:bg-indigo-50 rounded-2xl border border-slate-100 cursor-pointer transition-colors mb-2"><div class="flex items-center"><div class="w-10 h-10 rounded-full bg-white border border-slate-200 text-slate-700 flex items-center justify-center font-black text-xs mr-3">${i+1}</div><div><div class="font-bold text-sm text-slate-800">${x.name}</div><div class="text-[10px] font-bold text-slate-500 mt-0.5"><i class="fa-solid fa-phone mr-1"></i>${x.id} <span class="mx-1 text-slate-300">|</span> <i class="fa-solid fa-lock text-indigo-400 mr-1"></i><span class="text-indigo-500">${x.password||'N/A'}</span></div></div></div><div class="px-3 py-1.5 rounded-lg font-black text-xs ${c}">${Math.abs(x.totalScore||0)} pts</div></div>`;
+            });
         }
         
         window.openUserHistoryFull = function(uid) {
@@ -548,21 +524,35 @@
             document.querySelectorAll('.view-section').forEach(el => el.classList.add('hidden-safe')); document.getElementById('admin-user-detail').classList.remove('hidden-safe'); document.getElementById('admin-user-detail').classList.add('active');
             document.getElementById('hist-name').innerText = user.name; document.getElementById('hist-phone').innerHTML = `<i class="fa-solid fa-phone text-slate-400 mr-1"></i>${user.id} <span class="text-slate-300 mx-1">|</span> <i class="fa-solid fa-lock text-indigo-400 mr-1"></i>${user.password || 'N/A'}`;
             const body = document.getElementById('hist-body'); body.innerHTML = '';
-            if(!user.history || Object.keys(user.history).length===0) { body.innerHTML = '<div class="text-center p-8 text-sm font-semibold text-slate-500 bg-white border border-slate-200 rounded-3xl">No history found.</div>'; return; }
+            if(!user.history || Object.keys(user.history).length===0) { body.innerHTML = '<div class="text-center p-8 text-sm font-semibold text-slate-500 bg-white border border-slate-200 rounded-3xl">No regular quiz history found.</div>'; return; }
             
-            let hByDay = {}; const sd = window.AppState.settings.startDate ? new Date(window.AppState.settings.startDate) : new Date(); sd.setHours(0,0,0,0);
+            // Build history display (Simplified for space)
             Object.keys(user.history).forEach(qId => {
-                const rec = user.history[qId], q = window.AppState.allQuestions.find(x=>x.id===qId); let dNum = 1; if(rec.timeAt) { let t=new Date(rec.timeAt); t.setHours(0,0,0,0); dNum=Math.floor((t-sd)/(1000*60*60*24))+1; } else if(q && q.day) dNum=parseInt(q.day); if(dNum<1) dNum=1;
-                if(!hByDay[dNum]) hByDay[dNum] = { r: [], pts: 0, d: rec.timeAt }; let p = 0; if(rec.correct) p = window.AppState.settings.scoringEnabled ? window.AppState.settings.pointsCorrect : 10; else if(rec.answer) p = -(window.AppState.settings.scoringEnabled ? window.AppState.settings.pointsNegative : 0);
-                hByDay[dNum].pts += p; hByDay[dNum].r.push({ q: q?q.text:"Unknown", u: rec.answer||"Skipped", c: q?q.answer:"N/A", p: p });
-            });
-            Object.keys(hByDay).sort((a,b)=>a-b).forEach(d => {
-                const dat = hByDay[d], col = dat.pts>=0 ? "bg-emerald-50 text-emerald-700":"bg-rose-50 text-rose-700", ds = dat.d ? new Date(dat.d).toLocaleDateString('en-GB',{day:'2-digit',month:'short'}) : 'N/A';
-                let html = `<details class="bg-white border border-slate-200 rounded-3xl overflow-hidden mb-3"><summary class="flex justify-between items-center p-4 bg-slate-50 cursor-pointer outline-none"><div class="flex items-center"><span class="font-black text-sm text-slate-800 mr-2">Day ${d}</span><span class="text-[9px] font-bold text-slate-500 bg-white px-2 py-0.5 rounded shadow-sm border border-slate-100">${ds}</span></div><div class="font-black text-[11px] px-2.5 py-1 rounded-lg ${col}">${Math.abs(dat.pts)}</div></summary><div class="p-0 border-t border-slate-200 divide-y divide-slate-50">`;
-                dat.r.forEach((r,i) => { const ac = r.p>0?"text-emerald-600":(r.p<0?"text-rose-600":"text-slate-400"), ic = r.p>0?'fa-circle-check text-emerald-500':(r.p<0?'fa-circle-xmark text-rose-500':'fa-circle-minus text-slate-400'); html += `<div class="p-4"><p class="font-bold text-xs text-slate-800 mb-2 leading-snug"><span class="text-indigo-400 mr-1">Q${i+1}.</span> ${r.q}</p><div class="flex justify-between items-end text-[11px]"><div class="space-y-1"><div class="flex items-center"><span class="text-slate-400 w-12 font-semibold">User:</span> <span class="font-black ${ac}"><i class="fa-solid ${ic} mr-1"></i>${r.u}</span></div><div class="flex items-center"><span class="text-slate-400 w-12 font-semibold">Real:</span> <span class="font-black text-slate-700 px-1">${r.c}</span></div></div><div class="font-black ${ac} text-xs bg-slate-50 px-2 py-1 rounded shadow-sm border border-slate-100">${Math.abs(r.p)}</div></div></div>`; }); html += `</div></details>`; body.innerHTML += html;
+                const rec = user.history[qId], q = window.AppState.allQuestions.find(x=>x.id===qId);
+                const ac = rec.correct ? "text-emerald-600" : (rec.answer?"text-rose-600":"text-slate-400");
+                body.innerHTML += `<div class="p-4 bg-white border border-slate-200 rounded-2xl"><p class="font-bold text-xs text-slate-800 mb-2">${q?q.text:"Unknown Q"}</p><div class="flex text-[11px]"><span class="text-slate-400 w-12 font-semibold">User:</span> <span class="font-black ${ac}">${rec.answer||"Skipped"}</span></div><div class="flex text-[11px] mt-1"><span class="text-slate-400 w-12 font-semibold">Real:</span> <span class="font-black text-slate-700">${q?q.answer:"N/A"}</span></div></div>`;
             });
         };
         window.closeUserHistoryFull = function() { document.getElementById('admin-user-detail').classList.remove('active'); document.getElementById('admin-user-detail').classList.add('hidden-safe'); document.getElementById('admin-users').classList.remove('hidden-safe'); document.getElementById('admin-users').classList.add('active'); };
+
+        window.downloadCSVTemplate = function() {
+            const csv = "Type (mcq/text),Question Text,Option A,Option B,Option C,Option D,Correct (A/B/C/D) or Text Ans,Time Limit (sec)\nmcq,Which planet is known as the Red Planet?,Earth,Mars,Jupiter,Venus,B,30";
+            let a = document.createElement('a'); a.href = 'data:text/csv;charset=utf-8,' + encodeURI(csv); a.download = 'FestQuiz_Template.csv'; a.click();
+        };
+
+        window.triggerDangerAction = function(type) {
+            const btns = `<button onclick="window.closeModal()" class="flex-1 bg-slate-200 text-slate-800 font-bold py-3.5 rounded-xl text-sm">Cancel</button><button onclick="window.executeDangerAction('${type}')" class="flex-1 bg-rose-600 text-white font-black py-3.5 rounded-xl text-sm shadow-md">DELETE</button>`;
+            window.showModal("Are you sure?", `Type CONFIRM to clear all ${type}. Cannot be undone.`, "fa-solid fa-skull-crossbones text-rose-500", btns, true);
+        };
+        window.executeDangerAction = async function(type) {
+            const val = document.getElementById('sys-modal-input').value; if(val !== 'CONFIRM') return window.showModal("Aborted", "You did not type CONFIRM.", "fa-solid fa-ban text-slate-500");
+            window.closeModal(); document.body.style.opacity = '0.5';
+            try {
+                const snap = await getDocs(collection(db, type)); const promises = [];
+                snap.forEach(d => promises.push(deleteDoc(doc(db, type, d.id)))); await Promise.all(promises);
+                document.body.style.opacity = '1'; window.showModal("Success", `All ${type} cleared.`, "fa-solid fa-check-double text-emerald-500");
+            } catch(e) { document.body.style.opacity = '1'; window.showModal("Error", e.message, "fa-solid fa-triangle-exclamation text-rose-500"); }
+        };
 
         window.onload = initAdmin;
     </script>
