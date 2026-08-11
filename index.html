@@ -27,17 +27,31 @@
         .rank-gold { background: linear-gradient(135deg, #fef08a, #f59e0b); border: 2px solid #fbbf24; }
         .rank-silver { background: linear-gradient(135deg, #f3f4f6, #9ca3af); border: 2px solid #d1d5db; }
         .rank-bronze { background: linear-gradient(135deg, #ffedd5, #b45309); border: 2px solid #f59e0b; }
+        .input-group:focus-within i { color: #ec4899; transform: scale(1.1); transition: all 0.3s ease; }
     </style>
 </head>
 <body class="text-slate-800 antialiased selection:bg-pink-200">
     <div class="festive-art-bg"></div>
+
+    <!-- Slide-down Top Alert Bar for validation & offline mode -->
+    <div id="top-alert-bar" class="fixed top-0 left-0 right-0 z-[400] transform -translate-y-full transition-transform duration-300 shadow-lg text-white text-xs font-bold text-center py-2.5 flex justify-center items-center">
+        <i id="top-alert-icon" class="mr-2 fa-solid fa-triangle-exclamation"></i> <span id="top-alert-text">Message</span>
+    </div>
+
+    <!-- Bilingual Language Toggle -->
+    <div class="fixed top-4 left-4 right-4 z-[50] flex justify-between items-center pointer-events-none">
+        <button onclick="window.toggleLang()" class="pointer-events-auto bg-white/90 backdrop-blur-md px-3.5 py-1.5 rounded-full shadow-md font-bold text-[10px] text-pink-600 flex items-center border border-pink-100 uppercase tracking-widest active:scale-95 transition-transform">
+            <i class="fa-solid fa-language text-sm mr-1.5"></i> <span id="lang-text">EN</span>
+        </button>
+    </div>
+
     <div id="loader" class="fixed inset-0 z-[500] flex flex-col items-center justify-center bg-white/70 backdrop-blur-md hidden-safe transition-opacity"><div class="animate-spin rounded-full h-14 w-14 border-4 border-slate-200 border-t-pink-500 mb-4 shadow-lg"></div><p class="text-sm font-bold text-slate-600 tracking-wider">LOADING...</p></div>
     
     <div id="instructions-modal" class="fixed inset-0 z-[150] hidden-safe bg-slate-900/80 backdrop-blur-md flex items-center justify-center p-4">
         <div class="bg-white rounded-[2.5rem] w-full max-w-md shadow-2xl overflow-hidden flex flex-col max-h-[85vh]">
-            <div class="bg-gradient-to-r from-pink-500 to-purple-500 p-6 text-white text-center shrink-0"><h2 class="text-2xl font-black flex items-center justify-center font-['Quicksand']"><i class="fa-solid fa-scroll mr-2"></i> Quiz Rules</h2></div>
+            <div class="bg-gradient-to-r from-pink-500 to-purple-500 p-6 text-white text-center shrink-0"><h2 class="text-2xl font-black flex items-center justify-center font-['Quicksand']"><i class="fa-solid fa-scroll mr-2"></i> <span data-i18n="rules">Quiz Rules</span></h2></div>
             <div class="p-6 overflow-y-auto flex-1 bg-slate-50/50"><ul id="instructions-content" class="text-sm text-slate-700 font-bold leading-relaxed space-y-3"></ul></div>
-            <div class="p-5 bg-white shrink-0"><button onclick="document.getElementById('instructions-modal').classList.add('hidden-safe')" class="w-full bg-slate-900 hover:bg-black text-white font-black py-4 rounded-2xl shadow-xl transition-transform active:scale-95 flex justify-center items-center text-lg">I Agree & Continue <i class="fa-solid fa-arrow-right ml-2"></i></button></div>
+            <div class="p-5 bg-white shrink-0"><button onclick="document.getElementById('instructions-modal').classList.add('hidden-safe')" class="w-full bg-slate-900 hover:bg-black text-white font-black py-4 rounded-2xl shadow-xl transition-transform active:scale-95 flex justify-center items-center text-lg"><span data-i18n="agree">I Agree & Continue</span> <i class="fa-solid fa-arrow-right ml-2"></i></button></div>
         </div>
     </div>
 
@@ -57,36 +71,39 @@
         </div>
     </div>
 
-    <div id="user-app" class="h-full flex flex-col relative">
-        <div class="flex-1 overflow-y-auto w-full max-w-[440px] mx-auto px-4 py-8 flex flex-col justify-center min-h-full">
+    <div id="user-app" class="h-full flex flex-col relative pt-10">
+        <div class="flex-1 overflow-y-auto w-full max-w-[440px] mx-auto px-4 py-8 flex flex-col justify-center min-h-full pb-20">
             
+            <!-- Auth Section -->
             <div id="auth-section" class="w-full glass-card p-8 transition-all duration-500 transform relative z-10 mb-16">
                 <button onclick="document.getElementById('instructions-modal').classList.remove('hidden-safe')" class="absolute top-5 right-5 flex flex-col items-center justify-center text-pink-500 hover:text-pink-600 group z-20">
                     <div class="w-10 h-10 bg-pink-100/90 rounded-full flex items-center justify-center shadow-md animate-bounce border border-pink-200"><i class="fa-solid fa-scroll text-base text-pink-600"></i></div>
                     <span class="text-[9px] font-black tracking-widest text-pink-600 animate-pulse mt-0.5">README</span>
                 </button>
                 <div class="text-center mb-8 relative">
-                    <div class="w-24 h-24 bg-white rounded-full flex items-center justify-center mx-auto mb-4 shadow-[0_10px_25px_rgba(236,72,153,0.25)] overflow-hidden border-2 border-white"><i class="fa-solid fa-masks-theater text-5xl text-pink-500" id="default-logo-login"></i><img id="custom-logo-login" src="" class="hidden-safe w-full h-full object-cover"></div>
-                    <h2 class="text-3xl font-black text-slate-800 font-['Quicksand'] tracking-tight" id="login-title">Join Fest Quiz</h2>
-                    <p class="text-sm text-slate-500 font-bold mt-1" id="login-sub">Enter details to start</p>
+                    <!-- Default Gamepad icon as requested for the login page -->
+                    <div class="w-24 h-24 bg-white rounded-full flex items-center justify-center mx-auto mb-4 shadow-[0_10px_25px_rgba(236,72,153,0.25)] overflow-hidden border-2 border-white"><i class="fa-solid fa-gamepad text-5xl text-pink-500" id="default-logo-login"></i><img id="custom-logo-login" src="" class="hidden-safe w-full h-full object-cover"></div>
+                    <h2 class="text-3xl font-black text-slate-800 font-['Quicksand'] tracking-tight" id="login-title" data-i18n="login_title">Join Fest Quiz</h2>
+                    <p class="text-sm text-slate-500 font-bold mt-1" id="login-sub" data-i18n="login_sub">Enter details to start</p>
                 </div>
                 <div class="space-y-4">
-                    <div class="relative"><i class="fa-solid fa-phone absolute left-4 top-4 text-slate-400"></i><input type="tel" id="login-phone" maxlength="10" class="w-full pl-12 pr-4 py-3.5 bg-slate-50/80 border-2 border-slate-100 rounded-2xl font-bold text-slate-700 outline-none" placeholder="10 Digit Phone Number" oninput="window.handlePhoneInput(this.value)"></div>
-                    <div class="relative"><i class="fa-solid fa-venus-mars absolute left-4 top-4 text-slate-400"></i><select id="login-gender" class="w-full pl-12 pr-4 py-3.5 bg-slate-50/80 border-2 border-slate-100 rounded-2xl font-bold text-slate-700 outline-none appearance-none"><option value="" disabled selected>Select Gender</option><option value="Male">Male</option><option value="Female">Female</option></select></div>
-                    <div class="relative"><i class="fa-solid fa-user absolute left-4 top-4 text-slate-400"></i><input type="text" id="login-name" class="w-full pl-12 pr-4 py-3.5 bg-slate-50/80 border-2 border-slate-100 rounded-2xl font-bold text-slate-700 outline-none" placeholder="Full Name"></div>
-                    <div class="relative"><i class="fa-solid fa-lock absolute left-4 top-4 text-slate-400"></i><input type="password" id="login-password" class="w-full pl-12 pr-4 py-3.5 bg-slate-50/80 border-2 border-slate-100 rounded-2xl font-bold text-slate-700 outline-none" placeholder="Password (Min 4 chars)"></div>
-                    <button onclick="window.initiateLogin()" class="w-full bg-gradient-to-r from-pink-500 to-rose-500 text-white font-black py-4 rounded-2xl shadow-xl transition-transform active:scale-95 flex justify-center items-center mt-6 text-lg">START QUIZ <i class="fa-solid fa-play ml-2"></i></button>
+                    <div class="relative input-group"><i class="fa-solid fa-phone absolute left-4 top-4 text-slate-400"></i><input type="tel" id="login-phone" maxlength="10" class="w-full pl-12 pr-4 py-3.5 bg-slate-50/80 border-2 border-slate-100 rounded-2xl font-bold text-slate-700 outline-none focus:border-pink-300" placeholder="10 Digit Phone Number" data-i18n-ph="ph_phone" oninput="window.handlePhoneInput(this.value)"></div>
+                    <div class="relative input-group"><i class="fa-solid fa-venus-mars absolute left-4 top-4 text-slate-400"></i><select id="login-gender" class="w-full pl-12 pr-4 py-3.5 bg-slate-50/80 border-2 border-slate-100 rounded-2xl font-bold text-slate-700 outline-none appearance-none focus:border-pink-300"><option value="" disabled selected data-i18n="ph_gender">Select Gender</option><option value="Male" data-i18n="gen_m">Male</option><option value="Female" data-i18n="gen_f">Female</option></select></div>
+                    <div class="relative input-group"><i class="fa-solid fa-user absolute left-4 top-4 text-slate-400"></i><input type="text" id="login-name" class="w-full pl-12 pr-4 py-3.5 bg-slate-50/80 border-2 border-slate-100 rounded-2xl font-bold text-slate-700 outline-none focus:border-pink-300" placeholder="Full Name" data-i18n-ph="ph_name"></div>
+                    <div class="relative input-group"><i class="fa-solid fa-lock absolute left-4 top-4 text-slate-400"></i><input type="password" id="login-password" class="w-full pl-12 pr-4 py-3.5 bg-slate-50/80 border-2 border-slate-100 rounded-2xl font-bold text-slate-700 outline-none focus:border-pink-300" placeholder="Password (Min 4 chars)" data-i18n-ph="ph_pass"></div>
+                    <button onclick="window.initiateLogin()" class="w-full bg-gradient-to-r from-pink-500 to-rose-500 text-white font-black py-4 rounded-2xl shadow-xl transition-transform active:scale-95 flex justify-center items-center mt-6 text-lg"><span data-i18n="btn_start">START QUIZ</span> <i class="fa-solid fa-play ml-2"></i></button>
                 </div>
             </div>
 
             <div id="login-ad-banner" onclick="window.openZ1Link()" class="hidden-safe fixed bottom-4 left-4 right-4 max-w-sm mx-auto bg-white/95 backdrop-blur-md p-2 rounded-2xl shadow-[0_-10px_30px_rgba(0,0,0,0.1)] border border-slate-100 z-30 cursor-pointer flex items-center">
-                <div class="w-16 h-12 bg-slate-100 rounded-xl mr-3 flex-shrink-0 overflow-hidden border border-slate-200"><img id="z1-img" src="" class="w-full h-full object-contain p-1"></div>
+                <div class="w-16 h-12 bg-slate-100 rounded-xl mr-3 flex-shrink-0 overflow-hidden border border-slate-200"><img id="z1-img" src="" class="w-full h-full object-cover p-1"></div>
                 <div class="flex-1 pr-2"><p class="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-0.5">Advertisement</p><p id="z1-text" class="text-xs font-bold text-slate-700 line-clamp-2">Visit Sponsor</p></div>
                 <div class="w-8 h-8 rounded-full bg-indigo-50 flex items-center justify-center text-indigo-500 shrink-0"><i class="fa-solid fa-chevron-right text-xs"></i></div>
             </div>
 
+            <!-- Quiz Section -->
             <div id="quiz-section" class="w-full hidden-safe flex-col items-center relative z-10">
-                <div class="bg-white/95 backdrop-blur-md px-6 py-2 rounded-full shadow-lg text-pink-600 font-black tracking-widest text-sm mb-6 border border-white flex items-center"><i class="fa-solid fa-layer-group mr-2 opacity-70"></i> Q <span id="q-counter" class="ml-1 text-slate-800">1/3</span></div>
+                <div class="bg-white/95 backdrop-blur-md px-6 py-2 rounded-full shadow-lg text-pink-600 font-black tracking-widest text-sm mb-6 border border-white flex items-center"><i class="fa-solid fa-layer-group mr-2 opacity-70"></i> <span data-i18n="q_prefix">Q</span> <span id="q-counter" class="ml-1 text-slate-800">1/3</span></div>
                 <div class="timer-circle mx-auto mb-8"><div class="timer-border"></div><div id="wave-bg" class="wave" style="top: 100%;"></div><div id="wave-fg" class="wave-fill" style="top: 100%;"></div><div class="timer-content"><div id="timer-text" class="text-6xl font-black text-rose-500 tracking-tighter">30</div><div id="timer-label" class="text-[11px] font-black text-rose-400 uppercase tracking-widest mt-1">SEC LEFT</div></div></div>
                 <div class="glass-card w-full p-6 sm:p-8 flex flex-col relative overflow-hidden">
                     <div class="flex items-start mb-6 border-b border-slate-100 pb-5">
@@ -95,29 +112,31 @@
                     </div>
                     <div id="quiz-options-container" class="space-y-3 flex-1 mb-8"></div>
                     <div class="flex space-x-3 mt-auto" id="quiz-action-buttons">
-                        <button id="btn-skip" onclick="window.handleAction('skip')" class="flex-1 bg-rose-50 text-rose-600 border-2 border-rose-100 font-black py-4 rounded-2xl active:scale-95 flex justify-center items-center"><i class="fa-solid fa-forward-step mr-2"></i> SKIP</button>
-                        <button id="btn-submit" onclick="window.handleAction('submit')" class="flex-[1.5] bg-[#10b981] hover:bg-[#059669] text-white font-black py-4 rounded-2xl shadow-xl shadow-emerald-200 active:scale-95 flex justify-center items-center">SUBMIT <i class="fa-solid fa-check ml-2 text-xl"></i></button>
-                        <button id="btn-next" onclick="window.handleAction('next')" class="hidden-safe w-full bg-slate-900 text-white font-black py-4 rounded-2xl shadow-xl active:scale-95 justify-center items-center text-lg">NEXT <i class="fa-solid fa-arrow-right ml-2"></i></button>
+                        <button id="btn-skip" onclick="window.handleAction('skip')" class="flex-1 bg-rose-50 text-rose-600 border-2 border-rose-100 font-black py-4 rounded-2xl active:scale-95 flex justify-center items-center"><i class="fa-solid fa-forward-step mr-2"></i> <span data-i18n="btn_skip">SKIP</span></button>
+                        <button id="btn-submit" onclick="window.handleAction('submit')" class="flex-[1.5] bg-[#10b981] hover:bg-[#059669] text-white font-black py-4 rounded-2xl shadow-xl shadow-emerald-200 active:scale-95 flex justify-center items-center"><span data-i18n="btn_submit">SUBMIT</span> <i class="fa-solid fa-check ml-2 text-xl"></i></button>
+                        <button id="btn-next" onclick="window.handleAction('next')" class="hidden-safe w-full bg-slate-900 text-white font-black py-4 rounded-2xl shadow-xl active:scale-95 justify-center items-center text-lg"><span data-i18n="btn_next">NEXT</span> <i class="fa-solid fa-arrow-right ml-2"></i></button>
                     </div>
                 </div>
             </div>
 
+            <!-- Result Section -->
             <div id="result-section" class="w-full glass-card p-8 hidden-safe text-center transform transition-all duration-500 scale-95 opacity-0 relative z-10">
                 <div class="w-24 h-24 bg-white rounded-full flex items-center justify-center mx-auto mb-5 shadow-[0_10px_25px_rgba(0,0,0,0.1)] overflow-hidden border-4 border-white"><i class="fa-solid fa-trophy text-5xl text-emerald-500" id="default-logo-result"></i><img id="custom-logo-result" src="" class="hidden-safe w-full h-full object-cover"></div>
-                <h2 class="text-3xl font-black text-slate-800 font-['Quicksand'] mb-1" id="res-day-title">Day Result</h2><p class="text-sm text-slate-500 font-bold mb-6">Completed successfully!</p>
+                <h2 class="text-3xl font-black text-slate-800 font-['Quicksand'] mb-1" id="res-day-title">Result</h2><p class="text-sm text-slate-500 font-bold mb-6" data-i18n="res_sub">Completed successfully!</p>
                 
-                <div id="res-net-box" class="bg-indigo-50 border-2 border-indigo-100 p-5 rounded-[2rem] relative overflow-hidden mb-5 shadow-inner flex flex-col items-center justify-center"><div class="absolute -right-2 -bottom-2 opacity-10"><i id="res-net-icon" class="fa-solid fa-ranking-star text-7xl text-indigo-500"></i></div><div id="res-net-label" class="text-[11px] text-indigo-600 font-black uppercase tracking-widest mb-1.5 relative z-10">Total Points Today</div><div class="text-6xl font-black text-indigo-700 relative z-10 font-['Quicksand'] tracking-tighter" id="res-net-score">0</div></div>
+                <div id="res-net-box" class="bg-indigo-50 border-2 border-indigo-100 p-5 rounded-[2rem] relative overflow-hidden mb-5 shadow-inner flex flex-col items-center justify-center"><div class="absolute -right-2 -bottom-2 opacity-10"><i id="res-net-icon" class="fa-solid fa-ranking-star text-7xl text-indigo-500"></i></div><div id="res-net-label" class="text-[11px] text-indigo-600 font-black uppercase tracking-widest mb-1.5 relative z-10" data-i18n="res_total">Total Points Today</div><div class="text-6xl font-black text-indigo-700 relative z-10 font-['Quicksand'] tracking-tighter" id="res-net-score">0</div></div>
                 <div class="grid grid-cols-2 gap-4 mb-8">
-                    <div class="bg-emerald-50/80 border-2 border-emerald-100 p-4 rounded-3xl relative overflow-hidden"><div class="text-[10px] text-emerald-600 font-black uppercase tracking-wider mb-1">Earned</div><div class="text-2xl font-black text-emerald-600" id="res-earned">+0</div></div>
-                    <div class="bg-rose-50/80 border-2 border-rose-100 p-4 rounded-3xl relative overflow-hidden"><div class="text-[10px] text-rose-600 font-black uppercase tracking-wider mb-1">Lost</div><div class="text-2xl font-black text-rose-600" id="res-lost">-0</div></div>
+                    <div class="bg-emerald-50/80 border-2 border-emerald-100 p-4 rounded-3xl relative overflow-hidden"><div class="text-[10px] text-emerald-600 font-black uppercase tracking-wider mb-1" data-i18n="res_earned">Earned</div><div class="text-2xl font-black text-emerald-600" id="res-earned">+0</div></div>
+                    <div class="bg-rose-50/80 border-2 border-rose-100 p-4 rounded-3xl relative overflow-hidden"><div class="text-[10px] text-rose-600 font-black uppercase tracking-wider mb-1" data-i18n="res_lost">Lost</div><div class="text-2xl font-black text-rose-600" id="res-lost">-0</div></div>
                 </div>
-                <button onclick="window.handlePostResultAction()" class="w-full bg-slate-900 text-white font-black py-4 rounded-2xl shadow-xl active:scale-95 text-lg">OK</button>
+                <button onclick="window.handlePostResultAction()" class="w-full bg-slate-900 text-white font-black py-4 rounded-2xl shadow-xl active:scale-95 text-lg" data-i18n="btn_ok">OK</button>
             </div>
 
+            <!-- Public Leaderboard -->
             <div id="public-leaderboard-section" class="w-full hidden-safe flex-col relative z-10 py-6">
                 <div class="text-center mb-8">
-                    <h2 class="text-4xl font-black text-slate-800 font-['Quicksand'] tracking-tight mb-2">Final Champions</h2>
-                    <p class="text-sm font-bold text-slate-500">Top 10 winners of the fest quiz!</p>
+                    <h2 class="text-4xl font-black text-slate-800 font-['Quicksand'] tracking-tight mb-2" data-i18n="pub_title">Final Champions</h2>
+                    <p class="text-sm font-bold text-slate-500" data-i18n="pub_sub">Top 10 winners of the fest quiz!</p>
                 </div>
                 
                 <div id="podium-container" class="flex items-end justify-center space-x-2 mb-10 h-52"></div>
@@ -132,19 +151,85 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getFirestore, collection, doc, getDoc, getDocs, onSnapshot, setDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { getFirestore, initializeFirestore, collection, doc, getDoc, getDocs, onSnapshot, setDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
         const firebaseConfig = { apiKey: "AIzaSyAfJSonmGHnf0t92B71ycuAZbc-CV3k7LE", authDomain: "fest-dsd-003.firebaseapp.com", projectId: "fest-dsd-003", storageBucket: "fest-dsd-003.firebasestorage.app", messagingSenderId: "409596394273", appId: "1:409596394273:web:b930012ce0a845ddb45c60" };
         const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
+        // Experimental Long Polling fix applied
+        const db = initializeFirestore(app, { experimentalForceLongPolling: true });
         const docPath = (coll, id) => doc(db, coll, id);
 
         window.AppState = {
-            user: null, allQuestions: [], dailyQuestions: [], currentQIndex: 0, timerInterval: null, timeLeft: 30, totalTimeLimit: 30, currentDay: 1, isLocked: false, todayEarned: 0, todayLost: 0,
+            lang: 'en', user: null, allQuestions: [], dailyQuestions: [], currentQIndex: 0, timerInterval: null, timeLeft: 30, totalTimeLimit: 30, currentDay: 1, isLocked: false, todayEarned: 0, todayLost: 0,
             settings: { questionMode: 'fixed', instructions: '', scoringEnabled: false, pointsCorrect: 10, pointsNegative: 0, resultsPublished: false, dynamicTimers: [], logoBase64: '', isMockTestActive: false },
             ads: { masterEnabled: false, zone1: {}, zone2: {} }, publicUsers: []
         };
 
+        const i18n = {
+            en: {
+                login_title: "Join Fest Quiz", login_sub: "Enter details to start", ph_phone: "10 Digit Phone Number", ph_gender: "Select Gender", gen_m: "Male", gen_f: "Female", ph_name: "Full Name", ph_pass: "Password (Min 4 chars)",
+                btn_start: "START QUIZ", q_prefix: "Q", btn_skip: "SKIP", btn_submit: "SUBMIT", btn_next: "NEXT",
+                res_sub: "Completed successfully!", res_total: "Total Points Today", res_earned: "Earned", res_lost: "Lost", btn_ok: "OK",
+                pub_title: "Final Champions", pub_sub: "Top 10 winners of the fest quiz!", rules: "Quiz Rules", agree: "I Agree & Continue", mock_mode: "Mock Test Mode", mock_sub: "Practice mode (Scores won't affect finals)"
+            },
+            ml: {
+                login_title: "ഫെസ്റ്റ് ക്വിസിലേക്ക് സ്വാഗതം", login_sub: "വിവരങ്ങൾ നൽകി തുടങ്ങുക", ph_phone: "10 അക്ക മൊബൈൽ നമ്പർ", ph_gender: "ലിംഗം തിരഞ്ഞെടുക്കുക", gen_m: "പുരുഷൻ", gen_f: "സ്ത്രീ", ph_name: "പൂർണ്ണ നാമം", ph_pass: "പാസ്‌വേഡ് (കുറഞ്ഞത് 4 അക്ഷരം)",
+                btn_start: "തുടങ്ങാം", q_prefix: "ചോദ്യം", btn_skip: "ഒഴിവാക്കുക", btn_submit: "സമർപ്പിക്കുക", btn_next: "അടുത്തത്",
+                res_sub: "വിജയകരമായി പൂർത്തിയാക്കി!", res_total: "ഇന്നത്തെ ആകെ പോയിന്റ്", res_earned: "ലഭിച്ചത്", res_lost: "നഷ്ടപ്പെട്ടത്", btn_ok: "ശരി",
+                pub_title: "വിജയികൾ", pub_sub: "ആദ്യത്തെ 10 സ്ഥാനക്കാർ", rules: "നിയമങ്ങൾ", agree: "വായിച്ചു മനസ്സിലാക്കി", mock_mode: "പരിശീലന ക്വിസ്", mock_sub: "ഇത് മെയിൻ സ്കോറിനെ ബാധിക്കില്ല"
+            }
+        };
+
+        window.toggleLang = function() {
+            window.AppState.lang = window.AppState.lang === 'en' ? 'ml' : 'en';
+            document.getElementById('lang-text').innerText = window.AppState.lang.toUpperCase();
+            applyLanguage();
+        };
+
+        function applyLanguage() {
+            const dict = i18n[window.AppState.lang];
+            document.querySelectorAll('[data-i18n]').forEach(el => { const key = el.getAttribute('data-i18n'); if(dict[key]) el.innerText = dict[key]; });
+            document.querySelectorAll('[data-i18n-ph]').forEach(el => { const key = el.getAttribute('data-i18n-ph'); if(dict[key]) el.placeholder = dict[key]; });
+            
+            if (window.AppState.settings.isMockTestActive) {
+                document.getElementById('login-title').innerText = dict.mock_mode;
+                document.getElementById('login-sub').innerText = dict.mock_sub;
+            } else {
+                document.getElementById('login-title').innerText = dict.login_title;
+                document.getElementById('login-sub').innerText = dict.login_sub;
+            }
+            renderInstructions();
+        }
+
+        // Add soft back prevention
+        function enableSoftBackPrevention() {
+            history.pushState({page: 'quiz'}, null, location.href);
+            window.onpopstate = function (e) {
+                if(document.getElementById('quiz-section').classList.contains('hidden-safe') === false) {
+                    history.go(1); // Push state forward again
+                    const btns = `<button onclick="window.closeModal()" class="flex-1 bg-slate-200 text-slate-800 font-bold py-3.5 rounded-xl text-sm">Cancel</button><button onclick="location.reload()" class="flex-1 bg-rose-600 text-white font-black py-3.5 rounded-xl text-sm shadow-md">Exit Quiz</button>`;
+                    window.showModal("Exit Quiz?", "Your progress will be lost if you exit now.", "fa-solid fa-triangle-exclamation text-amber-500", btns);
+                }
+            };
+        }
+
+        // Top Alert UI for Validation & Offline Modes
+        let alertTimeout;
+        window.showTopAlert = function(msg, type='error', sticky=false) {
+            const bar = document.getElementById('top-alert-bar'); const icon = document.getElementById('top-alert-icon'); const txt = document.getElementById('top-alert-text');
+            txt.innerText = msg;
+            if(type === 'error') { bar.className = "fixed top-0 left-0 right-0 z-[400] transform transition-transform duration-300 shadow-lg text-white text-xs font-bold text-center py-2.5 flex justify-center items-center bg-rose-600 translate-y-0"; icon.className = "mr-2 fa-solid fa-triangle-exclamation"; }
+            else if(type === 'success') { bar.className = "fixed top-0 left-0 right-0 z-[400] transform transition-transform duration-300 shadow-lg text-white text-xs font-bold text-center py-2.5 flex justify-center items-center bg-emerald-600 translate-y-0"; icon.className = "mr-2 fa-solid fa-check-circle"; }
+            
+            clearTimeout(alertTimeout);
+            if(!sticky) alertTimeout = setTimeout(() => { bar.classList.replace('translate-y-0', '-translate-y-full'); }, 3000);
+        };
+        window.hideTopAlert = function() { document.getElementById('top-alert-bar').classList.replace('translate-y-0', '-translate-y-full'); };
+
+        window.addEventListener('offline', () => window.showTopAlert('No internet connection - Offline mode', 'error', true));
+        window.addEventListener('online', () => { window.showTopAlert('Back online!', 'success', false); });
+
+        // Normal Modal Logic
         window.showModal = function(t, m, ic, cb=null) { const mo=document.getElementById('sys-modal'), mc=document.getElementById('sys-modal-card'); document.getElementById('sys-modal-title').innerText=t; document.getElementById('sys-modal-msg').innerText=m; document.getElementById('sys-modal-icon').innerHTML=`<i class="${ic} text-5xl"></i>`; if(cb){document.getElementById('sys-modal-btns').innerHTML=cb;}else{document.getElementById('sys-modal-btns').innerHTML=`<button onclick="window.closeModal()" class="w-full bg-slate-900 text-white font-black py-4 rounded-xl text-sm transition-transform active:scale-95 shadow-lg">OK</button>`;} mo.classList.remove('hidden-safe'); setTimeout(()=>{mo.classList.remove('opacity-0'); mc.classList.remove('scale-95');},10); };
         window.closeModal = function() { const mo=document.getElementById('sys-modal'), mc=document.getElementById('sys-modal-card'); mo.classList.add('opacity-0'); mc.classList.add('scale-95'); setTimeout(()=>mo.classList.add('hidden-safe'),300); };
         window.showLoader = function() { document.getElementById('loader').classList.remove('hidden-safe'); };
@@ -160,9 +245,8 @@
                         ['login', 'quiz', 'result'].forEach(x => { const ci=document.getElementById(`custom-logo-${x}`), di=document.getElementById(`default-logo-${x}`); if(ci&&di){ ci.src=data.logoBase64; ci.classList.remove('hidden-safe'); di.classList.add('hidden-safe'); } });
                     }
                     if(data.startDate) window.AppState.currentDay = calcDay(data.startDate);
-                    if(data.isMockTestActive) { document.getElementById('login-title').innerText = "Mock Test Mode"; document.getElementById('login-sub').innerText = "Practice questions (Scores won't affect finals)"; }
-                    else { document.getElementById('login-title').innerText = "Join Fest Quiz"; document.getElementById('login-sub').innerText = "Enter details to start"; }
-                    renderInstructions(); checkPublicMode();
+                    applyLanguage(); // Calls renderInstructions & checks mock
+                    checkPublicMode();
                 }
             });
 
@@ -214,18 +298,11 @@
             showLoader(); const u = window.activePosterUser;
             const canvas = document.getElementById('poster-canvas'); const ctx = canvas.getContext('2d');
             
-            // Draw Background (Dynamic based on rank)
-            let color1 = "#4f46e5", color2 = "#ec4899"; // Default Gold
-            if(u.rank === 2) { color1 = "#475569"; color2 = "#94a3b8"; } // Silver
-            if(u.rank === 3) { color1 = "#9a3412"; color2 = "#f59e0b"; } // Bronze
-            
+            let color1 = "#4f46e5", color2 = "#ec4899"; if(u.rank === 2) { color1 = "#475569"; color2 = "#94a3b8"; } if(u.rank === 3) { color1 = "#9a3412"; color2 = "#f59e0b"; }
             const grad = ctx.createLinearGradient(0, 0, 1080, 1080); grad.addColorStop(0, color1); grad.addColorStop(1, color2);
             ctx.fillStyle = grad; ctx.fillRect(0, 0, 1080, 1080);
             
-            // Draw White Card
             ctx.shadowColor="rgba(0,0,0,0.3)"; ctx.shadowBlur=40; ctx.shadowOffsetY=20; ctx.fillStyle="#ffffff"; ctx.beginPath(); ctx.roundRect(80, 200, 920, 800, 50); ctx.fill(); ctx.shadowColor="transparent";
-            
-            // Text Elements
             ctx.fillStyle="#ffffff"; ctx.font="900 70px Arial"; ctx.textAlign="center"; ctx.fillText("CHAMPION", 540, 120);
             
             let rankCol="#f59e0b"; if(u.rank===2) rankCol="#64748b"; if(u.rank===3) rankCol="#b45309";
@@ -233,9 +310,7 @@
             ctx.fillStyle="#1e293b"; ctx.font="900 80px Arial"; ctx.fillText(u.name.toUpperCase(), 540, 860);
             ctx.fillStyle="#64748b"; ctx.font="bold 45px Arial"; ctx.fillText(`Total Score: ${u.totalScore||0} pts`, 540, 940);
 
-            const completeAndDownload = () => {
-                const link = document.createElement('a'); link.download = `Rank_${u.rank}_${u.name}.jpg`; link.href = canvas.toDataURL("image/jpeg", 0.9); link.click(); hideLoader(); document.getElementById('poster-upload').value='';
-            };
+            const completeAndDownload = () => { const link = document.createElement('a'); link.download = `Rank_${u.rank}_${u.name}.jpg`; link.href = canvas.toDataURL("image/jpeg", 0.9); link.click(); hideLoader(); document.getElementById('poster-upload').value=''; };
 
             const drawImageWithClip = (imgSrc, isLogo) => {
                 return new Promise((resolve) => {
@@ -249,16 +324,10 @@
                 });
             };
 
-            // Chain drawing promises
             const pLogo = window.AppState.settings.logoBase64 ? drawImageWithClip(window.AppState.settings.logoBase64, true) : Promise.resolve();
             pLogo.then(() => {
                 if(photoData) { drawImageWithClip(photoData, false).then(completeAndDownload); }
-                else {
-                    // Draw Crown Placeholder
-                    ctx.fillStyle = rankCol; ctx.beginPath(); ctx.arc(540, 480, 180, 0, Math.PI*2); ctx.fill();
-                    ctx.fillStyle = "#ffffff"; ctx.font = "900 150px Arial"; ctx.fillText("★", 540, 530);
-                    completeAndDownload();
-                }
+                else { ctx.fillStyle = rankCol; ctx.beginPath(); ctx.arc(540, 480, 180, 0, Math.PI*2); ctx.fill(); ctx.fillStyle = "#ffffff"; ctx.font = "900 150px Arial"; ctx.fillText("★", 540, 530); completeAndDownload(); }
             });
         };
 
@@ -266,7 +335,9 @@
         
         window.initiateLogin = async function() {
             const phone=document.getElementById('login-phone').value.trim(), name=document.getElementById('login-name').value.trim(), gender=document.getElementById('login-gender').value, pass=document.getElementById('login-password').value;
-            if(phone.length!==10 || !name || !gender || pass.length<4) return window.showModal("Error", "Please fill all details correctly (Phone 10 digits, Pass min 4).", "fa-solid fa-triangle-exclamation text-rose-500");
+            if(phone.length!==10) return window.showTopAlert("Enter 10 digit phone number", "error");
+            if(!name || !gender) return window.showTopAlert("Please fill all details", "error");
+            if(pass.length<4) return window.showTopAlert("Password minimum 4 chars", "error");
             
             showLoader();
             try {
@@ -277,10 +348,8 @@
                     hideLoader();
                     const btns = `<button onclick="window.closeModal(); window.processLogin(false)" class="flex-1 bg-slate-200 text-slate-800 font-bold py-3.5 rounded-xl text-sm">No, Don't Save</button><button onclick="window.closeModal(); window.processLogin(true)" class="flex-[1.5] bg-emerald-500 text-white font-black py-3.5 rounded-xl text-sm shadow-md">Yes, Save Details</button>`;
                     window.showModal("Save for Finals?", "This is a Mock Test. Do you want to save this Phone & Password for the actual competition?", "fa-solid fa-floppy-disk text-indigo-500", btns);
-                } else {
-                    window.processLogin(true); // Normal flow
-                }
-            } catch(e) { hideLoader(); window.showModal("Error", e.message, "fa-solid fa-xmark text-rose-500"); }
+                } else { window.processLogin(true); }
+            } catch(e) { hideLoader(); window.showTopAlert(e.message, "error"); }
         };
 
         window.processLogin = async function(saveToDb) {
@@ -291,10 +360,12 @@
             if(saveToDb) {
                 const snap = await getDoc(docPath('users', phone));
                 if(snap.exists()) {
-                    const d = snap.data(); if(d.password !== pass) { hideLoader(); return window.showModal("Error", "Incorrect password.", "fa-solid fa-lock text-rose-500"); }
+                    const d = snap.data(); if(d.password !== pass) { hideLoader(); return window.showTopAlert("Incorrect password.", "error"); }
                     uData = d; uData.isRegistered = true;
                     if(!window.AppState.settings.isMockTestActive && uData.lastDayPlayed === window.AppState.currentDay) {
-                        hideLoader(); return window.showModal("Played", "You have already played today.", "fa-solid fa-check text-emerald-500");
+                        hideLoader(); 
+                        const btns = `<button onclick="window.closeModal(); window.finishQuiz()" class="w-full bg-slate-900 text-white font-black py-3.5 rounded-xl text-sm shadow-md">Show Result</button>`;
+                        return window.showModal("Already Played", "You have already completed today's quiz.", "fa-solid fa-check text-emerald-500", btns);
                     }
                 } else { await setDoc(docPath('users', phone), uData); }
             }
@@ -324,6 +395,7 @@
 
             if(selQ.length===0) { hideLoader(); return window.showModal("Wait!", "Questions are not ready.", "fa-solid fa-clock text-amber-500"); }
             window.AppState.dailyQuestions = selQ; window.AppState.currentQIndex = 0;
+            enableSoftBackPrevention();
             document.getElementById('auth-section').classList.add('hidden-safe'); document.getElementById('login-ad-banner').classList.add('hidden-safe'); document.getElementById('quiz-section').classList.remove('hidden-safe'); document.getElementById('quiz-section').classList.add('flex'); hideLoader(); loadQuestion();
         }
 
@@ -350,7 +422,9 @@
             if(q.type==='mcq') { document.querySelectorAll('input[name="quiz_option"]').forEach(el=>el.disabled=true); const sel=document.querySelector('input[name="quiz_option"]:checked'); if(sel) ans=sel.value; } else { const txt=document.getElementById('quiz-text-answer'); if(txt){ txt.disabled=true; ans=txt.value.trim(); } }
             if(!isSkip&&!isTimeout) { let isC = (ans&&ans.toLowerCase()===q.answer.trim().toLowerCase()); if(window.AppState.settings.scoringEnabled) { if(isC) window.AppState.todayEarned+=window.AppState.settings.pointsCorrect; else if(ans) window.AppState.todayLost+=window.AppState.settings.pointsNegative; } else { if(isC) window.AppState.todayEarned+=10; } if(!window.AppState.user.history) window.AppState.user.history={}; window.AppState.user.history[q.id] = { answer:ans, correct:isC, timeAt:new Date().toISOString() }; }
             document.getElementById('btn-skip').classList.add('hidden-safe'); document.getElementById('btn-submit').classList.add('hidden-safe'); document.getElementById('btn-next').classList.remove('hidden-safe'); document.getElementById('btn-next').classList.add('flex');
-            document.getElementById('btn-next').innerHTML=(window.AppState.currentQIndex===window.AppState.dailyQuestions.length-1)?`FINISH QUIZ <i class="fa-solid fa-flag-checkered ml-2"></i>`:`NEXT QUESTION <i class="fa-solid fa-arrow-right ml-2"></i>`; document.getElementById('btn-next').className="flex w-full bg-slate-900 text-white font-black py-4 rounded-2xl shadow-xl active:scale-95 justify-center items-center text-lg";
+            let isLast = window.AppState.currentQIndex===window.AppState.dailyQuestions.length-1;
+            let nxtTxt = isLast ? "FINISH QUIZ" : "NEXT"; if(window.AppState.lang==='ml') nxtTxt = isLast ? "പൂർത്തിയാക്കുക" : "അടുത്തത്";
+            document.getElementById('btn-next').innerHTML=`${nxtTxt} ${isLast?'<i class="fa-solid fa-flag-checkered ml-2"></i>':'<i class="fa-solid fa-arrow-right ml-2"></i>'}`; document.getElementById('btn-next').className="flex w-full bg-slate-900 text-white font-black py-4 rounded-2xl shadow-xl active:scale-95 justify-center items-center text-lg";
         };
 
         window.finishQuiz = async function() {
@@ -363,12 +437,13 @@
             if(window.AppState.user.isRegistered) { try { await updateDoc(docPath('users', window.AppState.user.phone), { totalScore:window.AppState.user.totalScore, mockScore:window.AppState.user.mockScore, lastDayPlayed:window.AppState.user.lastDayPlayed, history:window.AppState.user.history, isRegistered:true }); } catch(e){} }
             
             hideLoader(); document.getElementById('quiz-section').classList.add('hidden-safe'); document.getElementById('quiz-section').classList.remove('flex'); const rsec=document.getElementById('result-section'); rsec.classList.remove('hidden-safe');
-            document.getElementById('res-day-title').innerText=isMock?"Mock Result":`Day ${window.AppState.currentDay} Result`; document.getElementById('res-earned').innerText=`+${window.AppState.todayEarned}`; document.getElementById('res-lost').innerText=`-${window.AppState.todayLost}`; document.getElementById('res-net-score').innerText=netToday>0?`+${netToday}`:netToday;
-            const netBox=document.getElementById('res-net-box'), netIcon=document.getElementById('res-net-icon'); netBox.className = 'border-2 p-5 rounded-[2rem] relative overflow-hidden mb-5 shadow-inner flex flex-col items-center justify-center'; if(netToday>=0){netBox.classList.add('bg-emerald-50','border-emerald-200'); netIcon.className='fa-solid fa-ranking-star text-7xl text-emerald-500';}else{netBox.classList.add('bg-rose-50','border-rose-200'); netIcon.className='fa-solid fa-ranking-star text-7xl text-rose-500';}
+            let dayStr = isMock?"Mock Result":`Day ${window.AppState.currentDay} Result`; if(window.AppState.lang==='ml') dayStr = isMock?"പരിശീലന ഫലം":`Day ${window.AppState.currentDay} റിസൾട്ട്`;
+            document.getElementById('res-day-title').innerText=dayStr; document.getElementById('res-earned').innerText=`+${window.AppState.todayEarned}`; document.getElementById('res-lost').innerText=`-${window.AppState.todayLost}`; document.getElementById('res-net-score').innerText=netToday>0?`+${netToday}`:netToday;
+            const netBox=document.getElementById('res-net-box'), netIcon=document.getElementById('res-net-icon'); netBox.className = 'border-2 p-5 rounded-[2rem] relative overflow-hidden mb-5 shadow-inner flex flex-col items-center justify-center'; if(netToday>=0){netBox.classList.add('bg-emerald-50','border-emerald-200'); netIcon.className='fa-solid fa-ranking-star text-7xl text-emerald-500'; document.getElementById('res-net-score').classList.replace('text-rose-700', 'text-emerald-700'); document.getElementById('res-net-label').classList.replace('text-rose-600', 'text-emerald-600'); }else{netBox.classList.add('bg-rose-50','border-rose-200'); netIcon.className='fa-solid fa-ranking-star text-7xl text-rose-500'; document.getElementById('res-net-score').classList.replace('text-emerald-700', 'text-rose-700'); document.getElementById('res-net-label').classList.replace('text-emerald-600', 'text-rose-600'); }
             setTimeout(()=>rsec.classList.remove('scale-95','opacity-0'),50);
         };
 
-        function renderZone1Ad() { const z1 = window.AppState.ads.zone1; const banner = document.getElementById('login-ad-banner'); if(window.AppState.ads.masterEnabled && z1 && z1.enabled && document.getElementById('auth-section').classList.contains('hidden-safe') === false && (z1.imageUrl || z1.imageBase64)) { document.getElementById('z1-img').src = z1.imageUrl || z1.imageBase64; window.AppState.z1Link = z1.link || '#'; banner.classList.remove('hidden-safe'); } else { banner.classList.add('hidden-safe'); } }
+        function renderZone1Ad() { const z1 = window.AppState.ads.zone1; const banner = document.getElementById('login-ad-banner'); if(window.AppState.ads.masterEnabled && z1 && z1.enabled && document.getElementById('auth-section').classList.contains('hidden-safe') === false) { let src = z1.linkUrl || z1.imageUrl || z1.imageBase64; if(src) { document.getElementById('z1-img').src = src; window.AppState.z1Link = z1.link || '#'; banner.classList.remove('hidden-safe'); } else { banner.classList.add('hidden-safe'); } } else { banner.classList.add('hidden-safe'); } }
         window.openZ1Link = function() { if(window.AppState.z1Link && window.AppState.z1Link !== '#') window.open(window.AppState.z1Link, '_blank'); };
         function renderInstructions() { const ul = document.getElementById('instructions-content'); const txt = window.AppState.settings.instructions; if(!txt.trim()) { ul.innerHTML = `<li>Ready to play! No specific rules.</li>`; return; } ul.innerHTML = txt.split('\n').filter(l => l.trim() !== '').map(l => `<li class="flex items-start"><i class="fa-solid fa-star text-pink-400 mt-1 mr-3 text-[10px]"></i> <span class="pt-0.5">${l}</span></li>`).join(''); }
         
@@ -381,7 +456,7 @@
                     if(yid) { contentBox.innerHTML = `<iframe class="w-full h-full object-cover" src="https://www.youtube.com/embed/${yid}?autoplay=1&mute=0&controls=0&loop=1&playlist=${yid}" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>`; contentBox.onclick = null; if(window.AppState.targetAdLink !== '#') ctaBox.classList.remove('hidden-safe'); }
                 } else if(z2.images && z2.images.length > 0) {
                     contentBox.innerHTML = `<img id="z2-slider-img" src="${z2.images[0]}" class="w-full h-full object-contain bg-black">`; ctaBox.classList.add('hidden-safe');
-                    if(z2.images.length > 1) { window.AppState.z2SlideIdx = 0; window.AppState.z2SlideInterval = setInterval(() => { window.AppState.z2SlideIdx = (window.AppState.z2SlideIdx + 1) % z2.images.length; document.getElementById('z2-slider-img').src = z2.images[window.AppState.z2SlideIdx]; }, 3000); }
+                    if(z2.images.length > 1) { window.AppState.z2SlideIdx = 0; window.AppState.z2SlideInterval = setInterval(() => { window.AppState.z2SlideIdx = (window.AppState.z2SlideIdx + 1) % z2.images.length; document.getElementById('z2-slider-img').src = z2.images[window.AppState.z2SlideIdx]; }, (parseInt(z2.slideInterval)||3)*1000); }
                 }
                 modal.classList.remove('hidden-safe'); setTimeout(() => { modal.classList.remove('opacity-0'); }, 10);
             } else { window.resetToHome(); }
