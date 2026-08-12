@@ -105,6 +105,30 @@
                     <label class="relative inline-flex items-center cursor-pointer"><input type="checkbox" id="setup-mock-toggle" class="sr-only peer"><div class="w-11 h-6 bg-slate-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-purple-600"></div></label>
                 </div>
                 
+                <div class="bg-indigo-50/50 p-4 rounded-2xl border border-indigo-100 space-y-3">
+                    <div class="flex justify-between items-center">
+                        <div>
+                            <h4 class="font-black text-sm text-indigo-800 flex items-center"><i class="fa-solid fa-star-half-stroke mr-2"></i> Scoring System</h4>
+                            <p class="text-[10px] text-indigo-600 font-bold mt-0.5">Enable and configure points calculation</p>
+                        </div>
+                        <label class="relative inline-flex items-center cursor-pointer">
+                            <input type="checkbox" id="setup-scoring-toggle" class="sr-only peer" onchange="window.toggleScoringUI()">
+                            <div class="w-11 h-6 bg-slate-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-indigo-600"></div>
+                        </label>
+                    </div>
+                    <div id="scoring-inputs-area" class="grid grid-cols-2 gap-3 pt-2 border-t border-indigo-100/50 transition-all opacity-50 pointer-events-none">
+                        <div class="flex flex-col">
+                            <label class="text-[10px] font-bold text-emerald-600 mb-1 uppercase">Correct Answer (+)</label>
+                            <input type="number" id="setup-pts-correct" value="10" class="w-full px-3 py-2 bg-white border border-emerald-200 rounded-lg text-xs font-bold outline-none text-emerald-700">
+                        </div>
+                        <div class="flex flex-col">
+                            <label class="text-[10px] font-bold text-rose-600 mb-1 uppercase">Wrong Answer (-)</label>
+                            <input type="number" id="setup-pts-negative" value="0" class="w-full px-3 py-2 bg-white border border-rose-200 rounded-lg text-xs font-bold outline-none text-rose-700">
+                        </div>
+                        <p class="col-span-2 text-[9px] text-slate-500 font-semibold italic">* Unanswered/Skipped questions will always give 0 points.</p>
+                    </div>
+                </div>
+
                 <div class="grid grid-cols-2 gap-4">
                     <div class="flex flex-col"><label class="text-[10px] font-bold text-slate-500 mb-1 uppercase">Dates</label><div class="flex items-center space-x-2"><input type="date" id="setup-start" class="w-full px-2 py-2 bg-slate-50 border border-slate-200 rounded-lg text-xs font-bold outline-none" onchange="window.calculateSetupDays()"><span class="text-slate-400">to</span><input type="date" id="setup-end" class="w-full px-2 py-2 bg-slate-50 border border-slate-200 rounded-lg text-xs font-bold outline-none" onchange="window.calculateSetupDays()"></div></div>
                     <div class="flex flex-col"><label class="text-[10px] font-bold text-slate-500 mb-1 uppercase">Qs/Day & Mode</label><div class="flex items-center space-x-2"><input type="number" id="setup-q-per-day" min="1" value="3" class="w-16 px-2 py-2 bg-slate-50 border border-slate-200 rounded-lg text-xs font-bold outline-none text-center" oninput="window.calculateSetupDays()"><select id="setup-q-mode" class="flex-1 px-2 py-2 bg-slate-50 border border-slate-200 rounded-lg text-xs font-bold outline-none" onchange="window.toggleTimerRulesUI()"><option value="fixed">Fixed</option><option value="random">Pool</option></select></div></div>
@@ -350,12 +374,16 @@
                     document.getElementById('setup-q-per-day').value = window.AppState.questionsPerDay; document.getElementById('setup-q-mode').value = data.questionMode || 'fixed';
                     document.getElementById('setup-publish-toggle').checked = data.resultsPublished || false;
                     document.getElementById('setup-mock-toggle').checked = data.isMockTestActive || false;
+                    document.getElementById('setup-scoring-toggle').checked = data.scoringEnabled || false;
+                    document.getElementById('setup-pts-correct').value = data.pointsCorrect || 10;
+                    document.getElementById('setup-pts-negative').value = data.pointsNegative || 0;
+                    
                     if(data.logoBase64) { document.getElementById('admin-logo-icon').classList.add('hidden-safe'); document.getElementById('admin-logo-preview').src = data.logoBase64; document.getElementById('admin-logo-preview').classList.remove('hidden-safe'); }
                     if(data.dynamicTimers && data.dynamicTimers.length >= 2) {
                         document.getElementById('tr1-start').value = data.dynamicTimers[0].s; document.getElementById('tr1-end').value = data.dynamicTimers[0].e; document.getElementById('tr1-time').value = data.dynamicTimers[0].t;
                         document.getElementById('tr2-start').value = data.dynamicTimers[1].s; document.getElementById('tr2-end').value = data.dynamicTimers[1].e; document.getElementById('tr2-time').value = data.dynamicTimers[1].t;
                     }
-                    window.calculateSetupDays(); window.toggleTimerRulesUI(); window.updateDashboardStats();
+                    window.calculateSetupDays(); window.toggleTimerRulesUI(); window.toggleScoringUI(); window.updateDashboardStats();
                 }
             });
 
@@ -384,6 +412,7 @@
         window.switchAdminTab = function(tabId) { document.querySelectorAll('.view-section:not(#admin-user-detail)').forEach(el => { el.classList.remove('active'); el.classList.add('hidden-safe'); }); const t = document.getElementById(`admin-${tabId}`); if(t) { t.classList.remove('hidden-safe'); t.classList.add('active'); } document.getElementById('admin-user-detail').classList.add('hidden-safe'); document.getElementById('admin-user-detail').classList.remove('active'); const m = document.getElementById('admin-menu'); if(!m.classList.contains('scale-0')) m.classList.add('scale-0', 'opacity-0'); if(tabId==='questions') window.renderAdminQuestionPills(); };
         window.calculateSetupDays = function() { const s = document.getElementById('setup-start').value, e = document.getElementById('setup-end').value, q = parseInt(document.getElementById('setup-q-per-day').value) || 0; let days = 0; if(s && e) { days = Math.floor(Math.abs(new Date(e) - new Date(s)) / (1000 * 60 * 60 * 24)) + 1; if(days < 0) days = 0; } document.getElementById('setup-total-days').innerText = days; document.getElementById('setup-total-q').innerText = days * q; };
         window.toggleTimerRulesUI = function() { const m = document.getElementById('setup-q-mode').value; const sec = document.getElementById('dynamic-timer-section'); if(m === 'random') { sec.classList.remove('hidden'); document.getElementById('fixed-time-input').classList.add('hidden-safe'); } else { sec.classList.add('hidden'); document.getElementById('fixed-time-input').classList.remove('hidden-safe'); } window.renderAdminQuestionPills(); };
+        window.toggleScoringUI = function() { const area = document.getElementById('scoring-inputs-area'); if(document.getElementById('setup-scoring-toggle').checked) { area.classList.remove('opacity-50', 'pointer-events-none'); } else { area.classList.add('opacity-50', 'pointer-events-none'); } };
         window.handleLogoUpload = function(e) { const f = e.target.files[0]; if(!f) return; if(f.size > 1024*1024) return window.showModal("Error", "Logo must be under 1MB", "fa-solid fa-triangle-exclamation text-rose-500"); const r = new FileReader(); r.onload = function(ev) { window.AppState.settings.logoBase64 = ev.target.result; document.getElementById('admin-logo-icon').classList.add('hidden-safe'); document.getElementById('admin-logo-preview').src = ev.target.result; document.getElementById('admin-logo-preview').classList.remove('hidden-safe'); }; r.readAsDataURL(f); };
         
         window.updateDashboardStats = function() {
@@ -426,6 +455,7 @@
 
         window.saveAdminSetup = async function() {
             const data = { startDate: document.getElementById('setup-start').value, endDate: document.getElementById('setup-end').value, totalDays: parseInt(document.getElementById('setup-total-days').innerText) || 1, questionsPerDay: parseInt(document.getElementById('setup-q-per-day').value) || 3, questionMode: document.getElementById('setup-q-mode').value, logoBase64: window.AppState.settings.logoBase64 || '', resultsPublished: document.getElementById('setup-publish-toggle').checked, isMockTestActive: document.getElementById('setup-mock-toggle').checked,
+                scoringEnabled: document.getElementById('setup-scoring-toggle').checked, pointsCorrect: parseInt(document.getElementById('setup-pts-correct').value) || 10, pointsNegative: parseInt(document.getElementById('setup-pts-negative').value) || 0,
                 dynamicTimers: [ { s: parseInt(document.getElementById('tr1-start').value)||1, e: parseInt(document.getElementById('tr1-end').value)||5, t: parseInt(document.getElementById('tr1-time').value)||40 }, { s: parseInt(document.getElementById('tr2-start').value)||6, e: parseInt(document.getElementById('tr2-end').value)||10, t: parseInt(document.getElementById('tr2-time').value)||30 } ]
             };
             try { await setDoc(docPath('settings', 'global'), data, {merge:true}); window.showModal("Saved", "Core configuration saved.", "fa-solid fa-check text-emerald-500"); } catch(e) {}
