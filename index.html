@@ -33,12 +33,10 @@
 <body class="text-slate-800 antialiased selection:bg-pink-200">
     <div class="festive-art-bg"></div>
 
-    <!-- Slide-down Top Alert Bar -->
     <div id="top-alert-bar" class="fixed top-0 left-0 right-0 z-[400] transform -translate-y-full transition-transform duration-300 shadow-lg text-white text-xs font-bold text-center py-2.5 flex justify-center items-center">
         <i id="top-alert-icon" class="mr-2 fa-solid fa-triangle-exclamation"></i> <span id="top-alert-text">Message</span>
     </div>
 
-    <!-- Bilingual Language Toggle (Fixed Positioning Top Right) -->
     <div class="fixed top-4 right-4 z-[50] flex justify-end pointer-events-none">
         <button onclick="window.toggleLang()" class="pointer-events-auto bg-white/90 backdrop-blur-md px-3.5 py-1.5 rounded-full shadow-md font-bold text-[10px] text-pink-600 flex items-center border border-pink-100 uppercase tracking-widest active:scale-95 transition-transform">
             <i class="fa-solid fa-language text-sm mr-1.5"></i> <span id="lang-text">EN</span>
@@ -186,24 +184,13 @@
             }
         };
 
-        window.toggleLang = function() {
-            window.AppState.lang = window.AppState.lang === 'en' ? 'ml' : 'en';
-            document.getElementById('lang-text').innerText = window.AppState.lang.toUpperCase();
-            applyLanguage();
-        };
+        window.toggleLang = function() { window.AppState.lang = window.AppState.lang === 'en' ? 'ml' : 'en'; document.getElementById('lang-text').innerText = window.AppState.lang.toUpperCase(); applyLanguage(); };
 
         function applyLanguage() {
             const dict = i18n[window.AppState.lang];
             document.querySelectorAll('[data-i18n]').forEach(el => { const key = el.getAttribute('data-i18n'); if(dict[key]) el.innerText = dict[key]; });
             document.querySelectorAll('[data-i18n-ph]').forEach(el => { const key = el.getAttribute('data-i18n-ph'); if(dict[key]) el.placeholder = dict[key]; });
-            
-            if (window.AppState.settings.isMockTestActive) {
-                document.getElementById('login-title').innerText = dict.mock_mode;
-                document.getElementById('login-sub').innerText = dict.mock_sub;
-            } else {
-                document.getElementById('login-title').innerText = dict.login_title;
-                document.getElementById('login-sub').innerText = dict.login_sub;
-            }
+            if (window.AppState.settings.isMockTestActive) { document.getElementById('login-title').innerText = dict.mock_mode; document.getElementById('login-sub').innerText = dict.mock_sub; } else { document.getElementById('login-title').innerText = dict.login_title; document.getElementById('login-sub').innerText = dict.login_sub; }
             renderInstructions();
         }
 
@@ -224,9 +211,7 @@
             txt.innerText = msg;
             if(type === 'error') { bar.className = "fixed top-0 left-0 right-0 z-[400] transform transition-transform duration-300 shadow-lg text-white text-xs font-bold text-center py-2.5 flex justify-center items-center bg-rose-600 translate-y-0"; icon.className = "mr-2 fa-solid fa-triangle-exclamation"; }
             else if(type === 'success') { bar.className = "fixed top-0 left-0 right-0 z-[400] transform transition-transform duration-300 shadow-lg text-white text-xs font-bold text-center py-2.5 flex justify-center items-center bg-emerald-600 translate-y-0"; icon.className = "mr-2 fa-solid fa-check-circle"; }
-            
-            clearTimeout(alertTimeout);
-            if(!sticky) alertTimeout = setTimeout(() => { bar.classList.replace('translate-y-0', '-translate-y-full'); }, 3000);
+            clearTimeout(alertTimeout); if(!sticky) alertTimeout = setTimeout(() => { bar.classList.replace('translate-y-0', '-translate-y-full'); }, 3000);
         };
         window.hideTopAlert = function() { document.getElementById('top-alert-bar').classList.replace('translate-y-0', '-translate-y-full'); };
 
@@ -248,8 +233,7 @@
                         ['login', 'quiz', 'result'].forEach(x => { const ci=document.getElementById(`custom-logo-${x}`), di=document.getElementById(`default-logo-${x}`); if(ci&&di){ ci.src=data.logoBase64; ci.classList.remove('hidden-safe'); di.classList.add('hidden-safe'); } });
                     }
                     if(data.startDate) window.AppState.currentDay = calcDay(data.startDate);
-                    applyLanguage();
-                    checkPublicMode();
+                    applyLanguage(); checkPublicMode();
                 }
             });
 
@@ -293,21 +277,15 @@
             const btns = `<button onclick="window.closeModal(); window.generatePoster(null)" class="flex-1 bg-slate-200 text-slate-800 font-bold py-3.5 rounded-xl text-sm">No Photo</button><button onclick="window.closeModal(); document.getElementById('poster-upload').click()" class="flex-[1.5] bg-indigo-600 text-white font-black py-3.5 rounded-xl text-sm shadow-md">Choose Photo</button>`;
             window.showModal("Add Photo?", "Do you want to add your photo to the poster? (Optional)", "fa-solid fa-image-portrait text-indigo-500", btns);
         };
-        window.handlePosterPhotoSelected = function(e) {
-            const f = e.target.files[0]; if(!f) { window.generatePoster(null); return; }
-            const r = new FileReader(); r.onload = function(ev) { window.generatePoster(ev.target.result); }; r.readAsDataURL(f);
-        };
+        window.handlePosterPhotoSelected = function(e) { const f = e.target.files[0]; if(!f) { window.generatePoster(null); return; } const r = new FileReader(); r.onload = function(ev) { window.generatePoster(ev.target.result); }; r.readAsDataURL(f); };
+        
         window.generatePoster = function(photoData) {
-            showLoader(); const u = window.activePosterUser;
-            const canvas = document.getElementById('poster-canvas'); const ctx = canvas.getContext('2d');
-            
+            showLoader(); const u = window.activePosterUser; const canvas = document.getElementById('poster-canvas'); const ctx = canvas.getContext('2d');
             let color1 = "#4f46e5", color2 = "#ec4899"; if(u.rank === 2) { color1 = "#475569"; color2 = "#94a3b8"; } if(u.rank === 3) { color1 = "#9a3412"; color2 = "#f59e0b"; }
             const grad = ctx.createLinearGradient(0, 0, 1080, 1080); grad.addColorStop(0, color1); grad.addColorStop(1, color2);
             ctx.fillStyle = grad; ctx.fillRect(0, 0, 1080, 1080);
-            
             ctx.shadowColor="rgba(0,0,0,0.3)"; ctx.shadowBlur=40; ctx.shadowOffsetY=20; ctx.fillStyle="#ffffff"; ctx.beginPath(); ctx.roundRect(80, 200, 920, 800, 50); ctx.fill(); ctx.shadowColor="transparent";
             ctx.fillStyle="#ffffff"; ctx.font="900 70px Arial"; ctx.textAlign="center"; ctx.fillText("CHAMPION", 540, 120);
-            
             let rankCol="#f59e0b"; if(u.rank===2) rankCol="#64748b"; if(u.rank===3) rankCol="#b45309";
             ctx.fillStyle=rankCol; ctx.font="900 90px Arial"; ctx.textAlign="center"; ctx.fillText(`RANK #${u.rank}`, 540, 750);
             ctx.fillStyle="#1e293b"; ctx.font="900 80px Arial"; ctx.fillText(u.name.toUpperCase(), 540, 860);
@@ -342,21 +320,17 @@
                     const snap = await getDoc(docPath('users', clean)); 
                     if(snap.exists() && snap.data().isRegistered!==false) { 
                         const d = snap.data(); 
-                        document.getElementById('login-name').value = d.name; 
-                        document.getElementById('login-gender').value = d.gender; 
-                        document.getElementById('login-name').classList.add('bg-emerald-50', 'border-emerald-300');
-                        document.getElementById('login-gender').classList.add('bg-emerald-50', 'border-emerald-300');
+                        document.getElementById('login-name').value = d.name; document.getElementById('login-gender').value = d.gender; 
+                        document.getElementById('login-name').classList.add('bg-emerald-50', 'border-emerald-300'); document.getElementById('login-gender').classList.add('bg-emerald-50', 'border-emerald-300');
                     } 
                 } catch(e){} 
             } else {
-                document.getElementById('login-name').classList.remove('bg-emerald-50', 'border-emerald-300');
-                document.getElementById('login-gender').classList.remove('bg-emerald-50', 'border-emerald-300');
+                document.getElementById('login-name').classList.remove('bg-emerald-50', 'border-emerald-300'); document.getElementById('login-gender').classList.remove('bg-emerald-50', 'border-emerald-300');
             }
         };
         
         window.initiateLogin = async function() {
             const phone=document.getElementById('login-phone').value.trim(), name=document.getElementById('login-name').value.trim(), gender=document.getElementById('login-gender').value, pass=document.getElementById('login-password').value;
-            const dict = i18n[window.AppState.lang];
             if(phone.length!==10) return window.showTopAlert("Enter 10 digit phone number", "error");
             if(!name || !gender) return window.showTopAlert("Please fill all details", "error");
             if(pass.length<4) return window.showTopAlert("Password minimum 4 chars", "error");
@@ -375,8 +349,7 @@
         };
 
         window.processLogin = async function(saveToDb) {
-            showLoader();
-            const dict = i18n[window.AppState.lang];
+            showLoader(); const dict = i18n[window.AppState.lang];
             const phone=document.getElementById('login-phone').value.trim(), name=document.getElementById('login-name').value.trim(), gender=document.getElementById('login-gender').value, pass=document.getElementById('login-password').value;
             let uData = { phone, name, gender, password: pass, totalScore: 0, mockScore: 0, history: {}, lastDayPlayed: 0, isRegistered: saveToDb };
             
@@ -386,26 +359,18 @@
                     const d = snap.data(); if(d.password !== pass) { hideLoader(); return window.showTopAlert(window.AppState.lang==='ml'?"പാസ്‌വേഡ് തെറ്റാണ്.":"Incorrect password.", "error"); }
                     uData = d; uData.isRegistered = true;
                     
-                    // ROBUST ANTI-CHEAT CHECK (Block multiple plays & refreshing)
                     let hasPlayedToday = false;
-                    if(uData.lastDayPlayed === window.AppState.currentDay) {
-                        hasPlayedToday = true;
-                    } else if(uData.history) {
-                        const sDate = window.AppState.settings.startDate;
-                        let sT = new Date(sDate||Date.now()); sT.setHours(0,0,0,0);
+                    if(uData.lastDayPlayed === window.AppState.currentDay) { hasPlayedToday = true; } 
+                    else if(uData.history) {
+                        const sDate = window.AppState.settings.startDate; let sT = new Date(sDate||Date.now()); sT.setHours(0,0,0,0);
                         for(let qid of Object.keys(uData.history)) {
                             let rec = uData.history[qid];
-                            if(rec && rec.timeAt) {
-                                let rT = new Date(rec.timeAt);
-                                let dN = Math.floor(Math.abs(rT - sT) / (1000 * 60 * 60 * 24)) + 1;
-                                if(dN === window.AppState.currentDay) { hasPlayedToday = true; break; }
-                            }
+                            if(rec && rec.timeAt) { let rT = new Date(rec.timeAt); let dN = Math.floor(Math.abs(rT - sT) / (1000 * 60 * 60 * 24)) + 1; if(dN === window.AppState.currentDay) { hasPlayedToday = true; break; } }
                         }
                     }
 
                     if(!window.AppState.settings.isMockTestActive && hasPlayedToday) {
-                        hideLoader(); 
-                        window.AppState.user = uData; 
+                        hideLoader(); window.AppState.user = uData; 
                         const btnTxt = window.AppState.lang === 'ml' ? 'ശരി' : 'OK';
                         const btns = `<button onclick="window.closeModal(); window.showTodayResultFromLogin()" class="w-full bg-slate-900 text-white font-black py-3.5 rounded-xl text-sm shadow-md">${btnTxt}</button>`;
                         return window.showModal(dict.alr_played, dict.alr_desc, "fa-solid fa-check-circle text-emerald-500", btns);
@@ -416,42 +381,31 @@
         };
 
         window.showTodayResultFromLogin = function() {
-            showLoader();
-            let earned = 0; let lost = 0;
-            const sDate = window.AppState.settings.startDate;
-            const isMock = window.AppState.settings.isMockTestActive;
+            showLoader(); let earned = 0; let lost = 0;
+            const sDate = window.AppState.settings.startDate; const isMock = window.AppState.settings.isMockTestActive;
 
             if(window.AppState.user.history) {
                 Object.keys(window.AppState.user.history).forEach(qid => {
                     let rec = window.AppState.user.history[qid];
                     if(rec && rec.timeAt) {
-                        let rT = new Date(rec.timeAt);
-                        let sT = new Date(sDate||Date.now()); sT.setHours(0,0,0,0);
+                        let rT = new Date(rec.timeAt); let sT = new Date(sDate||Date.now()); sT.setHours(0,0,0,0);
                         let dN = Math.floor(Math.abs(rT - sT) / (1000 * 60 * 60 * 24)) + 1;
                         if(dN === window.AppState.currentDay) {
-                            if(rec.correct) earned += (window.AppState.settings.pointsCorrect||10);
-                            else if(rec.answer) lost += (window.AppState.settings.pointsNegative||0);
+                            if(rec.correct) earned += (window.AppState.settings.pointsCorrect||10); else if(rec.answer && !rec.skipped && !rec.timeout) lost += (window.AppState.settings.pointsNegative||0);
                         }
                     }
                 });
             }
-            window.AppState.todayEarned = earned;
-            window.AppState.todayLost = lost;
+            window.AppState.todayEarned = earned; window.AppState.todayLost = lost;
 
-            hideLoader();
-            document.getElementById('auth-section').classList.add('hidden-safe');
-            document.getElementById('login-ad-banner').classList.add('hidden-safe');
-            const rsec=document.getElementById('result-section');
-            rsec.classList.remove('hidden-safe');
+            hideLoader(); document.getElementById('auth-section').classList.add('hidden-safe'); document.getElementById('login-ad-banner').classList.add('hidden-safe');
+            const rsec=document.getElementById('result-section'); rsec.classList.remove('hidden-safe');
 
-            let dayStr = isMock?"Mock Result":`Day ${window.AppState.currentDay} Result`; 
-            if(window.AppState.lang==='ml') dayStr = isMock?"പരിശീലന ഫലം":`Day ${window.AppState.currentDay} റിസൾട്ട്`;
+            let dayStr = isMock?"Mock Result":`Day ${window.AppState.currentDay} Result`; if(window.AppState.lang==='ml') dayStr = isMock?"പരിശീലന ഫലം":`Day ${window.AppState.currentDay} റിസൾട്ട്`;
             document.getElementById('res-day-title').innerText=dayStr; 
 
             let netToday = earned - lost;
-            document.getElementById('res-earned').innerText=`+${earned}`; 
-            document.getElementById('res-lost').innerText=`-${lost}`; 
-            document.getElementById('res-net-score').innerText=netToday>0?`+${netToday}`:netToday;
+            document.getElementById('res-earned').innerText=`+${earned}`; document.getElementById('res-lost').innerText=`-${lost}`; document.getElementById('res-net-score').innerText=netToday>0?`+${netToday}`:netToday;
             
             const netBox=document.getElementById('res-net-box'), netIcon=document.getElementById('res-net-icon'); 
             netBox.className = 'border-2 p-5 rounded-[2rem] relative overflow-hidden mb-5 shadow-inner flex flex-col items-center justify-center'; 
@@ -466,16 +420,13 @@
         }
 
         function prepareQuestions() {
-            const isMock = window.AppState.settings.isMockTestActive;
-            const mode = isMock ? 'mock' : window.AppState.settings.questionMode;
-            let selQ = [];
+            const isMock = window.AppState.settings.isMockTestActive; const mode = isMock ? 'mock' : window.AppState.settings.questionMode; let selQ = [];
             
             if(mode === 'random' || mode === 'mock') {
                 const hIds=window.AppState.user.history ? Object.keys(window.AppState.user.history) : [];
                 let pool=window.AppState.allQuestions.filter(q=>q.mode===mode && !hIds.includes(q.id));
                 for(let i=pool.length-1; i>0; i--) { const j=Math.floor(Math.random()*(i+1)); [pool[i],pool[j]]=[pool[j],pool[i]]; }
-                selQ = pool.slice(0, window.AppState.questionsPerDay||3);
-                const dTime = getDynamicTimeForToday(); selQ.forEach(q => q.timeLimit = dTime);
+                selQ = pool.slice(0, window.AppState.questionsPerDay||3); const dTime = getDynamicTimeForToday(); selQ.forEach(q => q.timeLimit = dTime);
             } else {
                 selQ=window.AppState.allQuestions.filter(q=>q.mode!=='random' && q.mode!=='mock' && parseInt(q.day)===window.AppState.currentDay); selQ.sort((a,b)=>a.slotIndex-b.slotIndex);
             }
@@ -483,12 +434,7 @@
             if(selQ.length===0) { hideLoader(); return window.showModal("Wait!", "Questions are not ready.", "fa-solid fa-clock text-amber-500"); }
             window.AppState.dailyQuestions = selQ; window.AppState.currentQIndex = 0;
             
-            // ANTI-CHEAT: Lock user entry for today IMMEDIATELY upon starting quiz
-            if(!isMock && window.AppState.user.isRegistered) {
-                window.AppState.user.lastDayPlayed = window.AppState.currentDay;
-                try { updateDoc(docPath('users', window.AppState.user.phone), { lastDayPlayed: window.AppState.currentDay }); } catch(e){}
-            }
-
+            if(!isMock && window.AppState.user.isRegistered) { window.AppState.user.lastDayPlayed = window.AppState.currentDay; try { updateDoc(docPath('users', window.AppState.user.phone), { lastDayPlayed: window.AppState.currentDay }); } catch(e){} }
             enableSoftBackPrevention();
             document.getElementById('auth-section').classList.add('hidden-safe'); document.getElementById('login-ad-banner').classList.add('hidden-safe'); document.getElementById('quiz-section').classList.remove('hidden-safe'); document.getElementById('quiz-section').classList.add('flex'); hideLoader(); loadQuestion();
         }
@@ -508,19 +454,13 @@
             window.AppState.timerInterval = setInterval(() => { 
                 if(window.AppState.isLocked) return; 
                 window.AppState.timeLeft--; updateWaveUI(window.AppState.timeLeft, wBg, wFg, txt, lbl); 
-                if(window.AppState.timeLeft<=0) { 
-                    clearInterval(window.AppState.timerInterval); 
-                    window.closeModal(); // Ensure modals are closed
-                    window.processAnswer(true); 
-                } 
+                if(window.AppState.timeLeft<=0) { clearInterval(window.AppState.timerInterval); window.closeModal(); window.processAnswer(true); } 
             }, 1000); 
         }
         function updateWaveUI(timeLeft, wBg, wFg, txt, lbl) { const pct=(timeLeft/window.AppState.totalTimeLimit)*100; const drop=100-pct; wBg.style.top=`${drop}%`; wFg.style.top=`${drop}%`; txt.innerText=timeLeft; let col='rgba(52,211,153,', tCol='#10b981'; if(pct<=60&&pct>30){ col='rgba(245,158,11,'; tCol='#f59e0b'; } else if(pct<=30){ col='rgba(244,63,94,'; tCol='#f43f5e'; } wBg.style.backgroundColor=`${col}0.2)`; wFg.style.backgroundColor=`${col}0.5)`; txt.style.color=tCol; lbl.style.color=tCol; }
 
         window.handleAction = function(type) {
-            if(window.AppState.isLocked&&type!=='next') return;
-            const dict = i18n[window.AppState.lang];
-            
+            if(window.AppState.isLocked&&type!=='next') return; const dict = i18n[window.AppState.lang];
             if(type==='skip') { 
                 const btns = `<button onclick="window.closeModal()" class="flex-1 bg-slate-200 text-slate-800 font-bold py-3.5 rounded-xl text-sm">${dict.cancel}</button><button onclick="window.closeModal(); window.processAnswer(false, true)" class="flex-1 bg-rose-500 text-white font-black py-3.5 rounded-xl text-sm shadow-md">${dict.yes_skip}</button>`;
                 window.showModal(dict.skip_q, dict.skip_sure, "fa-solid fa-forward-step text-rose-500", btns);
@@ -529,13 +469,10 @@
                 const q=window.AppState.dailyQuestions[window.AppState.currentQIndex]; let hasAns=false; 
                 if(q.type==='mcq') hasAns=document.querySelector('input[name="quiz_option"]:checked')!==null; else hasAns=document.getElementById('quiz-text-answer').value.trim()!==''; 
                 if(!hasAns) return window.showTopAlert(dict.please_sel, "error"); 
-                
                 const btns = `<button onclick="window.closeModal()" class="flex-1 bg-slate-200 text-slate-800 font-bold py-3.5 rounded-xl text-sm">${dict.cancel}</button><button onclick="window.closeModal(); window.processAnswer(false, false)" class="flex-1 bg-emerald-500 text-white font-black py-3.5 rounded-xl text-sm shadow-md">${dict.yes_sub}</button>`;
                 window.showModal(dict.sub_q, dict.sub_sure, "fa-solid fa-check-circle text-emerald-500", btns);
             }
-            else if(type==='next') { 
-                if(window.AppState.currentQIndex===window.AppState.dailyQuestions.length-1) window.finishQuiz(); else { window.AppState.currentQIndex++; loadQuestion(); } 
-            }
+            else if(type==='next') { if(window.AppState.currentQIndex===window.AppState.dailyQuestions.length-1) window.finishQuiz(); else { window.AppState.currentQIndex++; loadQuestion(); } }
         };
 
         window.processAnswer = function(isTimeout=false, isSkip=false) {
@@ -550,10 +487,7 @@
                 if(!window.AppState.user.history) window.AppState.user.history={}; window.AppState.user.history[q.id] = { answer:null, correct:false, timeAt:new Date().toISOString(), skipped: isSkip, timeout: isTimeout };
             }
 
-            // ANTI-CHEAT: Incremental Save - Save each answer to DB immediately so refresh doesn't wipe history
-            if(window.AppState.user.isRegistered && !window.AppState.settings.isMockTestActive) {
-                try { updateDoc(docPath('users', window.AppState.user.phone), { history: window.AppState.user.history }); } catch(e){}
-            }
+            if(window.AppState.user.isRegistered && !window.AppState.settings.isMockTestActive) { try { updateDoc(docPath('users', window.AppState.user.phone), { history: window.AppState.user.history }); } catch(e){} }
 
             document.getElementById('btn-skip').classList.add('hidden-safe'); document.getElementById('btn-submit').classList.add('hidden-safe'); document.getElementById('btn-next').classList.remove('hidden-safe'); document.getElementById('btn-next').classList.add('flex');
             let isLast = window.AppState.currentQIndex===window.AppState.dailyQuestions.length-1;
@@ -562,14 +496,10 @@
         };
 
         window.finishQuiz = async function() {
-            showLoader(); const netToday=window.AppState.todayEarned-window.AppState.todayLost; 
-            const isMock = window.AppState.settings.isMockTestActive;
-            
+            showLoader(); const netToday=window.AppState.todayEarned-window.AppState.todayLost; const isMock = window.AppState.settings.isMockTestActive;
             if(isMock) { window.AppState.user.mockScore = (window.AppState.user.mockScore||0) + netToday; }
             else { window.AppState.user.totalScore += netToday; window.AppState.user.lastDayPlayed = window.AppState.currentDay; }
-            
             if(window.AppState.user.isRegistered) { try { await updateDoc(docPath('users', window.AppState.user.phone), { totalScore:window.AppState.user.totalScore, mockScore:window.AppState.user.mockScore, lastDayPlayed:window.AppState.user.lastDayPlayed, history:window.AppState.user.history, isRegistered:true }); } catch(e){} }
-            
             hideLoader(); document.getElementById('quiz-section').classList.add('hidden-safe'); document.getElementById('quiz-section').classList.remove('flex'); const rsec=document.getElementById('result-section'); rsec.classList.remove('hidden-safe');
             let dayStr = isMock?"Mock Result":`Day ${window.AppState.currentDay} Result`; if(window.AppState.lang==='ml') dayStr = isMock?"പരിശീലന ഫലം":`Day ${window.AppState.currentDay} റിസൾട്ട്`;
             document.getElementById('res-day-title').innerText=dayStr; document.getElementById('res-earned').innerText=`+${window.AppState.todayEarned}`; document.getElementById('res-lost').innerText=`-${window.AppState.todayLost}`; document.getElementById('res-net-score').innerText=netToday>0?`+${netToday}`:netToday;
@@ -600,12 +530,8 @@
         window.resetToHome = function() { 
             const rsec=document.getElementById('result-section'); rsec.classList.add('scale-95','opacity-0'); 
             setTimeout(() => { 
-                rsec.classList.add('hidden-safe'); 
-                document.getElementById('auth-section').classList.remove('hidden-safe'); 
-                renderZone1Ad(); 
-                document.getElementById('login-password').value=''; 
-                document.getElementById('login-name').classList.remove('bg-emerald-50', 'border-emerald-300');
-                document.getElementById('login-gender').classList.remove('bg-emerald-50', 'border-emerald-300');
+                rsec.classList.add('hidden-safe'); document.getElementById('auth-section').classList.remove('hidden-safe'); renderZone1Ad(); 
+                document.getElementById('login-password').value=''; document.getElementById('login-name').classList.remove('bg-emerald-50', 'border-emerald-300'); document.getElementById('login-gender').classList.remove('bg-emerald-50', 'border-emerald-300');
             }, 300); 
         };
 
