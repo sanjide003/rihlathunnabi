@@ -6,6 +6,7 @@
     <title>Fest Quiz - Admin Hub</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&display=swap');
         body { font-family: 'Inter', sans-serif; background-color: #f8fafc; margin: 0; padding: 0; overflow: hidden; height: 100svh; width: 100vw; }
@@ -59,7 +60,7 @@
                     </div>
                     <div class="bg-blue-50 border border-blue-100 rounded-2xl p-4 flex flex-col relative overflow-hidden group">
                         <i class="fa-solid fa-clipboard-question absolute -right-3 -bottom-3 text-5xl text-blue-500/10 group-hover:scale-110 transition-transform"></i>
-                        <span class="text-[10px] font-black text-blue-600 uppercase tracking-widest mb-1 relative z-10">Questions Set</span>
+                        <span class="text-[10px] font-black text-blue-600 uppercase tracking-widest mb-1 relative z-10">Real Questions</span>
                         <span id="dash-q-count" class="text-3xl font-black text-blue-700 relative z-10">0</span>
                     </div>
                     <div class="bg-amber-50 border border-amber-100 rounded-2xl p-4 flex flex-col relative overflow-hidden group">
@@ -183,9 +184,10 @@
         <div id="admin-questions" class="view-section hidden-safe flex-col h-full overflow-hidden flex w-full max-w-4xl mx-auto">
             <div class="bg-white p-3 rounded-2xl border border-slate-100 shadow-sm shrink-0 mb-3 z-10">
                 <div class="flex space-x-2 mb-3">
-                    <button onclick="window.downloadCSVTemplate()" class="flex-1 bg-slate-50 text-slate-700 text-xs font-bold py-2.5 rounded-xl border border-slate-200 shadow-sm hover:bg-slate-100"><i class="fa-solid fa-download mr-1.5 text-indigo-500"></i> CSV Template</button>
-                    <input type="file" id="csv-upload-input" accept=".csv" class="hidden-safe" onchange="window.handleCSVUpload(event)">
-                    <button onclick="document.getElementById('csv-upload-input').click()" class="flex-1 bg-indigo-50 text-indigo-700 text-xs font-bold py-2.5 rounded-xl border border-indigo-200 shadow-sm hover:bg-indigo-100"><i class="fa-solid fa-upload mr-1.5"></i> Upload CSV</button>
+                    <button onclick="window.downloadCSVTemplate()" class="flex-1 bg-slate-50 text-slate-700 text-xs font-bold py-2.5 rounded-xl border border-slate-200 shadow-sm hover:bg-slate-100"><i class="fa-solid fa-download mr-1.5 text-indigo-500"></i> Download Template</button>
+                    <!-- Updated file input to accept CSV and Excel files -->
+                    <input type="file" id="csv-upload-input" accept=".csv, .xlsx, .xls" class="hidden-safe" onchange="window.handleCSVUpload(event)">
+                    <button onclick="document.getElementById('csv-upload-input').click()" class="flex-[1.2] bg-indigo-50 text-indigo-700 text-xs font-bold py-2.5 rounded-xl border border-indigo-200 shadow-sm hover:bg-indigo-100"><i class="fa-solid fa-upload mr-1.5"></i> Upload File (CSV/XLSX)</button>
                 </div>
 
                 <div id="pool-capacity-indicator" class="hidden text-xs font-bold text-center p-2 bg-indigo-50 text-indigo-700 rounded-lg border border-indigo-100 mb-2">
@@ -418,7 +420,11 @@
         window.updateDashboardStats = function() {
             const registeredUsers = window.AppState.allUsers.filter(u => u.isRegistered !== false);
             document.getElementById('dash-users-count').innerText = registeredUsers.length;
-            document.getElementById('dash-q-count').innerText = window.AppState.allQuestions.length;
+            
+            // Fixed: Only count real questions (not mock)
+            const realQuestions = window.AppState.allQuestions.filter(q => q.mode !== 'mock');
+            document.getElementById('dash-q-count').innerText = realQuestions.length;
+            
             const adStatus = window.AppState.ads.masterEnabled; document.getElementById('dash-ads-status').innerText = adStatus ? 'Active' : 'Offline'; document.getElementById('dash-ads-status').className = adStatus ? 'text-2xl font-black text-emerald-500 relative z-10 mt-1' : 'text-2xl font-black text-rose-500 relative z-10 mt-1';
             
             let dayCounts = {}; let todayNum = 1;
@@ -531,27 +537,61 @@
             const f = e.target.files[0]; if(!f) return;
             const target = document.getElementById('admin-q-target').value;
             const mode = target === 'mock' ? 'mock' : 'random'; 
-            const r = new FileReader();
-            r.onload = async function(ev) {
-                const text = ev.target.result; const rows = text.split('\n'); let successCount = 0;
-                document.body.style.opacity = '0.5'; 
-                for(let i = 1; i < rows.length; i++) {
-                    const cols = rows[i].split(',').map(c => c.trim());
-                    if(cols.length >= 8 && cols[1]) {
-                        let type = cols[0].toLowerCase();
-                        let data = { type: type, text: cols[1], timeLimit: parseInt(cols[7])||30, updatedAt: new Date().toISOString(), mode: mode };
-                        if(type === 'mcq') {
-                            data.options = [cols[2], cols[3], cols[4], cols[5]]; data.correctOptionKey = cols[6].toUpperCase();
-                            data.answer = data.correctOptionKey==='A'?cols[2]:(data.correctOptionKey==='B'?cols[3]:(data.correctOptionKey==='C'?cols[4]:cols[5]));
-                        } else { data.answer = cols[6]; }
-                        let dId = `${mode}_${Date.now()}_${i}`;
-                        try { await setDoc(docPath('questions', dId), data); successCount++; } catch(err){}
+            
+            const reader = new FileReader();
+            reader.onload = async function(ev) {
+                document.body.style.opacity = '0.5';
+                try {
+                    // Read file as ArrayBuffer and process with SheetJS (XLSX)
+                    const data = new Uint8Array(ev.target.result);
+                    const workbook = XLSX.read(data, {type: 'array'});
+                    const firstSheet = workbook.SheetNames[0];
+                    // Convert sheet to array of arrays
+                    const rows = XLSX.utils.sheet_to_json(workbook.Sheets[firstSheet], {header: 1});
+                    
+                    let successCount = 0;
+                    
+                    // Skip header row (index 0)
+                    for(let i = 1; i < rows.length; i++) {
+                        const cols = rows[i];
+                        // Ensure row has basic data (Type and Question Text)
+                        if(cols && cols.length >= 2 && cols[1]) {
+                            let type = (cols[0] || '').toString().toLowerCase().trim();
+                            if(type !== 'mcq' && type !== 'text') type = 'text'; // Fallback
+                            
+                            let qText = (cols[1] || '').toString().trim();
+                            let timeLimit = parseInt(cols[7]) || 30;
+                            
+                            let dataObj = { type: type, text: qText, timeLimit: timeLimit, updatedAt: new Date().toISOString(), mode: mode };
+                            
+                            if(type === 'mcq' && cols.length >= 7) {
+                                let optA = (cols[2] || '').toString().trim();
+                                let optB = (cols[3] || '').toString().trim();
+                                let optC = (cols[4] || '').toString().trim();
+                                let optD = (cols[5] || '').toString().trim();
+                                let correctKey = (cols[6] || '').toString().toUpperCase().trim();
+                                
+                                dataObj.options = [optA, optB, optC, optD]; 
+                                dataObj.correctOptionKey = ['A','B','C','D'].includes(correctKey) ? correctKey : 'A';
+                                dataObj.answer = dataObj.correctOptionKey==='A'?optA:(dataObj.correctOptionKey==='B'?optB:(dataObj.correctOptionKey==='C'?optC:optD));
+                            } else { 
+                                dataObj.answer = (cols[6] || '').toString().trim(); 
+                            }
+                            
+                            let dId = `${mode}_${Date.now()}_${i}`;
+                            try { await setDoc(docPath('questions', dId), dataObj); successCount++; } catch(err){}
+                        }
                     }
+                    document.body.style.opacity = '1'; document.getElementById('csv-upload-input').value = '';
+                    window.showModal("Upload Complete", `${successCount} questions added to ${target === 'mock' ? 'Mock' : 'Main'} Pool.`, "fa-solid fa-check text-emerald-500");
+                } catch(error) {
+                    console.error(error);
+                    document.body.style.opacity = '1'; document.getElementById('csv-upload-input').value = '';
+                    window.showModal("Upload Failed", "Error parsing file. Please check if the file format is correct.", "fa-solid fa-triangle-exclamation text-rose-500");
                 }
-                document.body.style.opacity = '1'; document.getElementById('csv-upload-input').value = '';
-                window.showModal("Upload Complete", `${successCount} questions added to ${target === 'mock' ? 'Mock' : 'Main'} Pool.`, "fa-solid fa-check text-emerald-500");
             };
-            r.readAsText(f);
+            // Use readAsArrayBuffer to support both CSV and XLSX binary formats
+            reader.readAsArrayBuffer(f);
         };
 
         window.loadUsersForLeaderboard = function() {
