@@ -540,9 +540,15 @@
             if(!isSkip&&!isTimeout) { 
                 let isC = (ans&&ans.toLowerCase()===q.answer.trim().toLowerCase()); 
                 if(window.AppState.settings.scoringEnabled) { if(isC) window.AppState.todayEarned+=window.AppState.settings.pointsCorrect; else if(ans) window.AppState.todayLost+=window.AppState.settings.pointsNegative; } else { if(isC) window.AppState.todayEarned+=10; } 
-                if(!window.AppState.user.history) window.AppState.user.history={}; window.AppState.user.history[q.id] = { answer:ans, correct:isC, timeAt:new Date().toISOString() }; 
+                if(!window.AppState.settings.isMockTestActive) { 
+                    if(!window.AppState.user.history) window.AppState.user.history={}; 
+                    window.AppState.user.history[q.id] = { answer:ans, correct:isC, timeAt:new Date().toISOString() }; 
+                }
             } else {
-                if(!window.AppState.user.history) window.AppState.user.history={}; window.AppState.user.history[q.id] = { answer:null, correct:false, timeAt:new Date().toISOString(), skipped: isSkip, timeout: isTimeout };
+                if(!window.AppState.settings.isMockTestActive) { 
+                    if(!window.AppState.user.history) window.AppState.user.history={}; 
+                    window.AppState.user.history[q.id] = { answer:null, correct:false, timeAt:new Date().toISOString(), skipped: isSkip, timeout: isTimeout }; 
+                }
             }
 
             if(window.AppState.user.isRegistered && !window.AppState.settings.isMockTestActive) { try { updateDoc(docPath('users', window.AppState.user.phone), { history: window.AppState.user.history }); } catch(e){} }
@@ -557,7 +563,22 @@
             showLoader(); const netToday=window.AppState.todayEarned-window.AppState.todayLost; const isMock = window.AppState.settings.isMockTestActive;
             if(isMock) { window.AppState.user.mockScore = (window.AppState.user.mockScore||0) + netToday; }
             else { window.AppState.user.totalScore += netToday; window.AppState.user.lastDayPlayed = window.AppState.currentDay; }
-            if(window.AppState.user.isRegistered) { try { await updateDoc(docPath('users', window.AppState.user.phone), { totalScore:window.AppState.user.totalScore, mockScore:window.AppState.user.mockScore, lastDayPlayed:window.AppState.user.lastDayPlayed, history:window.AppState.user.history, isRegistered:true }); } catch(e){} }
+            
+            if(window.AppState.user.isRegistered) { 
+                try { 
+                    let dbUpdateData = { isRegistered: true };
+                    if (isMock) { 
+                        dbUpdateData.mockScore = window.AppState.user.mockScore; 
+                    } else { 
+                        dbUpdateData.totalScore = window.AppState.user.totalScore; 
+                        dbUpdateData.mockScore = window.AppState.user.mockScore; 
+                        dbUpdateData.lastDayPlayed = window.AppState.user.lastDayPlayed; 
+                        dbUpdateData.history = window.AppState.user.history; 
+                    }
+                    await updateDoc(docPath('users', window.AppState.user.phone), dbUpdateData); 
+                } catch(e){} 
+            }
+            
             hideLoader(); 
             
             // Hide quiz elements
@@ -569,7 +590,7 @@
             
             let dayStr = isMock?"Mock Result":`Day ${window.AppState.currentDay} Result`; if(window.AppState.lang==='ml') dayStr = isMock?"പരിശീലന ഫലം":`Day ${window.AppState.currentDay} റിസൾട്ട്`;
             document.getElementById('res-day-title').innerText=dayStr; document.getElementById('res-earned').innerText=`+${window.AppState.todayEarned}`; document.getElementById('res-lost').innerText=`-${window.AppState.todayLost}`; document.getElementById('res-net-score').innerText=netToday>0?`+${netToday}`:netToday;
-            const netBox=document.getElementById('res-net-box'), netIcon=document.getElementById('res-net-icon'); netBox.className = 'border-2 p-4 sm:p-5 rounded-[2rem] relative overflow-hidden mb-5 shadow-inner flex flex-col items-center justify-center w-full'; if(netToday>=0){netBox.classList.add('bg-emerald-50','border-emerald-200'); netIcon.className='fa-solid fa-ranking-star text-6xl sm:text-7xl text-emerald-500'; document.getElementById('res-net-score').classList.replace('text-rose-700', 'text-emerald-700'); document.getElementById('res-net-label').classList.replace('text-rose-600', 'text-emerald-600'); }else{netBox.classList.add('bg-rose-50','border-rose-200'); netIcon.className='fa-solid fa-ranking-star text-6xl sm:text-7xl text-rose-500'; document.getElementById('res-net-score').classList.replace('text-emerald-700', 'text-rose-700'); document.getElementById('res-net-label').classList.replace('text-emerald-600', 'text-rose-600'); }
+            const netBox=document.getElementById('res-net-box'), netIcon=document.getElementById('res-net-icon'); netBox.className = 'border-2 p-4 sm:p-5 rounded-[2rem] relative overflow-hidden mb-5 shadow-inner flex flex-col items-center justify-center w-full'; if(netToday>=0){netBox.classList.add('bg-emerald-50','border-emerald-200'); netIcon.className='fa-solid fa-ranking-star text-6xl sm:text-7xl text-emerald-500'; document.getElementById('res-net-score').classList.replace('text-rose-700', 'text-emerald-700'); document.getElementById('res-net-label').classList.replace('text-emerald-600', 'text-rose-600'); }else{netBox.classList.add('bg-rose-50','border-rose-200'); netIcon.className='fa-solid fa-ranking-star text-6xl sm:text-7xl text-rose-500'; document.getElementById('res-net-score').classList.replace('text-emerald-700', 'text-rose-700'); document.getElementById('res-net-label').classList.replace('text-emerald-600', 'text-rose-600'); }
             
             window.updateResultText();
             setTimeout(() => { rsec.classList.remove('scale-95','opacity-0'); if(netToday > 0) window.fireConfetti(); }, 50);
