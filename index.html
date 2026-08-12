@@ -8,31 +8,29 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        /* Mobile Specific Core Fixes */
+        /* Core Mobile Resets */
         body { 
             font-family: 'Nunito', sans-serif; 
             margin: 0; padding: 0; 
-            height: 100svh; /* svh handles mobile browser URL bars better */
+            height: 100svh; /* Perfect mobile height */
             width: 100vw; 
             overflow: hidden; 
             -webkit-user-select: none; -webkit-touch-callout: none; 
         }
-        /* Prevent iOS zoom on input focus */
-        input, textarea, select { font-size: 16px !important; -webkit-user-select: text; }
+        input, textarea, select { font-size: 16px !important; -webkit-user-select: text; } /* Prevent iOS Zoom */
         
-        /* Safe Area Support for Notches */
-        .pt-safe { padding-top: env(safe-area-inset-top); }
-        .top-safe { top: max(1rem, env(safe-area-inset-top)); }
-        
+        /* Background & Cards */
         .festive-art-bg { background-color: #fdf2f8; background-image: radial-gradient(circle at 10% 10%, rgba(253, 164, 175, 0.5) 0%, transparent 50%), radial-gradient(circle at 90% 20%, rgba(147, 197, 253, 0.5) 0%, transparent 50%), radial-gradient(circle at 50% 80%, rgba(216, 180, 254, 0.5) 0%, transparent 60%), radial-gradient(circle at 80% 90%, rgba(134, 239, 172, 0.4) 0%, transparent 50%); background-size: cover; position: fixed; inset: 0; z-index: -2; }
         .glass-card { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(15px); border-radius: 2.5rem; box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.1), 0 0 20px rgba(255, 255, 255, 0.6) inset; }
+        
+        /* Radio Buttons */
         .option-radio:checked + label { background-color: #ecfdf5 !important; border-color: #10b981 !important; box-shadow: 0 4px 15px rgba(16, 185, 129, 0.1); }
         .option-radio:checked + label .opt-letter { background-color: #10b981 !important; color: white !important; }
         .option-radio:checked + label .opt-check { opacity: 1 !important; transform: scale(1) !important; }
         .opt-check { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
         
         /* Timer Animation */
-        .timer-circle { position: relative; width: 150px; height: 150px; border-radius: 50%; overflow: hidden; background: #ffffff; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1), inset 0 0 10px rgba(0,0,0,0.05); display: flex; align-items: center; justify-content: center; }
+        .timer-circle { position: relative; width: 140px; height: 140px; border-radius: 50%; overflow: hidden; background: #ffffff; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1), inset 0 0 10px rgba(0,0,0,0.05); display: flex; align-items: center; justify-content: center; margin: 0 auto; }
         .wave, .wave-fill { position: absolute; left: -50%; width: 200%; height: 200%; border-radius: 40%; transition: top 1s linear, background-color 1s ease; z-index: 1; }
         .wave { background: rgba(52, 211, 153, 0.2); animation: spin 6s infinite linear; }
         .wave-fill { background: rgba(52, 211, 153, 0.5); border-radius: 43%; animation: spin 7s infinite linear; }
@@ -41,67 +39,86 @@
         .timer-content { position: relative; z-index: 10; text-align: center; }
         
         .hidden-safe { display: none !important; }
+        .input-group:focus-within i { color: #ec4899; transform: scale(1.1); transition: all 0.3s ease; }
+
+        /* Podium Ranks */
         .rank-gold { background: linear-gradient(135deg, #fef08a, #f59e0b); border: 2px solid #fbbf24; }
         .rank-silver { background: linear-gradient(135deg, #f3f4f6, #9ca3af); border: 2px solid #d1d5db; }
         .rank-bronze { background: linear-gradient(135deg, #ffedd5, #b45309); border: 2px solid #f59e0b; }
-        .input-group:focus-within i { color: #ec4899; transform: scale(1.1); transition: all 0.3s ease; }
     </style>
 </head>
 <body class="text-slate-800 antialiased selection:bg-pink-200">
     <div class="festive-art-bg"></div>
 
-    <!-- Alert Bar (Adjusted for Safe Area) -->
-    <div id="top-alert-bar" class="fixed top-0 left-0 right-0 z-[400] transform -translate-y-full transition-transform duration-300 shadow-lg text-white text-xs font-bold text-center py-3 pt-safe flex justify-center items-center">
-        <i id="top-alert-icon" class="mr-2 fa-solid fa-triangle-exclamation mt-[env(safe-area-inset-top)]"></i> <span id="top-alert-text" class="mt-[env(safe-area-inset-top)]">Message</span>
+    <!-- System Alerts -->
+    <div id="top-alert-bar" class="fixed top-0 left-0 right-0 z-[400] transform -translate-y-full transition-transform duration-300 shadow-lg text-white text-xs font-bold text-center py-3 flex justify-center items-center pt-[max(0.5rem,env(safe-area-inset-top))]">
+        <i id="top-alert-icon" class="mr-2 fa-solid fa-triangle-exclamation"></i> <span id="top-alert-text">Message</span>
     </div>
 
-    <!-- Language Button (Fixed Positioning considering Notch) -->
-    <div class="fixed top-safe right-4 z-[100] flex justify-end pointer-events-none mt-2">
-        <button onclick="window.toggleLang()" class="pointer-events-auto bg-white/95 backdrop-blur-md px-4 py-2 rounded-full shadow-lg font-black text-xs text-pink-600 flex items-center border border-pink-200 uppercase tracking-widest active:scale-95 transition-transform">
-            <i class="fa-solid fa-language text-base mr-2"></i> <span id="lang-text">EN</span>
+    <!-- TOP NAVIGATION (Language & Rules separated for mobile notches) -->
+    <div class="fixed top-0 left-0 right-0 z-[100] w-full pt-[max(1rem,env(safe-area-inset-top))] px-4 flex justify-between pointer-events-none">
+        <!-- Rules Button (Left) -->
+        <button onclick="document.getElementById('instructions-modal').classList.remove('hidden-safe')" class="pointer-events-auto bg-white/90 backdrop-blur-md px-4 py-2 rounded-full shadow-md font-black text-xs text-indigo-600 flex items-center border border-indigo-100 uppercase tracking-widest active:scale-95 transition-transform">
+            <i class="fa-solid fa-scroll text-sm mr-2"></i> <span data-i18n="rules_btn">RULES</span>
+        </button>
+        <!-- Language Button (Right) -->
+        <button onclick="window.toggleLang()" class="pointer-events-auto bg-white/90 backdrop-blur-md px-4 py-2 rounded-full shadow-md font-black text-xs text-pink-600 flex items-center border border-pink-100 uppercase tracking-widest active:scale-95 transition-transform">
+            <i class="fa-solid fa-language text-sm mr-2"></i> <span id="lang-text">EN</span>
         </button>
     </div>
 
-    <div id="loader" class="fixed inset-0 z-[500] flex flex-col items-center justify-center bg-white/80 backdrop-blur-md hidden-safe transition-opacity"><div class="animate-spin rounded-full h-14 w-14 border-4 border-slate-200 border-t-pink-500 mb-4 shadow-lg"></div><p class="text-sm font-bold text-slate-600 tracking-wider">LOADING...</p></div>
+    <!-- Loader -->
+    <div id="loader" class="fixed inset-0 z-[500] flex flex-col items-center justify-center bg-white/80 backdrop-blur-md hidden-safe transition-opacity">
+        <div class="animate-spin rounded-full h-14 w-14 border-4 border-slate-200 border-t-pink-500 mb-4 shadow-lg"></div>
+        <p class="text-sm font-bold text-slate-600 tracking-wider">LOADING...</p>
+    </div>
     
     <!-- Instructions Modal -->
     <div id="instructions-modal" class="fixed inset-0 z-[150] hidden-safe bg-slate-900/80 backdrop-blur-md flex items-center justify-center p-4">
         <div class="bg-white rounded-[2.5rem] w-full max-w-md shadow-2xl overflow-hidden flex flex-col max-h-[85vh]">
-            <div class="bg-gradient-to-r from-pink-500 to-purple-500 p-6 text-white text-center shrink-0"><h2 class="text-2xl font-black flex items-center justify-center font-['Quicksand']"><i class="fa-solid fa-scroll mr-2"></i> <span data-i18n="rules">Quiz Rules</span></h2></div>
-            <div class="p-6 overflow-y-auto flex-1 bg-slate-50/50"><ul id="instructions-content" class="text-sm text-slate-700 font-bold leading-relaxed space-y-3"></ul></div>
-            <div class="p-5 bg-white shrink-0"><button onclick="document.getElementById('instructions-modal').classList.add('hidden-safe')" class="w-full bg-slate-900 hover:bg-black text-white font-black py-4 rounded-2xl shadow-xl transition-transform active:scale-95 flex justify-center items-center text-lg"><span data-i18n="agree">I Agree & Continue</span> <i class="fa-solid fa-arrow-right ml-2"></i></button></div>
+            <div class="bg-gradient-to-r from-pink-500 to-purple-500 p-6 text-white text-center shrink-0">
+                <h2 class="text-2xl font-black flex items-center justify-center font-['Quicksand']"><i class="fa-solid fa-scroll mr-2"></i> <span data-i18n="rules">Quiz Rules</span></h2>
+            </div>
+            <div class="p-6 overflow-y-auto flex-1 bg-slate-50/50">
+                <ul id="instructions-content" class="text-sm text-slate-700 font-bold leading-relaxed space-y-3"></ul>
+            </div>
+            <div class="p-5 bg-white shrink-0">
+                <button onclick="document.getElementById('instructions-modal').classList.add('hidden-safe')" class="w-full bg-slate-900 hover:bg-black text-white font-black py-4 rounded-2xl shadow-xl transition-transform active:scale-95 flex justify-center items-center text-lg">
+                    <span data-i18n="agree">I Agree & Continue</span> <i class="fa-solid fa-arrow-right ml-2"></i>
+                </button>
+            </div>
         </div>
     </div>
 
     <!-- System Modal -->
     <div id="sys-modal" class="fixed inset-0 z-[200] hidden-safe bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-5 opacity-0 transition-opacity">
         <div class="bg-white rounded-[2rem] p-6 w-full max-w-sm shadow-2xl transform scale-95 transition-transform" id="sys-modal-card">
-            <div class="text-center mb-4" id="sys-modal-icon"></div><h3 class="text-xl font-black text-slate-800 text-center mb-2 font-['Quicksand']" id="sys-modal-title">Title</h3><p class="text-sm text-slate-600 font-semibold text-center mb-6 leading-relaxed" id="sys-modal-msg">Message</p>
+            <div class="text-center mb-4" id="sys-modal-icon"></div>
+            <h3 class="text-xl font-black text-slate-800 text-center mb-2 font-['Quicksand']" id="sys-modal-title">Title</h3>
+            <p class="text-sm text-slate-600 font-semibold text-center mb-6 leading-relaxed" id="sys-modal-msg">Message</p>
             <div class="flex space-x-3" id="sys-modal-btns"></div>
         </div>
     </div>
 
     <!-- Interstitial Ad Modal -->
     <div id="interstitial-ad-modal" class="fixed inset-0 z-[250] hidden-safe bg-slate-900/95 backdrop-blur-lg flex items-center justify-center p-0 sm:p-6 opacity-0 transition-opacity duration-300">
-        <div class="w-full h-full sm:max-w-md sm:h-[80vh] bg-black sm:rounded-3xl shadow-2xl overflow-hidden relative flex flex-col pt-safe">
-            <button onclick="window.closeInterstitialAd()" class="absolute top-safe right-4 mt-2 w-10 h-10 bg-white/20 hover:bg-white/40 backdrop-blur-md rounded-full flex items-center justify-center text-white z-50 transition-colors shadow-lg"><i class="fa-solid fa-xmark text-lg"></i></button>
-            <div class="absolute top-safe left-4 mt-4 text-[10px] font-black text-white/50 tracking-widest uppercase z-50">Advertisement</div>
+        <div class="w-full h-full sm:max-w-md sm:h-[80vh] bg-black sm:rounded-3xl shadow-2xl overflow-hidden relative flex flex-col pt-[env(safe-area-inset-top)]">
+            <button onclick="window.closeInterstitialAd()" class="absolute top-4 right-4 w-10 h-10 bg-white/20 hover:bg-white/40 backdrop-blur-md rounded-full flex items-center justify-center text-white z-50 transition-colors shadow-lg mt-[env(safe-area-inset-top)]"><i class="fa-solid fa-xmark text-lg"></i></button>
+            <div class="absolute top-5 left-5 text-[10px] font-black text-white/50 tracking-widest uppercase z-50 mt-[env(safe-area-inset-top)]">Advertisement</div>
             <div id="ad-content-box" class="flex-1 w-full h-full relative cursor-pointer" onclick="window.openAdLink()"></div>
             <div id="ad-cta-box" class="hidden-safe shrink-0 p-5 bg-gradient-to-t from-black to-transparent absolute bottom-0 left-0 right-0 z-40"><button onclick="window.openAdLink()" class="w-full bg-blue-600 text-white font-black py-4 rounded-2xl shadow-xl flex justify-center items-center hover:bg-blue-700 transition-colors">Visit Sponsor <i class="fa-solid fa-arrow-up-right-from-square ml-2"></i></button></div>
         </div>
     </div>
 
-    <!-- MAIN APP CONTAINER -->
-    <!-- Added pt-[calc(env(safe-area-inset-top)+4rem)] to ensure content starts below notch and language button -->
-    <div id="user-app" class="h-full flex flex-col relative pt-[calc(env(safe-area-inset-top)+4rem)]">
-        <div class="flex-1 overflow-y-auto w-full max-w-[440px] mx-auto px-4 pb-8 flex flex-col justify-start sm:justify-center min-h-full hide-scrollbar">
+    <!-- MAIN APP CONTAINER (Centered layout for Desktop & Mobile) -->
+    <!-- h-[100svh] ensures it fits the screen exactly. flex-col & items-center keeps content strictly in the middle -->
+    <div id="user-app" class="h-[100svh] w-full flex flex-col justify-center items-center relative overflow-y-auto pt-[4rem] pb-4">
+        
+        <!-- Max-width container so it looks like a mobile app even on desktop monitors -->
+        <div class="w-full max-w-[440px] px-4 flex flex-col justify-center min-h-[90%]">
             
-            <!-- Auth Section -->
-            <div id="auth-section" class="w-full glass-card p-6 sm:p-8 transition-all duration-500 transform relative z-10 mb-20 mt-4 sm:mt-0 shadow-[0_8px_30px_rgb(0,0,0,0.08)]">
-                <button onclick="document.getElementById('instructions-modal').classList.remove('hidden-safe')" class="absolute -top-6 right-5 flex flex-col items-center justify-center text-pink-500 hover:text-pink-600 group z-20">
-                    <div class="w-12 h-12 bg-pink-100/95 rounded-full flex items-center justify-center shadow-lg border-2 border-white animate-bounce"><i class="fa-solid fa-scroll text-xl text-pink-600"></i></div>
-                    <span class="text-[10px] font-black tracking-widest text-pink-600 mt-1 bg-white/90 px-2.5 py-0.5 rounded-md shadow-sm border border-pink-100">RULES</span>
-                </button>
+            <!-- Auth / Login Section -->
+            <div id="auth-section" class="w-full glass-card p-6 sm:p-8 transition-all duration-500 shadow-[0_8px_30px_rgb(0,0,0,0.08)] relative z-10">
                 <div class="text-center mb-8 relative">
                     <div class="w-24 h-24 bg-white rounded-full flex items-center justify-center mx-auto mb-4 shadow-[0_10px_25px_rgba(236,72,153,0.2)] overflow-hidden border-4 border-white"><i class="fa-solid fa-gamepad text-5xl text-pink-500" id="default-logo-login"></i><img id="custom-logo-login" src="" class="hidden-safe w-full h-full object-cover"></div>
                     <h2 class="text-3xl font-black text-slate-800 font-['Quicksand'] tracking-tight" id="login-title" data-i18n="login_title">Join Fest Quiz</h2>
@@ -116,45 +133,53 @@
                 </div>
             </div>
 
-            <!-- Ad Banner (Bottom) -->
-            <div id="login-ad-banner" onclick="window.openZ1Link()" class="hidden-safe fixed bottom-6 left-4 right-4 max-w-[400px] mx-auto bg-white/95 backdrop-blur-md p-2 rounded-2xl shadow-[0_-5px_30px_rgba(0,0,0,0.15)] border border-slate-100 z-30 cursor-pointer flex items-center">
-                <div class="w-16 h-12 bg-slate-100 rounded-xl mr-3 flex-shrink-0 overflow-hidden border border-slate-200"><img id="z1-img" src="" class="w-full h-full object-cover p-0.5 rounded-lg"></div>
-                <div class="flex-1 pr-2"><p class="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-0.5">Advertisement</p><p id="z1-text" class="text-xs font-bold text-slate-700 line-clamp-2 leading-tight">Visit Sponsor</p></div>
-                <div class="w-8 h-8 rounded-full bg-indigo-50 flex items-center justify-center text-indigo-500 shrink-0 border border-indigo-100 shadow-sm"><i class="fa-solid fa-chevron-right text-xs"></i></div>
-            </div>
-
             <!-- Quiz Section -->
-            <div id="quiz-section" class="w-full hidden-safe flex-col items-center relative z-10 pt-2 pb-10">
-                <div class="w-full flex justify-between items-center mb-6">
-                    <div class="bg-white/95 backdrop-blur-md px-6 py-2 rounded-full shadow-md text-pink-600 font-black tracking-widest text-sm border border-white flex items-center"><i class="fa-solid fa-layer-group mr-2 opacity-70"></i> <span data-i18n="q_prefix">Q</span> <span id="q-counter" class="ml-1 text-slate-800">1/3</span></div>
+            <div id="quiz-section" class="w-full hidden-safe flex-col justify-center relative z-10 w-full h-full max-h-[850px]">
+                
+                <!-- Counter & Top Info (Inside quiz wrapper to stay centered) -->
+                <div class="w-full flex justify-center items-center mb-4">
+                    <div class="bg-white/95 backdrop-blur-md px-6 py-2 rounded-full shadow-md text-pink-600 font-black tracking-widest text-sm border border-white flex items-center">
+                        <i class="fa-solid fa-layer-group mr-2 opacity-70"></i> <span data-i18n="q_prefix">Q</span> <span id="q-counter" class="ml-1 text-slate-800">1/3</span>
+                    </div>
                 </div>
-                <!-- Timer -->
-                <div class="timer-circle mx-auto mb-8 shadow-[0_10px_30px_rgba(244,63,94,0.15)] border-4 border-white"><div class="timer-border"></div><div id="wave-bg" class="wave" style="top: 100%;"></div><div id="wave-fg" class="wave-fill" style="top: 100%;"></div><div class="timer-content"><div id="timer-text" class="text-6xl font-black text-rose-500 tracking-tighter drop-shadow-sm">30</div><div id="timer-label" class="text-[11px] font-black text-rose-400 uppercase tracking-widest mt-1">SEC LEFT</div></div></div>
+                
+                <!-- Timer perfectly centered above the card -->
+                <div class="timer-circle mb-6 shadow-[0_10px_30px_rgba(244,63,94,0.15)] border-4 border-white shrink-0">
+                    <div class="timer-border"></div>
+                    <div id="wave-bg" class="wave" style="top: 100%;"></div>
+                    <div id="wave-fg" class="wave-fill" style="top: 100%;"></div>
+                    <div class="timer-content">
+                        <div id="timer-text" class="text-5xl font-black text-rose-500 tracking-tighter drop-shadow-sm">30</div>
+                        <div id="timer-label" class="text-[10px] font-black text-rose-400 uppercase tracking-widest mt-1">SEC LEFT</div>
+                    </div>
+                </div>
                 
                 <!-- Question Card -->
-                <div class="glass-card w-full p-5 sm:p-8 flex flex-col relative overflow-hidden shadow-[0_10px_40px_rgba(0,0,0,0.08)] border border-white/50">
-                    <div class="flex items-start mb-6 border-b border-slate-100 pb-5">
-                        <div class="w-12 h-12 rounded-full bg-pink-50 flex items-center justify-center shrink-0 mr-4 shadow-sm overflow-hidden border border-pink-100"><i class="fa-solid fa-palette text-2xl text-pink-500" id="default-logo-quiz"></i><img id="custom-logo-quiz" src="" class="hidden-safe w-full h-full object-cover"></div>
-                        <h3 id="quiz-question-text" class="text-lg font-black text-slate-800 leading-relaxed pt-1">Loading...</h3>
+                <div class="glass-card w-full p-5 sm:p-8 flex flex-col relative overflow-y-auto shadow-[0_10px_40px_rgba(0,0,0,0.08)] border border-white/50 max-h-[60vh] shrink-0 hide-scrollbar">
+                    <div class="flex items-start mb-6 border-b border-slate-100 pb-5 shrink-0">
+                        <div class="w-12 h-12 rounded-full bg-pink-50 flex items-center justify-center shrink-0 mr-4 shadow-sm overflow-hidden border border-pink-100">
+                            <i class="fa-solid fa-palette text-2xl text-pink-500" id="default-logo-quiz"></i><img id="custom-logo-quiz" src="" class="hidden-safe w-full h-full object-cover">
+                        </div>
+                        <h3 id="quiz-question-text" class="text-[17px] font-black text-slate-800 leading-relaxed pt-1">Loading...</h3>
                     </div>
-                    <!-- Options Container -->
-                    <div id="quiz-options-container" class="space-y-3 flex-1 mb-8"></div>
+                    
+                    <!-- Options -->
+                    <div id="quiz-options-container" class="space-y-3 flex-1 mb-6"></div>
                     
                     <!-- Action Buttons -->
-                    <div class="flex space-x-3 mt-auto" id="quiz-action-buttons">
-                        <button id="btn-skip" onclick="window.handleAction('skip')" class="flex-1 bg-rose-50 text-rose-600 border border-rose-100 font-black py-4 rounded-2xl active:scale-95 flex justify-center items-center shadow-sm"><i class="fa-solid fa-forward-step mr-2"></i> <span data-i18n="btn_skip">SKIP</span></button>
-                        <button id="btn-submit" onclick="window.handleAction('submit')" class="flex-[1.5] bg-emerald-500 hover:bg-emerald-600 text-white font-black py-4 rounded-2xl shadow-[0_8px_20px_rgba(16,185,129,0.3)] active:scale-95 flex justify-center items-center border border-emerald-400"><span data-i18n="btn_submit">SUBMIT</span> <i class="fa-solid fa-check ml-2 text-xl"></i></button>
+                    <div class="flex space-x-3 shrink-0 pt-2" id="quiz-action-buttons">
+                        <button id="btn-skip" onclick="window.handleAction('skip')" class="flex-1 bg-rose-50 text-rose-600 border border-rose-100 font-black py-4 rounded-2xl active:scale-95 flex justify-center items-center shadow-sm text-sm"><i class="fa-solid fa-forward-step mr-2"></i> <span data-i18n="btn_skip">SKIP</span></button>
+                        <button id="btn-submit" onclick="window.handleAction('submit')" class="flex-[1.5] bg-emerald-500 hover:bg-emerald-600 text-white font-black py-4 rounded-2xl shadow-[0_8px_20px_rgba(16,185,129,0.3)] active:scale-95 flex justify-center items-center border border-emerald-400 text-sm"><span data-i18n="btn_submit">SUBMIT</span> <i class="fa-solid fa-check ml-2 text-lg"></i></button>
                         <button id="btn-next" onclick="window.handleAction('next')" class="hidden-safe w-full bg-slate-900 text-white font-black py-4 rounded-2xl shadow-xl active:scale-95 justify-center items-center text-lg"><span data-i18n="btn_next">NEXT</span> <i class="fa-solid fa-arrow-right ml-2"></i></button>
                     </div>
                 </div>
             </div>
 
             <!-- Result Section -->
-            <div id="result-section" class="w-full glass-card p-6 sm:p-8 hidden-safe text-center transform transition-all duration-500 scale-95 opacity-0 relative z-10 mt-10 shadow-[0_10px_40px_rgba(0,0,0,0.1)]">
+            <div id="result-section" class="w-full glass-card p-6 sm:p-8 hidden-safe text-center transform transition-all duration-500 scale-95 opacity-0 relative z-10 shadow-[0_10px_40px_rgba(0,0,0,0.1)]">
                 <div class="w-24 h-24 bg-white rounded-full flex items-center justify-center mx-auto mb-5 shadow-[0_10px_25px_rgba(16,185,129,0.2)] overflow-hidden border-4 border-white -mt-16"><i class="fa-solid fa-trophy text-5xl text-emerald-500" id="default-logo-result"></i><img id="custom-logo-result" src="" class="hidden-safe w-full h-full object-cover"></div>
                 <h2 class="text-3xl font-black text-slate-800 font-['Quicksand'] mb-1 tracking-tight" id="res-day-title">Result</h2><p class="text-sm text-slate-500 font-bold mb-6" id="res-sub-text" data-i18n="res_sub">Completed successfully!</p>
                 
-                <!-- Main Score Display -->
                 <div id="res-net-box" class="bg-indigo-50 border-2 border-indigo-100 p-6 rounded-[2rem] relative overflow-hidden mb-5 shadow-inner flex flex-col items-center justify-center"><div class="absolute -right-2 -bottom-2 opacity-10"><i id="res-net-icon" class="fa-solid fa-ranking-star text-7xl text-indigo-500"></i></div><div id="res-net-label" class="text-xs text-indigo-600 font-black uppercase tracking-widest mb-2 relative z-10" data-i18n="res_total">Total Points Today</div><div class="text-6xl font-black text-indigo-700 relative z-10 font-['Quicksand'] tracking-tighter drop-shadow-sm" id="res-net-score">0</div></div>
                 
                 <div class="grid grid-cols-2 gap-4 mb-8">
@@ -170,7 +195,6 @@
                     <h2 class="text-4xl font-black text-slate-800 font-['Quicksand'] tracking-tight mb-2" data-i18n="pub_title">Final Champions</h2>
                     <p class="text-sm font-bold text-slate-500" data-i18n="pub_sub">Top 10 winners of the fest quiz!</p>
                 </div>
-                
                 <div id="podium-container" class="flex items-end justify-center space-x-2 mb-10 h-52"></div>
                 <div class="glass-card w-full p-4 flex flex-col space-y-3 shadow-lg" id="public-list-container"></div>
                 
@@ -179,6 +203,13 @@
             </div>
 
         </div>
+    </div>
+
+    <!-- Ad Banner (Bottom) -->
+    <div id="login-ad-banner" onclick="window.openZ1Link()" class="hidden-safe fixed bottom-4 left-4 right-4 max-w-[400px] mx-auto bg-white/95 backdrop-blur-md p-2 rounded-2xl shadow-[0_-5px_30px_rgba(0,0,0,0.15)] border border-slate-100 z-30 cursor-pointer flex items-center mb-[env(safe-area-inset-bottom)]">
+        <div class="w-16 h-12 bg-slate-100 rounded-xl mr-3 flex-shrink-0 overflow-hidden border border-slate-200"><img id="z1-img" src="" class="w-full h-full object-cover p-0.5 rounded-lg"></div>
+        <div class="flex-1 pr-2"><p class="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-0.5">Advertisement</p><p id="z1-text" class="text-xs font-bold text-slate-700 line-clamp-2 leading-tight">Visit Sponsor</p></div>
+        <div class="w-8 h-8 rounded-full bg-indigo-50 flex items-center justify-center text-indigo-500 shrink-0 border border-indigo-100 shadow-sm"><i class="fa-solid fa-chevron-right text-xs"></i></div>
     </div>
 
     <script type="module">
@@ -199,7 +230,7 @@
         const i18n = {
             en: {
                 login_title: "Join Fest Quiz", login_sub: "Enter details to start", ph_phone: "10 Digit Phone Number", ph_gender: "Select Gender", gen_m: "Male", gen_f: "Female", ph_name: "Full Name", ph_pass: "Password (Min 4 chars)",
-                btn_start: "START QUIZ", q_prefix: "Q", btn_skip: "SKIP", btn_submit: "SUBMIT", btn_next: "NEXT",
+                btn_start: "START QUIZ", q_prefix: "Q", btn_skip: "SKIP", btn_submit: "SUBMIT", btn_next: "NEXT", rules_btn: "RULES",
                 res_sub: "Completed successfully!", res_total: "Total Points Today", res_earned: "Earned", res_lost: "Lost", btn_ok: "OK",
                 pub_title: "Final Champions", pub_sub: "Top 10 winners of the fest quiz!", rules: "Quiz Rules", agree: "I Agree & Continue", mock_mode: "Mock Test Mode", mock_sub: "Practice mode (Scores won't affect finals)",
                 skip_q: "Skip Question?", skip_sure: "Are you sure you want to skip this question?", yes_skip: "Yes, Skip", cancel: "Cancel",
@@ -208,7 +239,7 @@
             },
             ml: {
                 login_title: "ഫെസ്റ്റ് ക്വിസിലേക്ക് സ്വാഗതം", login_sub: "വിവരങ്ങൾ നൽകി തുടങ്ങുക", ph_phone: "10 അക്ക മൊബൈൽ നമ്പർ", ph_gender: "ജൻഡർ തിരഞ്ഞെടുക്കുക", gen_m: "പുരുഷൻ", gen_f: "സ്ത്രീ", ph_name: "പൂർണ്ണ നാമം", ph_pass: "പാസ്‌വേഡ് (കുറഞ്ഞത് 4 അക്ഷരം)",
-                btn_start: "തുടങ്ങാം", q_prefix: "ചോദ്യം", btn_skip: "ഒഴിവാക്കുക", btn_submit: "സമർപ്പിക്കുക", btn_next: "അടുത്തത്",
+                btn_start: "തുടങ്ങാം", q_prefix: "ചോദ്യം", btn_skip: "ഒഴിവാക്കുക", btn_submit: "സമർപ്പിക്കുക", btn_next: "അടുത്തത്", rules_btn: "നിയമങ്ങൾ",
                 res_sub: "വിജയകരമായി പൂർത്തിയാക്കി!", res_total: "ഇന്നത്തെ ആകെ പോയിന്റ്", res_earned: "ലഭിച്ചത്", res_lost: "നഷ്ടപ്പെട്ടത്", btn_ok: "ശരി",
                 pub_title: "വിജയികൾ", pub_sub: "ആദ്യത്തെ 10 സ്ഥാനക്കാർ", rules: "നിയമങ്ങൾ", agree: "വായിച്ചു മനസ്സിലാക്കി", mock_mode: "പരിശീലന ക്വിസ്", mock_sub: "ഇത് മെയിൻ സ്കോറിനെ ബാധിക്കില്ല",
                 skip_q: "സ്കിപ്പ് ചെയ്യണോ?", skip_sure: "ഈ ചോദ്യം ഒഴിവാക്കാൻ ഉറപ്പാണോ?", yes_skip: "അതെ, ഒഴിവാക്കുക", cancel: "ക്യാൻസൽ",
@@ -242,8 +273,8 @@
         window.showTopAlert = function(msg, type='error', sticky=false) {
             const bar = document.getElementById('top-alert-bar'); const icon = document.getElementById('top-alert-icon'); const txt = document.getElementById('top-alert-text');
             txt.innerText = msg;
-            if(type === 'error') { bar.className = "fixed top-0 left-0 right-0 z-[400] transform transition-transform duration-300 shadow-lg text-white text-xs font-bold text-center py-3 pt-safe flex justify-center items-center bg-rose-600 translate-y-0"; icon.className = "mr-2 fa-solid fa-triangle-exclamation mt-[env(safe-area-inset-top)]"; }
-            else if(type === 'success') { bar.className = "fixed top-0 left-0 right-0 z-[400] transform transition-transform duration-300 shadow-lg text-white text-xs font-bold text-center py-3 pt-safe flex justify-center items-center bg-emerald-600 translate-y-0"; icon.className = "mr-2 fa-solid fa-check-circle mt-[env(safe-area-inset-top)]"; }
+            if(type === 'error') { bar.className = "fixed top-0 left-0 right-0 z-[400] transform transition-transform duration-300 shadow-lg text-white text-xs font-bold text-center py-3 flex justify-center items-center bg-rose-600 translate-y-0 pt-[max(0.5rem,env(safe-area-inset-top))]"; icon.className = "mr-2 fa-solid fa-triangle-exclamation"; }
+            else if(type === 'success') { bar.className = "fixed top-0 left-0 right-0 z-[400] transform transition-transform duration-300 shadow-lg text-white text-xs font-bold text-center py-3 flex justify-center items-center bg-emerald-600 translate-y-0 pt-[max(0.5rem,env(safe-area-inset-top))]"; icon.className = "mr-2 fa-solid fa-check-circle"; }
             clearTimeout(alertTimeout); if(!sticky) alertTimeout = setTimeout(() => { bar.classList.replace('translate-y-0', '-translate-y-full'); }, 3000);
         };
         window.hideTopAlert = function() { document.getElementById('top-alert-bar').classList.replace('translate-y-0', '-translate-y-full'); };
@@ -515,7 +546,6 @@
             if(q.type==='mcq') { document.querySelectorAll('input[name="quiz_option"]').forEach(el=>el.disabled=true); const sel=document.querySelector('input[name="quiz_option"]:checked'); if(sel) ans=sel.value; } else { const txt=document.getElementById('quiz-text-answer'); if(txt){ txt.disabled=true; ans=txt.value.trim(); } }
             
             // For Mock test, we just calculate the local variables todayEarned and todayLost.
-            // We do NOT save it to window.AppState.user.history or firestore.
             let isC = false;
             if(!isSkip&&!isTimeout) { 
                 isC = (ans&&ans.toLowerCase()===q.answer.trim().toLowerCase()); 
@@ -526,7 +556,6 @@
                     if(isC) window.AppState.todayEarned += 10; 
                 } 
                 
-                // Save to local user history object ONLY if it's NOT a mock test
                 if(!window.AppState.settings.isMockTestActive) {
                     if(!window.AppState.user.history) window.AppState.user.history={}; 
                     window.AppState.user.history[q.id] = { answer:ans, correct:isC, timeAt:new Date().toISOString() }; 
@@ -538,7 +567,6 @@
                 }
             }
 
-            // Database saving ONLY if registered and NOT mock test
             if(window.AppState.user.isRegistered && !window.AppState.settings.isMockTestActive) { 
                 try { updateDoc(docPath('users', window.AppState.user.phone), { history: window.AppState.user.history }); } catch(e){} 
             }
@@ -555,7 +583,6 @@
             const isMock = window.AppState.settings.isMockTestActive;
             
             if(isMock) { 
-                // Only updating UI for Mock Test. No database update here.
                 window.AppState.user.mockScore = (window.AppState.user.mockScore||0) + netToday; 
             } else { 
                 window.AppState.user.totalScore += netToday; 
@@ -573,7 +600,6 @@
             let dayStr = isMock ? "Mock Result" : `Day ${window.AppState.currentDay} Result`; 
             if(window.AppState.lang === 'ml') dayStr = isMock ? "പരിശീലന ഫലം" : `Day ${window.AppState.currentDay} റിസൾട്ട്`;
             
-            // Updating the UI with exact points calculated in this session (Both Mock and Main)
             document.getElementById('res-day-title').innerText = dayStr;
             document.getElementById('res-sub-text').innerText = isMock ? (window.AppState.lang === 'ml' ? "പരിശീലനം പൂർത്തിയായി!" : "Practice completed!") : i18n[window.AppState.lang].res_sub; 
             document.getElementById('res-earned').innerText = `+${window.AppState.todayEarned}`; 
