@@ -16,6 +16,8 @@
         .view-section { display: none; }
         .view-section.active { display: flex; }
         .danger-stripes { background: repeating-linear-gradient(45deg, #fef2f2, #fef2f2 10px, #fff5f5 10px, #fff5f5 20px); }
+        details > summary { list-style: none; }
+        details > summary::-webkit-details-marker { display: none; }
     </style>
 </head>
 <body class="text-slate-800 antialiased selection:bg-indigo-200 flex flex-col">
@@ -38,6 +40,7 @@
 
     <div class="flex-1 overflow-hidden relative p-3 sm:p-4 flex flex-col bg-slate-50">
         
+        <!-- DASHBOARD TAB -->
         <div id="admin-dashboard" class="view-section active flex-col h-full overflow-y-auto max-w-4xl mx-auto w-full space-y-4">
             <div class="bg-white p-5 sm:p-6 rounded-3xl border border-slate-100 shadow-sm">
                 <h2 class="text-xl font-black text-slate-800 mb-1">System Overview</h2>
@@ -82,6 +85,7 @@
             </div>
         </div>
 
+        <!-- SETUP TAB -->
         <div id="admin-setup" class="view-section hidden-safe flex-col h-full overflow-y-auto max-w-3xl mx-auto w-full">
             <div class="bg-white p-5 rounded-3xl border border-slate-100 shadow-sm space-y-5 mb-6">
                 
@@ -142,7 +146,7 @@
                 </button>
             </div>
 
-            <div class="danger-stripes p-5 rounded-3xl border-2 border-rose-200 shadow-sm mt-4">
+            <div class="danger-stripes p-5 rounded-3xl border-2 border-rose-200 shadow-sm mt-4 mb-10">
                 <h3 class="font-black text-rose-700 text-sm flex items-center mb-3"><i class="fa-solid fa-triangle-exclamation mr-2"></i> DANGER ZONE</h3>
                 <div class="space-y-3">
                     <button onclick="window.triggerDangerAction('users')" class="w-full bg-white border border-rose-300 text-rose-700 hover:bg-rose-50 font-bold py-3 rounded-xl transition-colors text-xs shadow-sm flex items-center justify-center"><i class="fa-solid fa-users-slash mr-2"></i> Clear All Users & Scores</button>
@@ -151,10 +155,11 @@
             </div>
         </div>
 
+        <!-- QUESTIONS TAB -->
         <div id="admin-questions" class="view-section hidden-safe flex-col h-full overflow-hidden flex w-full max-w-4xl mx-auto">
             <div class="bg-white p-3 rounded-2xl border border-slate-100 shadow-sm shrink-0 mb-3 z-10">
                 <div class="flex space-x-2 mb-3">
-                    <button onclick="window.downloadCSVTemplate()" class="flex-1 bg-slate-50 text-slate-700 text-xs font-bold py-2.5 rounded-xl border border-slate-200 shadow-sm"><i class="fa-solid fa-download mr-1.5 text-indigo-500"></i> CSV Template</button>
+                    <button onclick="window.downloadCSVTemplate()" class="flex-1 bg-slate-50 text-slate-700 text-xs font-bold py-2.5 rounded-xl border border-slate-200 shadow-sm hover:bg-slate-100"><i class="fa-solid fa-download mr-1.5 text-indigo-500"></i> CSV Template</button>
                 </div>
 
                 <div id="pool-capacity-indicator" class="hidden text-xs font-bold text-center p-2 bg-indigo-50 text-indigo-700 rounded-lg border border-indigo-100 mb-2">
@@ -179,7 +184,7 @@
                 <div class="space-y-4 flex-1">
                     <div>
                         <label class="block text-[10px] font-bold text-slate-500 mb-1 uppercase">Target Group</label>
-                        <select id="admin-q-target" onchange="window.renderAdminQuestionPills()" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl font-bold text-xs outline-none">
+                        <select id="admin-q-target" onchange="window.renderAdminQuestionPills()" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl font-bold text-xs outline-none focus:border-indigo-500">
                             <option value="main">Main Quiz</option>
                             <option value="mock">Mock Test (Practice)</option>
                         </select>
@@ -187,7 +192,6 @@
                     <div><label class="block text-[10px] font-bold text-slate-500 mb-1 uppercase">Type</label><select id="admin-q-type" onchange="window.toggleAdminQType()" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl font-bold text-xs outline-none"><option value="mcq">MCQ</option><option value="text">Text</option></select></div>
                     <div><label class="block text-[10px] font-bold text-slate-500 mb-1 uppercase">Question</label><textarea id="admin-q-text" rows="2" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl font-semibold text-sm outline-none"></textarea></div>
 
-                    <!-- CRITICAL FIX: Clearly labeled A, B, C, D options for Admin -->
                     <div id="admin-mcq-area" class="space-y-3 pt-2 border-t border-slate-50">
                         <label class="block text-[10px] font-bold text-slate-500 uppercase mb-2">Options (Fill details)</label>
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -227,6 +231,7 @@
             </div>
         </div>
 
+        <!-- ADS TAB -->
         <div id="admin-ads" class="view-section hidden-safe flex-col h-full overflow-y-auto max-w-3xl mx-auto w-full">
             <div class="bg-white p-5 rounded-3xl border border-slate-100 shadow-sm space-y-5">
                 <div class="flex items-center justify-between border-b border-slate-100 pb-3">
@@ -266,6 +271,7 @@
             </div>
         </div>
 
+        <!-- USERS TAB -->
         <div id="admin-users" class="view-section hidden-safe flex-col h-full overflow-hidden w-full max-w-4xl mx-auto">
             <div class="bg-white p-4 rounded-3xl border border-slate-100 shadow-sm h-full flex flex-col">
                 <div class="flex justify-between items-center mb-4 shrink-0">
@@ -275,15 +281,17 @@
             </div>
         </div>
         
+        <!-- ADVANCED USER HISTORY DETAILS (ACCORDION) -->
         <div id="admin-user-detail" class="view-section hidden-safe flex-col h-full overflow-hidden w-full bg-slate-50 z-20 absolute inset-0">
             <div class="bg-white border-b border-slate-200 p-4 flex items-center justify-between shrink-0 shadow-sm">
-                <button onclick="window.closeUserHistoryFull()" class="text-xs font-bold text-slate-600 bg-slate-50 px-4 py-2 rounded-xl border border-slate-200 flex items-center shadow-sm"><i class="fa-solid fa-arrow-left mr-2"></i> Back</button>
-                <div class="text-right"><h3 class="text-base font-black text-slate-800" id="hist-name">Name</h3><p class="text-indigo-500 text-[11px] font-bold" id="hist-phone">Phone</p></div>
+                <button onclick="window.closeUserHistoryFull()" class="text-xs font-bold text-slate-600 bg-slate-50 px-4 py-2 rounded-xl border border-slate-200 flex items-center shadow-sm hover:bg-slate-100 transition-colors"><i class="fa-solid fa-arrow-left mr-2"></i> Back</button>
+                <div class="text-right"><h3 class="text-base font-black text-slate-800" id="hist-name">Name</h3><p class="text-slate-500 text-[11px] font-bold" id="hist-phone">Phone</p></div>
             </div>
-            <div class="p-4 overflow-y-auto flex-1 max-w-3xl mx-auto w-full space-y-3" id="hist-body"></div>
+            <div class="p-4 overflow-y-auto flex-1 max-w-3xl mx-auto w-full" id="hist-body"></div>
         </div>
     </div>
 
+    <!-- MODALS -->
     <div id="sys-modal" class="fixed inset-0 z-[200] hidden-safe bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 opacity-0 transition-opacity">
         <div class="bg-white rounded-3xl p-6 w-full max-w-sm shadow-2xl transform scale-95 transition-transform" id="sys-modal-card">
             <div class="text-center mb-3" id="sys-modal-icon"></div>
@@ -306,17 +314,15 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        // Long-polling fix applied here for reliable iframe connection
         import { getFirestore, initializeFirestore, collection, doc, setDoc, getDoc, getDocs, onSnapshot, deleteDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
         const firebaseConfig = { apiKey: "AIzaSyAfJSonmGHnf0t92B71ycuAZbc-CV3k7LE", authDomain: "fest-dsd-003.firebaseapp.com", projectId: "fest-dsd-003", storageBucket: "fest-dsd-003.firebasestorage.app", messagingSenderId: "409596394273", appId: "1:409596394273:web:b930012ce0a845ddb45c60" };
         const app = initializeApp(firebaseConfig);
-        // CRITICAL FIX: Use Long Polling to prevent WebSockets dropping in preview iframe
         const db = initializeFirestore(app, { experimentalForceLongPolling: true });
 
         window.AppState = {
             allQuestions: [], allUsers: [], totalDays: 1, questionsPerDay: 3, currentDay: 1, adminSelectedSlot: 0, adminSelectedDay: 1, adminPoolSelectedId: null,
-            settings: { startDate: '', questionMode: 'fixed', logoBase64: '', resultsPublished: false, dynamicTimers: [], isMockTestActive: false },
+            settings: { startDate: '', questionMode: 'fixed', logoBase64: '', resultsPublished: false, dynamicTimers: [], isMockTestActive: false, scoringEnabled: false, pointsCorrect: 10, pointsNegative: 0 },
             ads: { masterEnabled: false, zone1: {}, zone2: { images: [] } }
         };
         const docPath = (coll, id) => doc(db, coll, id);
@@ -333,7 +339,7 @@
         async function initAdmin() {
             onSnapshot(docPath('settings', 'global'), (snap) => {
                 if (snap.exists()) {
-                    const data = snap.data(); window.AppState.totalDays = data.totalDays || 1; window.AppState.questionsPerDay = data.questionsPerDay || 3; window.AppState.settings = data;
+                    const data = snap.data(); window.AppState.totalDays = data.totalDays || 1; window.AppState.questionsPerDay = data.questionsPerDay || 3; window.AppState.settings = { ...window.AppState.settings, ...data };
                     document.getElementById('setup-start').value = data.startDate || ''; document.getElementById('setup-end').value = data.endDate || '';
                     document.getElementById('setup-q-per-day').value = window.AppState.questionsPerDay; document.getElementById('setup-q-mode').value = data.questionMode || 'fixed';
                     document.getElementById('setup-publish-toggle').checked = data.resultsPublished || false;
@@ -492,23 +498,77 @@
             list.innerHTML = '';
             regUsers.forEach((x, i) => {
                 const c = x.totalScore >= 0 ? "text-emerald-700 bg-emerald-50" : "text-rose-700 bg-rose-50";
-                list.innerHTML += `<div onclick="window.openUserHistoryFull('${x.id}')" class="flex items-center justify-between p-3 bg-slate-50 hover:bg-indigo-50 rounded-2xl border border-slate-100 cursor-pointer transition-colors mb-2"><div class="flex items-center"><div class="w-10 h-10 rounded-full bg-white border border-slate-200 text-slate-700 flex items-center justify-center font-black text-xs mr-3">${i+1}</div><div><div class="font-bold text-sm text-slate-800">${x.name}</div><div class="text-[10px] font-bold text-slate-500 mt-0.5"><i class="fa-solid fa-phone mr-1"></i>${x.id} <span class="mx-1 text-slate-300">|</span> <i class="fa-solid fa-lock text-indigo-400 mr-1"></i><span class="text-indigo-500">${x.password||'N/A'}</span></div></div></div><div class="px-3 py-1.5 rounded-lg font-black text-xs ${c}">${Math.abs(x.totalScore||0)} pts</div></div>`;
+                list.innerHTML += `<div onclick="window.openUserHistoryFull('${x.id}')" class="flex items-center justify-between p-3 bg-slate-50 hover:bg-indigo-50 rounded-2xl border border-slate-100 cursor-pointer transition-colors mb-2"><div class="flex items-center"><div class="w-10 h-10 rounded-full bg-white border border-slate-200 text-slate-700 flex items-center justify-center font-black text-xs mr-3">${i+1}</div><div><div class="font-bold text-sm text-slate-800">${x.name}</div><div class="text-[10px] font-bold text-slate-500 mt-0.5"><i class="fa-solid fa-phone mr-1"></i>${x.id} <span class="mx-1 text-slate-300">|</span> <i class="fa-solid fa-lock text-indigo-400 mr-1"></i><span class="text-indigo-500">${x.password||'N/A'}</span></div></div></div><div class="px-3 py-1.5 rounded-lg font-black text-xs ${c}">${x.totalScore||0} pts</div></div>`;
             });
         }
         
+        // NEW ADVANCED ACCORDION USER HISTORY
         window.openUserHistoryFull = function(uid) {
             const user = window.AppState.allUsers.find(u => u.id === uid); if(!user) return;
             document.querySelectorAll('.view-section').forEach(el => el.classList.add('hidden-safe')); document.getElementById('admin-user-detail').classList.remove('hidden-safe'); document.getElementById('admin-user-detail').classList.add('active');
             document.getElementById('hist-name').innerText = user.name; document.getElementById('hist-phone').innerHTML = `<i class="fa-solid fa-phone text-slate-400 mr-1"></i>${user.id} <span class="text-slate-300 mx-1">|</span> <i class="fa-solid fa-lock text-indigo-400 mr-1"></i>${user.password || 'N/A'}`;
             const body = document.getElementById('hist-body'); body.innerHTML = '';
+            
             if(!user.history || Object.keys(user.history).length===0) { body.innerHTML = '<div class="text-center p-8 text-sm font-semibold text-slate-500 bg-white border border-slate-200 rounded-3xl">No regular quiz history found.</div>'; return; }
+            
+            const grouped = {};
+            const sDate = window.AppState.settings.startDate;
+            const ptsCorrect = window.AppState.settings.pointsCorrect || 10;
+            const ptsNegative = window.AppState.settings.pointsNegative || 0;
+            const scoringEnabled = window.AppState.settings.scoringEnabled;
             
             Object.keys(user.history).forEach(qId => {
                 const rec = user.history[qId], q = window.AppState.allQuestions.find(x=>x.id===qId);
-                const ac = rec.correct ? "text-emerald-600" : (rec.answer?"text-rose-600":"text-slate-400");
-                body.innerHTML += `<div class="p-4 bg-white border border-slate-200 rounded-2xl"><p class="font-bold text-xs text-slate-800 mb-2">${q?q.text:"Unknown Q"}</p><div class="flex text-[11px]"><span class="text-slate-400 w-12 font-semibold">User:</span> <span class="font-black ${ac}">${rec.answer||"Skipped"}</span></div><div class="flex text-[11px] mt-1"><span class="text-slate-400 w-12 font-semibold">Real:</span> <span class="font-black text-slate-700">${q?q.answer:"N/A"}</span></div></div>`;
+                let dayNum = 1;
+                if(q && q.day) { dayNum = parseInt(q.day); } 
+                else if (rec.timeAt) { let rT = new Date(rec.timeAt); let startT = new Date(sDate || Date.now()); startT.setHours(0,0,0,0); dayNum = Math.floor(Math.abs(rT - startT) / (1000 * 60 * 60 * 24)) + 1; if(dayNum < 1) dayNum = 1; }
+                
+                if(!grouped[dayNum]) grouped[dayNum] = { items: [], score: 0 };
+                grouped[dayNum].items.push({ rec, q });
+                
+                if(scoringEnabled) {
+                    if(rec.correct) grouped[dayNum].score += ptsCorrect;
+                    else if(rec.answer && !rec.skipped && !rec.timeout) grouped[dayNum].score -= ptsNegative;
+                } else { if(rec.correct) grouped[dayNum].score += 10; }
+            });
+            
+            const sortedDays = Object.keys(grouped).sort((a,b) => parseInt(a) - parseInt(b));
+            
+            sortedDays.forEach(d => {
+                const dayData = grouped[d];
+                const badgeColor = dayData.score >= 0 ? 'bg-emerald-100 text-emerald-700 border-emerald-200' : 'bg-rose-100 text-rose-700 border-rose-200';
+                const scoreSign = dayData.score > 0 ? '+' : '';
+                
+                let itemsHtml = '';
+                dayData.items.forEach(item => {
+                    const { rec, q } = item;
+                    let statusHtml = ''; let bgClass = 'bg-slate-50';
+                    const qText = q ? q.text : "Unknown Question"; const realAns = q ? q.answer : "N/A";
+                    
+                    if (rec.correct) {
+                        statusHtml = `<div class="flex items-center text-emerald-600 font-bold text-[11px] mt-1"><i class="fa-solid fa-circle-check mr-1.5"></i> Correct: ${rec.answer}</div>`; bgClass = 'bg-emerald-50/50 border-emerald-100';
+                    } else if (rec.timeout) {
+                        statusHtml = `<div class="flex flex-col mt-1"><div class="flex items-center text-orange-500 font-bold text-[11px]"><i class="fa-solid fa-clock mr-1.5"></i> Time Out</div><div class="text-[10px] text-slate-500 mt-0.5">Real Answer: <span class="font-bold text-slate-700">${realAns}</span></div></div>`; bgClass = 'bg-orange-50/50 border-orange-100';
+                    } else if (rec.skipped || !rec.answer) {
+                        statusHtml = `<div class="flex flex-col mt-1"><div class="flex items-center text-slate-500 font-bold text-[11px]"><i class="fa-solid fa-forward-step mr-1.5"></i> Skipped</div><div class="text-[10px] text-slate-500 mt-0.5">Real Answer: <span class="font-bold text-slate-700">${realAns}</span></div></div>`; bgClass = 'bg-slate-100 border-slate-200';
+                    } else {
+                        statusHtml = `<div class="flex flex-col mt-1"><div class="flex items-center text-rose-500 font-bold text-[11px]"><i class="fa-solid fa-circle-xmark mr-1.5"></i> Wrong: ${rec.answer}</div><div class="text-[10px] text-slate-500 mt-0.5">Real Answer: <span class="font-bold text-emerald-600">${realAns}</span></div></div>`; bgClass = 'bg-rose-50/50 border-rose-100';
+                    }
+                    itemsHtml += `<div class="p-3 border rounded-xl mb-2 ${bgClass}"><p class="font-bold text-xs text-slate-800">${qText}</p>${statusHtml}</div>`;
+                });
+                
+                body.innerHTML += `
+                    <details class="group bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm mb-3">
+                        <summary class="flex justify-between items-center p-4 cursor-pointer select-none bg-slate-50 group-open:bg-indigo-50 group-open:border-b group-open:border-indigo-100 transition-colors">
+                            <div class="font-black text-sm text-slate-800 group-open:text-indigo-700 flex items-center"><i class="fa-solid fa-calendar-day mr-2 text-indigo-400"></i> Day ${d}</div>
+                            <div class="flex items-center"><span class="px-2.5 py-1 rounded-lg border font-black text-[10px] sm:text-xs ${badgeColor} mr-3">${scoreSign}${dayData.score} pts</span><i class="fa-solid fa-chevron-down text-slate-400 group-open:rotate-180 transition-transform"></i></div>
+                        </summary>
+                        <div class="p-4 bg-white space-y-2">${itemsHtml}</div>
+                    </details>
+                `;
             });
         };
+        
         window.closeUserHistoryFull = function() { document.getElementById('admin-user-detail').classList.remove('active'); document.getElementById('admin-user-detail').classList.add('hidden-safe'); document.getElementById('admin-users').classList.remove('hidden-safe'); document.getElementById('admin-users').classList.add('active'); };
 
         window.downloadCSVTemplate = function() {
