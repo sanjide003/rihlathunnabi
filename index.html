@@ -471,11 +471,22 @@
             document.getElementById('res-day-title').innerText=dayStr; 
 
             let netToday = earned - lost;
-            document.getElementById('res-earned').innerText=`+${earned}`; document.getElementById('res-lost').innerText=`-${lost}`; document.getElementById('res-net-score').innerText=netToday>0?`+${netToday}`:netToday;
+            document.getElementById('res-earned').innerText=`+${earned}`; document.getElementById('res-lost').innerText=`-${lost}`; 
             
-            const netBox=document.getElementById('res-net-box'), netIcon=document.getElementById('res-net-icon'); 
-            netBox.className = 'border-2 p-6 rounded-[2rem] relative overflow-hidden mb-5 shadow-inner flex flex-col items-center justify-center'; 
-            if(netToday>=0){netBox.classList.add('bg-emerald-50','border-emerald-200'); netIcon.className='fa-solid fa-ranking-star text-7xl text-emerald-500'; document.getElementById('res-net-score').classList.replace('text-rose-700', 'text-emerald-700'); document.getElementById('res-net-label').classList.replace('text-rose-600', 'text-emerald-600'); }else{netBox.classList.add('bg-rose-50','border-rose-200'); netIcon.className='fa-solid fa-ranking-star text-7xl text-rose-500'; document.getElementById('res-net-score').classList.replace('text-emerald-700', 'text-rose-700'); document.getElementById('res-net-label').classList.replace('text-emerald-600', 'text-rose-600'); }
+            const netBox=document.getElementById('res-net-box'), netIcon=document.getElementById('res-net-icon'), netScoreLabel=document.getElementById('res-net-score'), netTextLabel=document.getElementById('res-net-label'); 
+            netBox.className = 'border-2 p-5 rounded-[2rem] relative overflow-hidden mb-5 shadow-inner flex flex-col items-center justify-center'; 
+            
+            if(netToday >= 0) {
+                netScoreLabel.innerText = `+${netToday}`;
+                netBox.classList.add('bg-emerald-50','border-emerald-200'); netIcon.className='fa-solid fa-ranking-star text-7xl text-emerald-500'; 
+                netScoreLabel.className = 'text-6xl font-black text-emerald-700 relative z-10 font-["Quicksand"] tracking-tighter transition-colors'; 
+                netTextLabel.className = 'text-[11px] text-emerald-600 font-black uppercase tracking-widest mb-1.5 relative z-10 transition-colors'; 
+            } else {
+                netScoreLabel.innerText = `${netToday}`;
+                netBox.classList.add('bg-rose-50','border-rose-200'); netIcon.className='fa-solid fa-ranking-star text-7xl text-rose-500'; 
+                netScoreLabel.className = 'text-6xl font-black text-rose-700 relative z-10 font-["Quicksand"] tracking-tighter transition-colors'; 
+                netTextLabel.className = 'text-[11px] text-rose-600 font-black uppercase tracking-widest mb-1.5 relative z-10 transition-colors'; 
+            }
             setTimeout(()=>rsec.classList.remove('scale-95','opacity-0'),50);
         };
 
@@ -578,40 +589,30 @@
         };
 
         window.finishQuiz = async function() {
-            showLoader(); 
-            const netToday = window.AppState.todayEarned - window.AppState.todayLost; 
-            const isMock = window.AppState.settings.isMockTestActive;
+            showLoader(); const netToday=window.AppState.todayEarned-window.AppState.todayLost; const isMock = window.AppState.settings.isMockTestActive;
+            if(isMock) { window.AppState.user.mockScore = (window.AppState.user.mockScore||0) + netToday; }
+            else { window.AppState.user.totalScore += netToday; window.AppState.user.lastDayPlayed = window.AppState.currentDay; }
+            if(window.AppState.user.isRegistered) { try { await updateDoc(docPath('users', window.AppState.user.phone), { totalScore:window.AppState.user.totalScore, mockScore:window.AppState.user.mockScore, lastDayPlayed:window.AppState.user.lastDayPlayed, history:window.AppState.user.history, isRegistered:true }); } catch(e){} }
+            hideLoader(); document.getElementById('quiz-section').classList.add('hidden-safe'); document.getElementById('quiz-section').classList.remove('flex'); const rsec=document.getElementById('result-section'); rsec.classList.remove('hidden-safe');
+            let dayStr = isMock?"Mock Result":`Day ${window.AppState.currentDay} Result`; if(window.AppState.lang==='ml') dayStr = isMock?"പരിശീലന ഫലം":`Day ${window.AppState.currentDay} റിസൾട്ട്`;
             
-            if(isMock) { 
-                window.AppState.user.mockScore = (window.AppState.user.mockScore||0) + netToday; 
-            } else { 
-                window.AppState.user.totalScore += netToday; 
-                window.AppState.user.lastDayPlayed = window.AppState.currentDay; 
-                if(window.AppState.user.isRegistered) { 
-                    try { await updateDoc(docPath('users', window.AppState.user.phone), { totalScore:window.AppState.user.totalScore, lastDayPlayed:window.AppState.user.lastDayPlayed, history:window.AppState.user.history, isRegistered:true }); } catch(e){} 
-                }
-            }
+            document.getElementById('res-day-title').innerText=dayStr; 
+            document.getElementById('res-earned').innerText=`+${window.AppState.todayEarned}`; 
+            document.getElementById('res-lost').innerText=`-${window.AppState.todayLost}`; 
             
-            hideLoader(); 
-            document.getElementById('quiz-section').classList.add('hidden-safe'); 
-            document.getElementById('quiz-section').classList.remove('flex'); 
-            const rsec=document.getElementById('result-section'); rsec.classList.remove('hidden-safe');
+            const netBox=document.getElementById('res-net-box'), netIcon=document.getElementById('res-net-icon'), netScoreLabel=document.getElementById('res-net-score'), netTextLabel=document.getElementById('res-net-label'); 
+            netBox.className = 'border-2 p-5 rounded-[2rem] relative overflow-hidden mb-5 shadow-inner flex flex-col items-center justify-center'; 
             
-            let dayStr = isMock ? "Mock Result" : `Day ${window.AppState.currentDay} Result`; 
-            if(window.AppState.lang === 'ml') dayStr = isMock ? "പരിശീലന ഫലം" : `Day ${window.AppState.currentDay} റിസൾട്ട്`;
-            
-            document.getElementById('res-day-title').innerText = dayStr;
-            document.getElementById('res-sub-text').innerText = isMock ? (window.AppState.lang === 'ml' ? "പരിശീലനം പൂർത്തിയായി!" : "Practice completed!") : i18n[window.AppState.lang].res_sub; 
-            document.getElementById('res-earned').innerText = `+${window.AppState.todayEarned}`; 
-            document.getElementById('res-lost').innerText = `-${window.AppState.todayLost}`; 
-            document.getElementById('res-net-score').innerText = netToday > 0 ? `+${netToday}` : netToday;
-            
-            const netBox=document.getElementById('res-net-box'), netIcon=document.getElementById('res-net-icon'); 
-            netBox.className = 'border-2 p-6 rounded-[2rem] relative overflow-hidden mb-5 shadow-inner flex flex-col items-center justify-center'; 
-            if(netToday>=0){
-                netBox.classList.add('bg-emerald-50','border-emerald-200'); netIcon.className='fa-solid fa-ranking-star text-7xl text-emerald-500'; document.getElementById('res-net-score').classList.replace('text-rose-700', 'text-emerald-700'); document.getElementById('res-net-label').classList.replace('text-rose-600', 'text-emerald-600'); 
+            if(netToday >= 0) {
+                netScoreLabel.innerText = `+${netToday}`;
+                netBox.classList.add('bg-emerald-50','border-emerald-200'); netIcon.className='fa-solid fa-ranking-star text-7xl text-emerald-500'; 
+                netScoreLabel.className = 'text-6xl font-black text-emerald-700 relative z-10 font-["Quicksand"] tracking-tighter transition-colors'; 
+                netTextLabel.className = 'text-[11px] text-emerald-600 font-black uppercase tracking-widest mb-1.5 relative z-10 transition-colors'; 
             } else {
-                netBox.classList.add('bg-rose-50','border-rose-200'); netIcon.className='fa-solid fa-ranking-star text-7xl text-rose-500'; document.getElementById('res-net-score').classList.replace('text-emerald-700', 'text-rose-700'); document.getElementById('res-net-label').classList.replace('text-emerald-600', 'text-rose-600'); 
+                netScoreLabel.innerText = `${netToday}`;
+                netBox.classList.add('bg-rose-50','border-rose-200'); netIcon.className='fa-solid fa-ranking-star text-7xl text-rose-500'; 
+                netScoreLabel.className = 'text-6xl font-black text-rose-700 relative z-10 font-["Quicksand"] tracking-tighter transition-colors'; 
+                netTextLabel.className = 'text-[11px] text-rose-600 font-black uppercase tracking-widest mb-1.5 relative z-10 transition-colors'; 
             }
             setTimeout(()=>rsec.classList.remove('scale-95','opacity-0'),50);
         };
