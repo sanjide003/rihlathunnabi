@@ -160,6 +160,8 @@
             <div class="bg-white p-3 rounded-2xl border border-slate-100 shadow-sm shrink-0 mb-3 z-10">
                 <div class="flex space-x-2 mb-3">
                     <button onclick="window.downloadCSVTemplate()" class="flex-1 bg-slate-50 text-slate-700 text-xs font-bold py-2.5 rounded-xl border border-slate-200 shadow-sm hover:bg-slate-100"><i class="fa-solid fa-download mr-1.5 text-indigo-500"></i> CSV Template</button>
+                    <input type="file" id="csv-upload-input" accept=".csv" class="hidden-safe" onchange="window.handleCSVUpload(event)">
+                    <button onclick="document.getElementById('csv-upload-input').click()" class="flex-1 bg-indigo-50 text-indigo-700 text-xs font-bold py-2.5 rounded-xl border border-indigo-200 shadow-sm hover:bg-indigo-100"><i class="fa-solid fa-upload mr-1.5"></i> Upload CSV</button>
                 </div>
 
                 <div id="pool-capacity-indicator" class="hidden text-xs font-bold text-center p-2 bg-indigo-50 text-indigo-700 rounded-lg border border-indigo-100 mb-2">
@@ -276,6 +278,10 @@
             <div class="bg-white p-4 rounded-3xl border border-slate-100 shadow-sm h-full flex flex-col">
                 <div class="flex justify-between items-center mb-4 shrink-0">
                     <h3 class="font-black text-slate-800 text-lg flex items-center"><i class="fa-solid fa-ranking-star text-emerald-500 mr-2"></i> Leaderboard</h3>
+                </div>
+                <div class="mb-4 relative shrink-0">
+                    <i class="fa-solid fa-search absolute left-3 top-3 text-slate-400"></i>
+                    <input type="text" id="admin-user-search" oninput="window.loadUsersForLeaderboard()" placeholder="Search by name or phone..." class="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl font-bold text-sm outline-none focus:border-emerald-500 transition-colors">
                 </div>
                 <div class="flex-1 overflow-y-auto"><div class="space-y-2" id="admin-user-list"></div></div>
             </div>
@@ -491,9 +497,40 @@
             try { await setDoc(docPath('settings', 'ads'), data); window.showModal("Saved", "Ad settings updated.", "fa-solid fa-check text-emerald-500"); } catch(e) {}
         };
 
-        function loadUsersForLeaderboard() {
+        window.handleCSVUpload = function(e) {
+            const f = e.target.files[0]; if(!f) return;
+            const target = document.getElementById('admin-q-target').value;
+            const mode = target === 'mock' ? 'mock' : 'random'; 
+            const r = new FileReader();
+            r.onload = async function(ev) {
+                const text = ev.target.result; const rows = text.split('\n'); let successCount = 0;
+                document.body.style.opacity = '0.5'; 
+                for(let i = 1; i < rows.length; i++) {
+                    const cols = rows[i].split(',').map(c => c.trim());
+                    if(cols.length >= 8 && cols[1]) {
+                        let type = cols[0].toLowerCase();
+                        let data = { type: type, text: cols[1], timeLimit: parseInt(cols[7])||30, updatedAt: new Date().toISOString(), mode: mode };
+                        if(type === 'mcq') {
+                            data.options = [cols[2], cols[3], cols[4], cols[5]]; data.correctOptionKey = cols[6].toUpperCase();
+                            data.answer = data.correctOptionKey==='A'?cols[2]:(data.correctOptionKey==='B'?cols[3]:(data.correctOptionKey==='C'?cols[4]:cols[5]));
+                        } else { data.answer = cols[6]; }
+                        let dId = `${mode}_${Date.now()}_${i}`;
+                        try { await setDoc(docPath('questions', dId), data); successCount++; } catch(err){}
+                    }
+                }
+                document.body.style.opacity = '1'; document.getElementById('csv-upload-input').value = '';
+                window.showModal("Upload Complete", `${successCount} questions added to ${target === 'mock' ? 'Mock' : 'Main'} Pool.`, "fa-solid fa-check text-emerald-500");
+            };
+            r.readAsText(f);
+        };
+
+        window.loadUsersForLeaderboard = function() {
             const list = document.getElementById('admin-user-list');
-            const regUsers = window.AppState.allUsers.filter(u => u.isRegistered !== false);
+            const searchQ = (document.getElementById('admin-user-search')?.value || '').toLowerCase();
+            let regUsers = window.AppState.allUsers.filter(u => u.isRegistered !== false);
+            
+            if(searchQ) { regUsers = regUsers.filter(u => (u.name||'').toLowerCase().includes(searchQ) || (u.id||'').includes(searchQ)); }
+            
             regUsers.sort((a,b) => (b.totalScore||0) - (a.totalScore||0));
             list.innerHTML = '';
             regUsers.forEach((x, i) => {
